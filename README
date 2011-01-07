@@ -7,7 +7,7 @@ Displays man pages, perldocs and python documentation properly.
 Definitely works on Linux, Solaris, OSX and Cygwin. Should work in most other places, if it detects your "ps" correctly.
 
 On github:
-
+http://github.com/rkitover/vimpager
  
 install details:
 mkdir ~/bin
