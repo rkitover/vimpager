@@ -5,6 +5,9 @@ description:
 A slightly more sophisticated replacement for less.sh that also supports being set as the PAGER environment variable.
 Displays man pages, perldocs and python documentation properly.
 Definitely works on Linux, Solaris, OSX and Cygwin. Should work in most other places, if it detects your "ps" correctly.
+
+On github:
+
  
 install details:
 mkdir ~/bin
