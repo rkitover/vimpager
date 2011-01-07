@@ -1,0 +1,16 @@
+script type:
+utility
+ 
+description:
+A slightly more sophisticated replacement for less.sh that also supports being set as the PAGER environment variable.
+Displays man pages, perldocs and python documentation properly.
+Definitely works on Linux, Solaris, OSX and Cygwin. Should work in most other places, if it detects your "ps" correctly.
+ 
+install details:
+mkdir ~/bin
+cp vimpager ~/bin
+chmod +x ~/bin/vimpager
+
+# put these in your ~/.bashrc or ~/.zshrc
+export PAGER=~/bin/vimpager
+alias less=$PAGER
