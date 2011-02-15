@@ -2,21 +2,15 @@
 
 # Script for using ViM as a PAGER.
 # Based on Bram's less.sh.
-# Version 1.4
+# Version 1.4.1
 # git://github.com/rkitover/vimpager.git
 
-file="$@"
-if [ -z "$file" ]; then file="-"; fi
-
-if uname -s | grep -iq cygwin; then
-    cygwin=1
-elif uname -s | grep -iq linux; then
-    linux=1
-elif uname -s | grep -iq sunos; then
-    solaris=1
-else
-    bsd=1
-fi
+case `uname -s` in
+	Cygwin) cygwin=1 ;;
+	Linux) linux=1 ;;
+	SunOS) solaris=1 ;;
+	*) bsd=1 ;;
+esac
 
 less_vim() {
     vim -R \
@@ -27,55 +21,46 @@ less_vim() {
     -c 'set mouse=h' \
     -c 'set nonu' \
     -c 'nmap <ESC>u :nohlsearch<cr>' \
-    "$@"
+    "${@:--}"
 }
 
-do_ps() {
-    if [ $solaris ]; then
-        ps -u `id -u` -o pid,comm=
-    elif [ $bsd ]; then
-        ps -U `id -u` -o pid,comm=
-    else
-        ps fuxw
-    fi
+awk_pstree() {
+	awk -v mypid=$1 '{
+		cmd[$1]=$3
+		ppid[$1]=$2
+	}
+	END {
+		while (mypid != 1 && cmd[mypid]) {
+			ptree=mypid "\t" cmd[mypid] "\n" ptree
+			mypid=ppid[mypid]
+		}
+		print ptree
+	}'
 }
 
-pproc() {
-    if [ $linux ]; then
-        ps -p $1 -o comm=
-    elif [ $cygwin ]; then
-        ps -p $1 | sed -e 's/^I/ /' | grep -v PID
-    else
-        ps -p $1 -o comm= | grep -v PID
-    fi
-}
-
-ppid() {
-    if [ $linux ]; then
-        ps -p $1 -o ppid=
-    elif [ $cygwin ]; then
-        ps -p $1 | sed -e 's/^I/ /' | grep -v PID | awk '{print $2}'
-    else
-        ps -p $1 -o ppid= | grep -v PID
-    fi
+do_ptree() {
+	if [ $solaris ]; then
+		# Tested on Solaris 8 and 10
+		ptree $$
+	else
+		# Tested on Linux and OS X
+		ps awo pid=,ppid=,comm= | awk_pstree $$
+	fi
 }
 
 # Check if called from man, perldoc or pydoc
-if do_ps | grep -q '\(py\(thon\|doc\|doc2\)\|man\|perl\(doc\)\?\([0-9.]*\)\?\)\>'; then
-    proc=$$
-    while next_parent=`ppid $proc` && [ $next_parent != 1 ]; do
-        if pproc $next_parent | grep -q 'man\>'; then
-            cat $file | sed -e 's/\[[^m]*m//g' | sed -e 's/.//g' | less_vim -c 'set ft=man' -; exit
-        elif pproc $next_parent | grep -q 'py\(thon\|doc\|doc2\)\>'; then
-            cat $file | sed -e 's/\[[^m]*m//g' | sed -e 's/.//g' | less_vim -c 'set ft=man' -; exit
-        elif pproc $next_parent | grep -q 'perl\(doc\)\?\([0-9.]*\)\?\>'; then
-            cat $file | sed -e 's/.//g' | less_vim -c 'set ft=man' -; exit
-        fi
-        proc=$next_parent
-    done
+ptree="`do_ptree`"
+if echo "$ptree" | awk '$2 ~ /^(man|py(thon|doc|doc2))$/ {t=1} END { if (t!=1) { exit 1 } }'; then
+	sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim -c 'set ft=man' -
+	exit
+elif echo "$ptree" | awk '$NF ~ /^perl(doc)?([0-9.]*)?$/ {t=1} END { if (t!=1) { exit 1 } }'; then
+	sed -e 's/.//g' "$@" | less_vim -c 'set ft=man' -
+	exit
 fi
 
-less_vim "$file"
+# Perhaps do some of the lessopen functions like ungzip etc?
+
+less_vim "$@"
 
 # CONTRIBUTORS:
 #
@@ -85,3 +70,4 @@ less_vim "$file"
 # Perry Hargrave
 # Koen Smits
 # Ivan S. Freitas <ivansichfreitas@gmail.com>
+# Wout Mertens (Solaris compatibility, less processes)
