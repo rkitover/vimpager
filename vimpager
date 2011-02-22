@@ -5,6 +5,11 @@
 # Version 1.4.1
 # git://github.com/rkitover/vimpager.git
 
+# Just pass through if not on a tty
+if [ ! -t 1 ]; then
+	exec cat "$@"
+fi
+
 case `uname -s` in
 	Cygwin) cygwin=1 ;;
 	Linux) linux=1 ;;
@@ -13,15 +18,15 @@ case `uname -s` in
 esac
 
 less_vim() {
-    vim -R \
-    -c 'let no_plugin_maps = 1' \
-    -c 'set scrolloff=999' \
-    -c 'runtime! macros/less.vim' \
-    -c 'set foldlevel=999' \
-    -c 'set mouse=h' \
-    -c 'set nonu' \
-    -c 'nmap <ESC>u :nohlsearch<cr>' \
-    "${@:--}"
+	vim -R \
+	-c 'let no_plugin_maps = 1' \
+	-c 'set scrolloff=999' \
+	-c 'runtime! macros/less.vim' \
+	-c 'set foldlevel=999' \
+	-c 'set mouse=h' \
+	-c 'set nonu' \
+	-c 'nmap <ESC>u :nohlsearch<cr>' \
+	"${@:--}"
 }
 
 awk_pstree() {
@@ -31,7 +36,7 @@ awk_pstree() {
 	}
 	END {
 		while (mypid != 1 && cmd[mypid]) {
-			ptree=mypid "\t" cmd[mypid] "\n" ptree
+			ptree=mypid " " cmd[mypid] "\n" ptree
 			mypid=ppid[mypid]
 		}
 		print ptree
@@ -50,10 +55,10 @@ do_ptree() {
 
 # Check if called from man, perldoc or pydoc
 ptree="`do_ptree`"
-if echo "$ptree" | awk '$2 ~ /^(man|py(thon|doc|doc2))$/ {t=1} END { if (t!=1) { exit 1 } }'; then
+if echo "$ptree" | awk '$2 ~ /(^|\/)(man|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
 	sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim -c 'set ft=man' -
 	exit
-elif echo "$ptree" | awk '$NF ~ /^perl(doc)?([0-9.]*)?$/ {t=1} END { if (t!=1) { exit 1 } }'; then
+elif echo "$ptree" | awk '$2 ~ /(^|\/)perl(doc)?([0-9.]*)?/ {t=1} END { exit 1-t }'; then
 	sed -e 's/.//g' "$@" | less_vim -c 'set ft=man' -
 	exit
 fi
