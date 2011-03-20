@@ -65,7 +65,7 @@ fi
 
 # Perhaps do some of the lessopen functions like ungzip etc?
 
-less_vim "$@"
+sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim
 
 # CONTRIBUTORS:
 #
