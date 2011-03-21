@@ -17,3 +17,7 @@ chmod +x ~/bin/vimpager
 # put these in your ~/.bashrc or ~/.zshrc
 export PAGER=~/bin/vimpager
 alias less=$PAGER
+
+Put the following into your ~/.vimrc if you want to use gvim for your pager window:
+
+let vimpager_use_gvim = 1
