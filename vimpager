@@ -22,7 +22,7 @@ less_vim() {
 		head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }'; then
 		vim_cmd='gvim -geom="$COLUMNS"x"$LINES" -R'
 	else
-	        vim_cmd='vim -R'
+	        vim_cmd='vim -R -X'
 	fi
 	$vim_cmd \
 	-c 'let no_plugin_maps = 1' \
