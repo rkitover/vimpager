@@ -70,7 +70,7 @@ fi
 case "$@" in
 	*.gz) gunzip -c "${@:--}" | sed -e 's/\[[^m]*m//g' -e 's/.//g' | less_vim - ;;
 	*.Z) uncompress -c "${@:--}" | sed -e 's/\[[^m]*m//g' -e 's/.//g' | less_vim - ;;
-	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "${@:--}" | less_vim - ;;
+	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim - ;;
 esac
 
 
@@ -83,3 +83,4 @@ esac
 # Koen Smits
 # Ivan S. Freitas <ivansichfreitas@gmail.com>
 # Wout Mertens (Solaris compatibility, less processes)
+# Jacobo de Vera (add -X option for faster startup)
