@@ -62,7 +62,7 @@ do_ptree() {
 # Check if called from man, perldoc or pydoc
 ptree="`do_ptree`"
 if echo "$ptree" | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
-	sed -e 's/\[[^m]*m//g' -e 's/.//g' "${@:--}" \
+	sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" \
 		| less_vim -c 'set ft=man' -
 	exit
 fi
