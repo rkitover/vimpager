@@ -2,9 +2,10 @@ script type:
 utility
  
 description:
-A slightly more sophisticated replacement for less.sh that also supports being set as the PAGER environment variable.
-Displays man pages, perldocs and python documentation properly.
-Definitely works on Linux, Solaris, OSX and Cygwin. Should work in most other places, if it detects your "ps" correctly.
+A slightly more sophisticated replacement for less.sh that also supports being
+set as the PAGER environment variable. Displays man pages, perldocs and python
+documentation properly. Definitely works on Linux, Solaris, FreeBSD, OSX and
+Cygwin. Should work in most other places as well.
 
 On github:
 http://github.com/rkitover/vimpager
@@ -18,6 +19,6 @@ chmod +x ~/bin/vimpager
 export PAGER=~/bin/vimpager
 alias less=$PAGER
 
-Put the following into your ~/.vimrc if you want to use gvim for your pager window:
+Put the following into your ~/.vimrc if you want to use gvim/MacVim for your pager window:
 
 let vimpager_use_gvim = 1

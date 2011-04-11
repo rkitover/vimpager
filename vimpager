@@ -11,27 +11,49 @@ if [ ! -t 1 ]; then
 fi
 
 case `uname -s` in
-	Cygwin) cygwin=1 ;;
 	Linux) linux=1 ;;
 	SunOS) solaris=1 ;;
+        Darwin) osx=1; bsd=1 ;;
+	CYGWIN*) cygwin=1 ;;
+	MINGW*) mingw=1 ;;
 	*) bsd=1 ;;
 esac
 
 less_vim() {
-        if [ -n "$DISPLAY" ] && (vim -e -c 'let vimpager_use_gvim' -c q </dev/tty) | cut -d\# -f2 | \
+        if (vim -e -c 'let vimpager_use_gvim' -c q </dev/tty) | cut -d\# -f2 | \
 		head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }'; then
-		vim_cmd='gvim -geom="$COLUMNS"x"$LINES" -R'
+                if [ -n "$osx" ]; then
+			if command -v mvim >/dev/null; then
+				vim_cmd="mvim -R"
+			else
+				vim_cmd="vim -X -R"
+			fi
+		else
+			if [ -z "$DISPLAY" ]; then
+				# cygwin/mingw might be using native win32 gvim
+				# (without X)
+				if [ -z "$cygwin" -a -z "$mingw" ]; then
+					vim_cmd='vim -X -R'
+				else
+					vim_cmd='gvim -R'
+				fi
+			else
+				vim_cmd='gvim -R'
+			fi
+		fi
 	else
-	        vim_cmd='vim -R -X'
+	        vim_cmd='vim -X -R'
 	fi
+	colors=`grep guifg ~/.gvimrc 2>/dev/null | head -1`
+	COLUMNS=`tput cols`
+	LINES=`tput lines`
 	$vim_cmd \
-	-c 'let no_plugin_maps = 1' \
-	-c 'set scrolloff=999' \
+	-c 'let no_plugin_maps = 1 | set scrolloff=999' \
 	-c 'runtime! macros/less.vim' \
-	-c 'set foldlevel=999' \
-	-c 'set mouse=h' \
-	-c 'set nonu' \
+	-c 'set foldlevel=999 | set mouse=h | set nonu' \
 	-c 'nmap <ESC>u :nohlsearch<cr>' \
+	-c "set lines=$LINES | set columns=$COLUMNS" \
+	-c "${colors:-echo}" \
 	"${@:--}"
 }
 
@@ -62,17 +84,28 @@ do_ptree() {
 # Check if called from man, perldoc or pydoc
 ptree="`do_ptree`"
 if echo "$ptree" | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
-	sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" \
-		| less_vim -c 'set ft=man' -
+	sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim -c 'set ft=man' -
 	exit
 fi
 
+trap "rm -rf /tmp/vimpager_$$" INT
+
+mkdir /tmp/vimpager_$$
+
+filename=/tmp/vimpager_${$}/${@:-stdin}
+
 case "$@" in
-	*.gz) gunzip -c "${@:--}" | sed -e 's/\[[^m]*m//g' -e 's/.//g' | less_vim - ;;
-	*.Z) uncompress -c "${@:--}" | sed -e 's/\[[^m]*m//g' -e 's/.//g' | less_vim - ;;
-	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim - ;;
+	*.gz) gunzip -c "$@" | sed -e 's/\[[^m]*m//g' -e 's/.//g' > $filename ;;
+	*.Z) uncompress -c "$@" | sed -e 's/\[[^m]*m//g' -e 's/.//g' > $filename ;;
+	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" > $filename ;;
 esac
 
+less_vim $filename
+
+reset
+clear
+
+(sleep 3; rm -rf /tmp/vimpager_$$) & # give gvim/mvim time to open the file
 
 # CONTRIBUTORS:
 #
@@ -84,3 +117,5 @@ esac
 # Ivan S. Freitas <ivansichfreitas@gmail.com>
 # Wout Mertens (Solaris compatibility, less processes)
 # Jacobo de Vera (add -X option for faster startup)
+
+# vim:noet ts=8 sts=8 sw=8:
