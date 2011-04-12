@@ -100,7 +100,7 @@ case "$@" in
 	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" > $filename ;;
 esac
 
-less_vim $filename
+less_vim $filename </dev/tty
 
 reset
 clear
