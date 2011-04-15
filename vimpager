@@ -92,7 +92,9 @@ trap "rm -rf /tmp/vimpager_$$" INT
 
 mkdir /tmp/vimpager_$$
 
-filename=/tmp/vimpager_${$}/${@:-stdin}
+filename=${@:-stdin}
+filename=`echo $filename | tr '/' '_'`
+filename=/tmp/vimpager_${$}/$filename
 
 case "$@" in
 	*.gz) gunzip -c "$@" | sed -e 's/\[[^m]*m//g' -e 's/.//g' > $filename ;;
