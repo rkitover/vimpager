@@ -15,46 +15,126 @@ case `uname -s` in
 	SunOS) solaris=1 ;;
         Darwin) osx=1; bsd=1 ;;
 	CYGWIN*) cygwin=1 ;;
-	MINGW*) mingw=1 ;;
+	MINGW*) msys=1 ;;
 	*) bsd=1 ;;
 esac
 
 less_vim() {
-        if (vim -e -c 'let vimpager_use_gvim' -c q </dev/tty) | cut -d\# -f2 | \
-		head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }'; then
+	if [ -z "$msys" ]; then
+		(vim --noplugin -X -e -c 'let vimpager_use_gvim' -c q < /dev/tty) \
+		   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
+		   && use_gvim=1
+	else
+		# The above doesn't work on msys for some reason, so we use
+		# grep.
+		use_gvim=`grep '\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/_vimrc 2>/dev/null | head -1`
+		[ -n "$use_gvim" ] || use_gvim=`grep '\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/.vimrc 2>/dev/null | head -1`
+	fi
+
+        if [ -n "$use_gvim" ]; then
                 if [ -n "$osx" ]; then
-			if command -v mvim >/dev/null; then
+			if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
 				vim_cmd="mvim -R"
 			else
 				vim_cmd="vim -X -R"
 			fi
-		else
-			if [ -z "$DISPLAY" ]; then
-				# cygwin/mingw might be using native win32 gvim
-				# (without X)
-				if [ -z "$cygwin" -a -z "$mingw" ]; then
-					vim_cmd='vim -X -R'
-				else
+		elif [ -n "$cygwin" ]; then
+			if command -v gvim >/dev/null; then
+				# The Cygwin gvim uses X
+				if ldd `command -v gvim` 2>/dev/null \
+				   | awk '$1 ~ /cygwin/ {t=1} END { exit 1-t }'; then
+					if [ -z "$DISPLAY" ]; then
+						vim_cmd="vim -X -R"
+					else
+						vim_cmd='gvim -R'
+					fi
+				elif [ -z "$SSH_CONNECTION" ]; then
 					vim_cmd='gvim -R'
+				else
+					vim_cmd="vim -X -R"
 				fi
 			else
+				vim_cmd="vim -X -R"
+			fi
+		elif [ -n "$msys" ]; then
+			if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
 				vim_cmd='gvim -R'
+			else
+				vim_cmd="vim -X -R"
+			fi
+		elif [ -z "$DISPLAY" ]; then
+			vim_cmd='vim -X -R'
+		else
+			if command -v gvim >/dev/null; then
+				vim_cmd='gvim -R'
+			else
+				vim_cmd="vim -X -R"
 			fi
 		fi
 	else
 	        vim_cmd='vim -X -R'
 	fi
-	colors=`grep guifg ~/.gvimrc 2>/dev/null | head -1`
-	COLUMNS=`tput cols`
-	LINES=`tput lines`
-	$vim_cmd \
-	-c 'let no_plugin_maps = 1 | set scrolloff=999' \
-	-c 'runtime! macros/less.vim' \
-	-c 'set foldlevel=999 | set mouse=h | set nonu' \
-	-c 'nmap <ESC>u :nohlsearch<cr>' \
-	-c "set lines=$LINES | set columns=$COLUMNS" \
-	-c "${colors:-echo}" \
-	"${@:--}"
+
+	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
+
+	case $vim_cmd in
+		vim*)
+			$vim_cmd --noplugin \
+			-c 'set scrolloff=999 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+			-c 'nmap <ESC>u :nohlsearch<cr>' \
+			"${@:--}"
+			;;
+		*) # gvim or mvim GUI
+			colors=`grep guifg ~/.gvimrc 2>/dev/null | head -1`
+			[ -n "$colors" ] || colors=`grep guifg ~/_gvimrc 2>/dev/null | head -1`
+
+			# Check if the user maximized the window in ~/_gvimrc on Win32, if
+			# so restore on startup.
+			if [ -n "$cygwin" -o -n "$msys" ]; then
+				simalt=`grep simalt ~/_gvimrc 2>/dev/null | head -1`
+				[ -n "$simalt" ] || simalt=`grep simalt ~/.gvimrc 2>/dev/null | head -1`
+				if [ -n "$simalt" ]; then
+					case $vim_cmd in
+						gvim*) restore="simalt ~r"
+					esac
+				fi	
+			fi
+
+			if command -v tput > /dev/null; then
+				# this is the only way it works on Cygwin
+				tput cols  > /tmp/vimpager_cols_$$
+				tput lines > /tmp/vimpager_lines_$$
+
+				cols=`cat /tmp/vimpager_cols_$$`
+				lines=`cat /tmp/vimpager_lines_$$`
+
+				rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$
+			fi
+
+			# msys has no tput, this doesn't work on Cygwin by the way
+			if [ -z "$cols" ] && command -v bash >/dev/null; then
+				cols=`bash -i -c 'echo $COLUMNS'`
+				lines=`bash -i -c 'echo $LINES'`
+			fi
+
+			# If we are unable to detect lines/columns, maximize
+			# the window.
+			if [ -z "$cols" ]; then
+				cols=999
+				lines=999
+			fi
+
+			$vim_cmd --noplugin \
+			-c 'set scrolloff=999 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+			-c 'nmap <ESC>u :nohlsearch<cr>' \
+			-c "${colors:-echo}" \
+			-c "${restore:-echo}" \
+			-c "set lines=$lines | set columns=$cols" \
+			"${@:--}" &
+			;;
+	esac
+
+	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 }
 
 awk_pstree() {
@@ -72,9 +152,11 @@ awk_pstree() {
 }
 
 do_ptree() {
-	if [ $solaris ]; then
+	if [ -n "$solaris" ]; then
 		# Tested on Solaris 8 and 10
 		ptree $$
+	elif [ -n "$cygwin" -o -n "$msys" ]; then
+		ps | awk '{ print $1 "\t" $2 "\t" $NF }' | awk_pstree $$
 	else
 		# Tested on Linux and OS X
 		ps awo pid=,ppid=,comm= | awk_pstree $$
@@ -82,10 +164,8 @@ do_ptree() {
 }
 
 # Check if called from man, perldoc or pydoc
-ptree="`do_ptree`"
-if echo "$ptree" | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
-	sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" | less_vim -c 'set ft=man' -
-	exit
+if do_ptree | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
+	extra_cmd="set ft=man"
 fi
 
 trap "rm -rf /tmp/vimpager_$$" INT
@@ -102,12 +182,28 @@ case "$@" in
 	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" > $filename ;;
 esac
 
-less_vim $filename </dev/tty
+# On cygwin it might be the win32 gvim, but windows paths work for cygwin
+# vim just fine as well.
+if [ -n "$cygwin" ]; then
+	filename=`cygpath -w $filename`
+fi
 
-reset
-clear
+less_vim -c "${extra_cmd:-echo}" $filename </dev/tty
 
-(sleep 3; rm -rf /tmp/vimpager_$$) & # give gvim/mvim time to open the file
+if [ -n "$osx" ]; then
+	reset
+	clear
+fi
+
+# Give gvim/mvim time to open the file.
+# On Cygwin we must also wait for the process to exit before the file can
+# be deleted.
+(
+	while [ -d /tmp/vimpager_$$ ]; do
+		sleep 3
+		rm -rf /tmp/vimpager_$$ 2>/dev/null
+	done
+) &
 
 # CONTRIBUTORS:
 #
