@@ -190,9 +190,14 @@ fi
 
 less_vim -c "${extra_cmd:-echo}" $filename </dev/tty
 
+# terminal vim on OSX can screw up the terminal
 if [ -n "$osx" ]; then
-	reset
-	clear
+	case $vim_cmd in
+		vim*)
+			reset
+			clear
+			;;
+	esac
 fi
 
 # Give gvim/mvim time to open the file.
