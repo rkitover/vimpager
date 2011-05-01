@@ -168,7 +168,7 @@ if do_ptree | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=
 	extra_cmd="set ft=man"
 fi
 
-trap "rm -rf /tmp/vimpager_$$" INT
+trap "rm -rf /tmp/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 mkdir /tmp/vimpager_$$
 
