@@ -80,7 +80,7 @@ less_vim() {
 	case $vim_cmd in
 		vim*)
 			$vim_cmd --noplugin \
-			-c 'set scrolloff=999 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+			-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
 			-c 'nmap <ESC>u :nohlsearch<cr>' \
 			"${@:--}"
 			;;
@@ -125,7 +125,7 @@ less_vim() {
 			fi
 
 			$vim_cmd --noplugin \
-			-c 'set scrolloff=999 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+			-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
 			-c 'nmap <ESC>u :nohlsearch<cr>' \
 			-c "${colors:-echo}" \
 			-c "${restore:-echo}" \
