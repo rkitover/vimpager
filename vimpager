@@ -27,8 +27,18 @@ less_vim() {
 	else
 		# The above doesn't work on msys for some reason, so we use
 		# grep.
-		use_gvim=`grep '\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/_vimrc 2>/dev/null | head -1`
-		[ -n "$use_gvim" ] || use_gvim=`grep '\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/.vimrc 2>/dev/null | head -1`
+		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/_vimrc 2>/dev/null | head -1`
+		[ -n "$use_gvim" ] || use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/.vimrc 2>/dev/null | head -1`
+
+		# msys may not be installed with an msys vim, and if we're
+		# not in a real console the native Windows vim will not
+		# work, so we have to use gvim.
+
+		if [ "x$TERM" != "xdumb" -a "x$TERM" != "xcygwin" -a "x$TERM" != "x" ]; then
+			if [ \( ! -x /bin/vim \) -a \( ! -x /usr/bin/vim \) -a \( ! -x /usr/local/bin/vim \) ]; then
+				use_gvim=1
+			fi
+		fi
 	fi
 
         if [ -n "$use_gvim" ]; then
