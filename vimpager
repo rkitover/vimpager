@@ -192,6 +192,11 @@ case "$@" in
 	*) sed -e 's/\[[^m]*m//g' -e 's/.//g' "$@" > $filename ;;
 esac
 
+# if file is zero length, exit immediately
+if [ ! -s $filename ]; then
+	exit
+fi
+
 # On cygwin it might be the win32 gvim, but windows paths work for cygwin
 # vim just fine as well.
 if [ -n "$cygwin" ]; then
