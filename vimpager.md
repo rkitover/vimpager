@@ -28,6 +28,9 @@ put these in your ~/.bashrc or ~/.zshrc
 To use a different vimrc with vimpager, put your settings into a ~/.vimpagerrc
 or a file pointed to by the VIMPAGER_RC environment variable.
 
+You can also switch on the "vimpager" variable in your vimrc to set alternate
+settings for vimpager.
+
 Put the following into your vimrc if you want to use gvim/MacVim for your pager window:
 
     let vimpager_use_gvim = 1
