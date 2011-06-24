@@ -7,8 +7,8 @@ vimpager - less.sh replacement
 cat \f[I]some_file\f[] | vimpager
 .SH DESCRIPTION
 .PP
-A slightly more sophisticated replacement for less.sh that also
-supports being set as the PAGER environment variable.
+A slightly more sophisticated replacement for less.sh that also supports
+being set as the PAGER environment variable.
 Displays man pages, perldocs and python documentation properly.
 Works on Linux, Solaris, FreeBSD, OSX, Cygwin and msys.
 Should work on most other systems as well.
@@ -16,23 +16,26 @@ Should work on most other systems as well.
 On GitHub: <http://github.com/rkitover/vimpager>
 .PP
 To use it as as your PAGER: put these in your ~/.bashrc or ~/.zshrc
-.PP
-\f[CR]
-      export\ PAGER=~/bin/vimpager
-      alias\ less=$PAGER
-      alias\ zless=$PAGER
+.IP
+.nf
+\f[C]
+export\ PAGER=~/bin/vimpager
+alias\ less=$PAGER
+alias\ zless=$PAGER
 \f[]
+.fi
 .PP
-Put the following into your ~/.vimrc if you want to use gvim/MacVim
-for your pager window:
-.PP
-\f[CR]
-      let\ vimpager_use_gvim\ =\ 1
+Put the following into your ~/.vimrc if you want to use gvim/MacVim for
+your pager window:
+.IP
+.nf
+\f[C]
+let\ vimpager_use_gvim\ =\ 1
 \f[]
+.fi
 .SH CYGWIN NOTES
 .PP
-The Cygwin gvim is very buggy, vimpager works correctly with the
-native Windows gvim, just put it in your PATH.
+The Cygwin gvim is very buggy, vimpager works correctly with the native
+Windows gvim, just put it in your PATH.
 .SH AUTHORS
-Rafael Kitover <rkitover@cpan.org>, Gert Van Gool <gertvangool@gmail.com>.
-
+Rafael Kitover <rkitover@cpan.org>.
