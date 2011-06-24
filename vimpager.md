@@ -25,7 +25,10 @@ put these in your ~/.bashrc or ~/.zshrc
     alias less=$PAGER
     alias zless=$PAGER
 
-Put the following into your ~/.vimrc if you want to use gvim/MacVim for your pager window:
+To use a different vimrc with vimpager, put your settings into a ~/.vimpagerrc
+or a file pointed to by the VIMPAGER_RC environment variable.
+
+Put the following into your vimrc if you want to use gvim/MacVim for your pager window:
 
     let vimpager_use_gvim = 1
 

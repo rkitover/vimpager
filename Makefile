@@ -4,6 +4,8 @@ INSTALLDIR= ${INSTALL} -d
 INSTALLBIN= ${INSTALL} -m 555
 INSTALLMAN= ${INSTALL} -m 444
 
+all: vimpager.1 README
+
 uninstall:
 	rm -f ${PREFIX}/bin/vimpager
 
@@ -15,10 +17,10 @@ install:
 
 man: vimpager.1
 
-vimpager.1:
+vimpager.1: vimpager.md
 	pandoc -s -w man vimpager.md -o vimpager.1
 
-README:
+README: vimpager.md
 	pandoc -s -w plain vimpager.md -o README
 
-.PHONY: install uninstall man
+.PHONY: all install uninstall man

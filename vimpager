@@ -87,12 +87,30 @@ less_vim() {
 
 	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 
+	vimrc=""
+
+	if [ -n "$VIMPAGER_RC" ]; then
+		vimrc=$VIMPAGER_RC
+	elif [ -f ~/.vimpagerrc ]; then
+		vimrc=~/.vimpagerrc
+	fi
+
 	case $vim_cmd in
 		vim*)
-			$vim_cmd --noplugin \
-			-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
-			-c 'nmap <ESC>u :nohlsearch<cr>' \
-			"${@:--}"
+			if [ -n "$vimrc" ]; then
+				$vim_cmd --noplugin \
+				--cmd 'let vimpager=1' \
+				-u $vimrc \
+				-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				"${@:--}"
+			else
+				$vim_cmd --noplugin \
+				--cmd 'let vimpager=1' \
+				-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				"${@:--}"
+			fi
 			;;
 		*) # gvim or mvim GUI
 			colors=`grep guifg ~/.gvimrc 2>/dev/null | head -1`
@@ -134,13 +152,26 @@ less_vim() {
 				lines=999
 			fi
 
-			$vim_cmd --noplugin \
-			-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
-			-c 'nmap <ESC>u :nohlsearch<cr>' \
-			-c "${colors:-echo}" \
-			-c "${restore:-echo}" \
-			-c "set lines=$lines | set columns=$cols" \
-			"${@:--}" &
+			if [ -n "$vimrc" ]; then
+				$vim_cmd --noplugin \
+				--cmd 'let vimpager=1' \
+				-u $vimrc \
+				-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				-c "${colors:-echo}" \
+				-c "${restore:-echo}" \
+				-c "set lines=$lines | set columns=$cols" \
+				"${@:--}" &
+			else
+				$vim_cmd --noplugin \
+				--cmd 'let vimpager=1' \
+				-c 'set scrolloff=5 | runtime! macros/less.vim | set foldlevel=999 | set mouse=h | set nonu' \
+				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				-c "${colors:-echo}" \
+				-c "${restore:-echo}" \
+				-c "set lines=$lines | set columns=$cols" \
+				"${@:--}" &
+			fi
 			;;
 	esac
 
