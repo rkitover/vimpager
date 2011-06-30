@@ -115,19 +115,35 @@ less_vim() {
 			fi
 			;;
 		*) # gvim or mvim GUI
-			colors=`grep guifg ~/.gvimrc 2>/dev/null | head -1`
-			[ -n "$colors" ] || colors=`grep guifg ~/_gvimrc 2>/dev/null | head -1`
+			if [ -f ~/.gvimrc ]; then
+				gvimrc=~/.gvimrc
+			elif [ -f ~/_gvimrc ]; then
+				gvimrc=~/_gvimrc
+			elif [ -n "$cygwin" ]; then
+# this from Corinna at http://cygwin.com/ml/cygwin/2010-08/msg00246.html
+				_sid=$(grep "^$USER:" /etc/passwd | sed -e 's/[^:]*:[^:]*:[^:]*:[^:]*:[^:]*,\(S-1-5-[^:]*\):.*/\1/')
+				_prof=$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProfileList/${_sid}/ProfileImagePath)
+				
+				if [ -f "${_prof}/_gvimrc" ]; then
+					gvimrc="${_prof}/_gvimrc"
+				elif [ -f "${_prof}/.gvimrc" ]; then
+					gvimrc="${_prof}/.gvimrc"
+				fi
+
+				unset _sid
+				unset _prof
+			fi
+
+			[ -n "$gvimrc" ] && colors=`grep guifg $gvimrc 2>/dev/null | head -1`
 
 			# Check if the user maximized the window in ~/_gvimrc on Win32, if
 			# so restore on startup.
-			if [ -n "$cygwin" -o -n "$msys" ]; then
-				simalt=`grep simalt ~/_gvimrc 2>/dev/null | head -1`
-				[ -n "$simalt" ] || simalt=`grep simalt ~/.gvimrc 2>/dev/null | head -1`
+			if [ -n "$gvimrc" -a \( -n "$cygwin" -o -n "$msys" \) ]; then
+				simalt=`grep simalt $gvimrc 2>/dev/null | head -1`
+
 				if [ -n "$simalt" ]; then
-					case $vim_cmd in
-						gvim*) restore="simalt ~r"
-					esac
-				fi	
+					restore="simalt ~r"
+				fi
 			fi
 
 			if command -v tput > /dev/null; then
