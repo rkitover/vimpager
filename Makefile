@@ -19,8 +19,10 @@ man: vimpager.1
 
 vimpager.1: vimpager.md
 	pandoc -s -w man vimpager.md -o vimpager.1
+	dos2unix vimpager.1
 
 README: vimpager.md
 	pandoc -s -w plain vimpager.md -o README
+	dos2unix README
 
 .PHONY: all install uninstall man
