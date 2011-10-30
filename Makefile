@@ -9,7 +9,7 @@ all: vimpager.1 README
 uninstall:
 	rm -f ${PREFIX}/bin/vimpager
 
-install: 
+install:
 	${INSTALLDIR} ${DESTDIR}${PREFIX}/bin
 	${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/
 	${INSTALLDIR} ${DESTDIR}${PREFIX}/man/man1
