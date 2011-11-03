@@ -123,7 +123,7 @@ less_vim() {
 # this from Corinna at http://cygwin.com/ml/cygwin/2010-08/msg00246.html
 				_sid=$(grep "^$USER:" /etc/passwd | sed -e 's/[^:]*:[^:]*:[^:]*:[^:]*:[^:]*,\(S-1-5-[^:]*\):.*/\1/')
 				_prof=$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProfileList/${_sid}/ProfileImagePath)
-				
+
 				if [ -f "${_prof}/_gvimrc" ]; then
 					gvimrc="${_prof}/_gvimrc"
 				elif [ -f "${_prof}/.gvimrc" ]; then
