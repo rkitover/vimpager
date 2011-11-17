@@ -34,9 +34,15 @@ file.
 You can also switch on the "vimpager" variable in your vimrc to set alternate
 settings for vimpager.
 
-Put the following into your vimrc if you want to use gvim/MacVim for your pager window:
+Put the following into your .vimrc/.vimpagerrc if you want to use gvim/MacVim
+for your pager window:
 
     let vimpager_use_gvim = 1
+
+To start vim with -X (no x11 connection, a bit faster startup) put the following
+into your .vimrc/.vimpagerrc:
+
+    let vimpager_disable_x11 = 1
 
 # CYGWIN NOTES
 The Cygwin gvim is very buggy, vimpager works correctly with the native

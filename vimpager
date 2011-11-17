@@ -20,15 +20,51 @@ case `uname -s` in
 esac
 
 less_vim() {
+	vimrc=""
+
+	if [ -n "$VIMPAGER_RC" ]; then
+		vimrc=$VIMPAGER_RC
+	elif [ -n "$msys" ]; then
+		if [ -f ~/_vimpagerrc ]; then
+			vimrc=~/_vimpagerrc
+		elif [ -f ~/.vimpagerrc ]; then
+			vimrc=~/.vimpagerrc
+		fi
+	elif [ -f ~/.vimpagerrc ]; then
+		vimrc=~/.vimpagerrc
+	elif [ -f ~/_vimpagerrc ]; then
+		vimrc=~/_vimpagerrc
+	fi
+
 	if [ -z "$msys" ]; then
-		(vim --noplugin -X -e -c 'let vimpager_use_gvim' -c q < /dev/tty) \
-		   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
-		   && use_gvim=1
+		if [ -n "$vimrc" ]; then
+			(vim -u "$vimrc" --noplugin -X -e -c 'let vimpager_use_gvim' -c q < /dev/tty) \
+			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
+			   && use_gvim=1
+			(vim -u "$vimrc" --noplugin -X -e -c 'let vimpager_disable_x11' -c q < /dev/tty) \
+			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
+			   && disable_x11=1
+		else
+			(vim --noplugin -X -e -c 'let vimpager_use_gvim' -c q < /dev/tty) \
+			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
+			   && use_gvim=1
+			(vim --noplugin -X -e -c 'let vimpager_disable_x11' -c q < /dev/tty) \
+			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
+			   && disable_x11=1
+		fi
 	else
 		# The above doesn't work on msys for some reason, so we use
 		# grep.
-		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/_vimrc 2>/dev/null | head -1`
-		[ -n "$use_gvim" ] || use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' ~/.vimrc 2>/dev/null | head -1`
+
+		_vimrc_file="${vimrc:-~/_vimrc}"
+
+		if [ ! -e "$_vimrc_file" ]; then
+			_vimrc_file=~/.vimrc
+		fi
+
+		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
+		
+		disable_x11=`grep '^[ \t]*\<let[ \t]\+vimpager_disable_x11[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
 
 		# msys may not be installed with an msys vim, and if we're
 		# not in a real console the native Windows vim will not
@@ -39,6 +75,8 @@ less_vim() {
 				use_gvim=1
 			fi
 		fi
+
+		unset _vimrc_file
 	fi
 
         if [ -n "$use_gvim" ]; then
@@ -46,7 +84,7 @@ less_vim() {
 			if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
 				vim_cmd="mvim -R"
 			else
-				vim_cmd="vim -X -R"
+				vim_cmd="vim -R"
 			fi
 		elif [ -n "$cygwin" ]; then
 			if command -v gvim >/dev/null; then
@@ -54,51 +92,45 @@ less_vim() {
 				if ldd `command -v gvim` 2>/dev/null \
 				   | awk '$1 ~ /cygwin/ {t=1} END { exit 1-t }'; then
 					if [ -z "$DISPLAY" ]; then
-						vim_cmd="vim -X -R"
+						vim_cmd="vim -R"
 					else
 						vim_cmd='gvim -R'
 					fi
 				elif [ -z "$SSH_CONNECTION" ]; then
 					vim_cmd='gvim -R'
 				else
-					vim_cmd="vim -X -R"
+					vim_cmd="vim -R"
 				fi
 			else
-				vim_cmd="vim -X -R"
+				vim_cmd="vim -R"
 			fi
 		elif [ -n "$msys" ]; then
 			if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
 				vim_cmd='gvim -R'
 			else
-				vim_cmd="vim -X -R"
+				vim_cmd="vim -R"
 			fi
 		elif [ -z "$DISPLAY" ]; then
-			vim_cmd='vim -X -R'
+			vim_cmd='vim -R'
 		else
 			if command -v gvim >/dev/null; then
 				vim_cmd='gvim -R'
 			else
-				vim_cmd="vim -X -R"
+				vim_cmd="vim -R"
 			fi
 		fi
 	else
-	        vim_cmd='vim -X -R'
+	        vim_cmd='vim -R'
 	fi
 
 	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 
-	vimrc=""
-
-	if [ -n "$VIMPAGER_RC" ]; then
-		vimrc=$VIMPAGER_RC
-	elif [ -f ~/.vimpagerrc ]; then
-		vimrc=~/.vimpagerrc
-	elif [ -f ~/_vimpagerrc ]; then
-		vimrc=~/_vimpagerrc
-	fi
-
 	case $vim_cmd in
 		vim*)
+			if [ -n "$disable_x11" ]; then
+				vim_cmd="$vim_cmd -X"
+			fi
+
 			if [ -n "$vimrc" ]; then
 				$vim_cmd \
 				--cmd 'let vimpager=1' \

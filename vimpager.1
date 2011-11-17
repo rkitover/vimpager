@@ -35,12 +35,21 @@ To disable loading plugins, put \[lq]set noloadplugins\[rq] into a
 You can also switch on the \[lq]vimpager\[rq] variable in your vimrc to
 set alternate settings for vimpager.
 .PP
-Put the following into your vimrc if you want to use gvim/MacVim for
-your pager window:
+Put the following into your .vimrc/.vimpagerrc if you want to use
+gvim/MacVim for your pager window:
 .IP
 .nf
 \f[C]
 let\ vimpager_use_gvim\ =\ 1
+\f[]
+.fi
+.PP
+To start vim with -X (no x11 connection, a bit faster startup) put the
+following into your .vimrc/.vimpagerrc:
+.IP
+.nf
+\f[C]
+let\ vimpager_disable_x11\ =\ 1
 \f[]
 .fi
 .SH CYGWIN NOTES
