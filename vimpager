@@ -135,13 +135,13 @@ less_vim() {
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-u $vimrc \
-				-c 'runtime! macros/less.vim | source $MYVIMRC | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				"${@:--}"
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
-				-c 'runtime! macros/less.vim | source $MYVIMRC | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				"${@:--}"
 			fi
@@ -206,7 +206,7 @@ less_vim() {
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-u $vimrc \
-				-c 'runtime! macros/less.vim | source $MYVIMRC | source $MYGVIMRC | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
@@ -215,7 +215,7 @@ less_vim() {
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
-				-c 'runtime! macros/less.vim | source $MYVIMRC | source $MYGVIMRC | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
