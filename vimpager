@@ -37,21 +37,23 @@ less_vim() {
 	fi
 
 	if [ -z "$msys" ]; then
+		trap "rm -f /tmp/vimpager_opts_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+
+		# the echo "foo" is to skip the color codes and make matching the first line easier
+
 		if [ -n "$vimrc" ]; then
-			(vim -u "$vimrc" --noplugin -X -e -c 'let vimpager_use_gvim' -c q < /dev/tty) \
-			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
-			   && use_gvim=1
-			(vim -u "$vimrc" --noplugin -X -e -c 'let vimpager_disable_x11' -c q < /dev/tty) \
-			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
-			   && disable_x11=1
+			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		else
-			(vim --noplugin -X -e -c 'let vimpager_use_gvim' -c q < /dev/tty) \
-			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
-			   && use_gvim=1
-			(vim --noplugin -X -e -c 'let vimpager_disable_x11' -c q < /dev/tty) \
-			   | cut -d\# -f2 | head -1 | awk '$1 ~ /^1/ {t=1} END { exit 1-t }' \
-			   && disable_x11=1
+			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		fi
+
+		head -2 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
+			use_gvim=1
+
+		head -3 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
+			disable_x11=1
+
+		rm -f /tmp/vimpager_opts_$$
 	else
 		# The above doesn't work on msys for some reason, so we use
 		# grep.
