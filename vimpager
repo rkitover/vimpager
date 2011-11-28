@@ -180,6 +180,8 @@ less_vim() {
 
 			if command -v tput > /dev/null; then
 				# this is the only way it works on Cygwin
+				trap "rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+
 				tput cols  > /tmp/vimpager_cols_$$
 				tput lines > /tmp/vimpager_lines_$$
 
