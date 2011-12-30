@@ -44,6 +44,11 @@ into your .vimrc/.vimpagerrc:
 
     let vimpager_disable_x11 = 1
 
+The scroll offset (:help scrolloff), may be specified by placing the 
+following into your .vimrc/.vimpagerrc (default = 5, disable = 0):
+
+	let vimpager_scrolloff = 5
+
 # CYGWIN NOTES
 The Cygwin gvim is very buggy, vimpager works correctly with the native
 Windows gvim, just put it in your PATH.
