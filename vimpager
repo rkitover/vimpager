@@ -42,9 +42,9 @@ less_vim() {
 		# the echo "foo" is to skip the color codes and make matching the first line easier
 
 		if [ -n "$vimrc" ]; then
-			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
+			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		else
-			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
+			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		fi
 
 		head -2 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
@@ -52,6 +52,9 @@ less_vim() {
 
 		head -3 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
 			disable_x11=1
+
+		head -4 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^[0-9]+/ {t=1} END {exit 1-t}' && \
+			scrolloff="$(head -4 < /tmp/vimpager_opts_$$ | tail -1|sed -e 's/[^0-9]//g')"
 
 		rm -f /tmp/vimpager_opts_$$
 	else
@@ -67,6 +70,8 @@ less_vim() {
 		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
 		
 		disable_x11=`grep '^[ \t]*\<let[ \t]\+vimpager_disable_x11[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
+
+		scrolloff=`grep '^[ \t]*\<let[ \t]\+vimpager_scrolloff[ \t]\+=[ \t]\+[0-9]+' "$_vimrc_file" 2>/dev/null | head -1`
 
 		# msys may not be installed with an msys vim, and if we're
 		# not in a real console the native Windows vim will not
@@ -137,13 +142,13 @@ less_vim() {
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-u $vimrc \
-				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				"${@:--}"
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
-				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				"${@:--}"
 			fi
@@ -210,7 +215,7 @@ less_vim() {
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-u $vimrc \
-				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
@@ -219,7 +224,7 @@ less_vim() {
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
-				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff=5 | set foldlevel=999 | set nonu' \
+				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
