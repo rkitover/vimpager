@@ -340,5 +340,6 @@ less_vim -c "${extra_cmd:-echo}" "$filename" </dev/tty
 # Wout Mertens (Solaris compatibility, less processes)
 # Jacobo de Vera (add -X option for faster startup)
 # Damien Pollet <damien.pollet@gmail.com>
+# Peter Fern <github@obfusc8.org>
 
 # vim:noet ts=8 sts=8 sw=8:
