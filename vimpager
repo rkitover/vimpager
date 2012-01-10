@@ -272,15 +272,14 @@ trap "rm -rf /tmp/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 mkdir /tmp/vimpager_$$
 
-_col_b_test=`echo xx | col -b 2>/dev/null`
+command -v perl > /dev/null && \
+	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
 
-if [ "x$_col_b_test" = "xx" ]; then
-	col_b="col -b"
+if [ "x$have_perl" != "x" ]; then
+	col_b="perl -CIOL -pe s/.\\010//g"
 else
 	col_b="sed -e s/.//g"
 fi
-
-unset _col_b_test
 
 filename=${@:-stdin}
 filename=`echo "$filename" | tr '/' '_'`
