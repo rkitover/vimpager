@@ -275,20 +275,22 @@ mkdir /tmp/vimpager_$$
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
 
-if [ "x$have_perl" != "x" ]; then
-	col_b="perl -CIOL -pe s/.\\010//g"
-else
-	col_b="sed -e s/.//g"
-fi
+col_b() {
+	if [ "x$have_perl" != "x" ]; then
+		perl -CIOL -pe 'no warnings "utf8"; s/.\010//g'
+	else
+		sed -e 's/.//g'
+	fi
+}
 
 filename=${@:-stdin}
 filename=`echo "$filename" | tr '/' '_'`
 filename="/tmp/vimpager_${$}/$filename"
 
 case "$@" in
-	*.gz) gunzip -c "$@" | sed -e 's/\[[^m]*m//g' | $col_b > "$filename" ;;
-	*.Z) uncompress -c "$@" | sed -e 's/\[[^m]*m//g' | $col_b > "$filename" ;;
-	*) sed -e 's/\[[^m]*m//g' "$@" | $col_b > "$filename" ;;
+	*.gz) gunzip -c "$@" | sed -e 's/\[[^m]*m//g' | col_b > "$filename" ;;
+	*.Z) uncompress -c "$@" | sed -e 's/\[[^m]*m//g' | col_b > "$filename" ;;
+	*) sed -e 's/\[[^m]*m//g' "$@" | col_b > "$filename" ;;
 esac
 
 # if file is zero length, or one blank line (cygwin) exit immediately
