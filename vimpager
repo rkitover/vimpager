@@ -68,7 +68,7 @@ less_vim() {
 		fi
 
 		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
-		
+
 		disable_x11=`grep '^[ \t]*\<let[ \t]\+vimpager_disable_x11[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
 
 		scrolloff=`grep '^[ \t]*\<let[ \t]\+vimpager_scrolloff[ \t]\+=[ \t]\+[0-9]+' "$_vimrc_file" 2>/dev/null | head -1`
