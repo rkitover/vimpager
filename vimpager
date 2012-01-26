@@ -264,7 +264,7 @@ do_ptree() {
 }
 
 # Check if called from man, perldoc or pydoc
-if do_ptree | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
+if do_ptree | awk '$2 ~ /(^|\/)(w?man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
 	extra_cmd="set ft=man"
 fi
 
