@@ -68,7 +68,7 @@ less_vim() {
 		fi
 
 		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
-		
+
 		disable_x11=`grep '^[ \t]*\<let[ \t]\+vimpager_disable_x11[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
 
 		scrolloff=`grep '^[ \t]*\<let[ \t]\+vimpager_scrolloff[ \t]\+=[ \t]\+[0-9]+' "$_vimrc_file" 2>/dev/null | head -1`
@@ -265,8 +265,11 @@ do_ptree() {
 
 # Check if called from man, perldoc or pydoc
 if do_ptree | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
-	extra_cmd="set ft=man"
+	extra_c="set ft=man"
 fi
+
+
+extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
 trap "rm -rf /tmp/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
@@ -306,7 +309,7 @@ if [ -n "$cygwin" ]; then
 	filename=`cygpath -w "$filename"`
 fi
 
-less_vim -c "${extra_cmd:-echo}" "$filename" </dev/tty
+less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 
 # terminal vim on OSX can screw up the terminal
 # (but doesn't anymore for some reason...)
