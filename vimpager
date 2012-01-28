@@ -144,12 +144,16 @@ less_vim() {
 				-u $vimrc \
 				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				-c 'nmap <Down> 1<C-d>' \
+				-c 'nmap <Up> 1<C-u>' \
 				"${@:--}"
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
 				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				-c 'nmap <Down> 1<C-d>' \
+				-c 'nmap <Up> 1<C-u>' \
 				"${@:--}"
 			fi
 			;;
