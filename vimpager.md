@@ -47,7 +47,16 @@ into your .vimrc/.vimpagerrc:
 The scroll offset (:help scrolloff), may be specified by placing the 
 following into your .vimrc/.vimpagerrc (default = 5, disable = 0):
 
-	let vimpager_scrolloff = 5
+    let vimpager_scrolloff = 5
+
+The process tree of vimpager is available in the "vimpager_ptree" variable, an
+example usage is as follows:
+
+    if exists("vimpager")
+      if exists("vimpager_ptree") && vimpager_ptree[-2] == 'wman'
+        set ft=man
+      endif
+    endif
 
 # CYGWIN NOTES
 The Cygwin gvim is very buggy, vimpager works correctly with the native

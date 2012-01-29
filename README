@@ -54,6 +54,15 @@ following into your .vimrc/.vimpagerrc (default = 5, disable = 0):
 
     let vimpager_scrolloff = 5
 
+The process tree of vimpager is available in the "vimpager_ptree"
+variable, an example usage is as follows:
+
+    if exists("vimpager")
+      if exists("vimpager_ptree") && vimpager_ptree[-2] == 'wman'
+        set ft=man
+      endif
+    endif
+
 CYGWIN NOTES
 ============
 
