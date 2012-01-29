@@ -143,17 +143,13 @@ less_vim() {
 				--cmd 'let vimpager=1' \
 				-u $vimrc \
 				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
-				-c 'nmap <ESC>u :nohlsearch<cr>' \
-				-c 'nmap <Down> 1<C-d>' \
-				-c 'nmap <Up> 1<C-u>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				"${@:--}"
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
-				-c 'nmap <ESC>u :nohlsearch<cr>' \
-				-c 'nmap <Down> 1<C-d>' \
-				-c 'nmap <Up> 1<C-u>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				"${@:--}"
 			fi
 			;;
@@ -220,7 +216,7 @@ less_vim() {
 				--cmd 'let vimpager=1' \
 				-u $vimrc \
 				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
-				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
 				-c "set lines=$lines | set columns=$cols" \
@@ -229,7 +225,7 @@ less_vim() {
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				-c 'runtime! macros/less.vim | if $MYVIMRC != "" | source $MYVIMRC | endif | if $MYGVIMRC != "" | source $MYGVIMRC | endif | set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu' \
-				-c 'nmap <ESC>u :nohlsearch<cr>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
 				-c "set lines=$lines | set columns=$cols" \
@@ -271,7 +267,6 @@ do_ptree() {
 if do_ptree | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
 	extra_c="set ft=man"
 fi
-
 
 extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
@@ -350,5 +345,6 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 # Damien Pollet <damien.pollet@gmail.com>
 # Peter Fern <github@obfusc8.org>
 # Wei Dai <x@wei23.net>
+# Iftekharul Haque <iftekharul.haque@gmail.com>
 
 # vim:noet ts=8 sts=8 sw=8:
