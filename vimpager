@@ -272,7 +272,7 @@ extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\
 
 trap "rm -rf /tmp/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-mkdir /tmp/vimpager_$$
+mkdir -m 0700 /tmp/vimpager_$$
 
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
