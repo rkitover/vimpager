@@ -346,5 +346,8 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 # Peter Fern <github@obfusc8.org>
 # Wei Dai <x@wei23.net>
 # Iftekharul Haque <iftekharul.haque@gmail.com>
+# Anselm Strauss <amsibamsi@gmail.com>
+# Anisse Astier <anisse@astier.eu>
+# Simon Olofsson <simon@olofsson.de>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
