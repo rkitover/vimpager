@@ -42,9 +42,9 @@ less_vim() {
 		# the echo "foo" is to skip the color codes and make matching the first line easier
 
 		if [ -n "$vimrc" ]; then
-			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
+			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif | echo 0' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		else
-			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
+			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif | echo 0' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		fi
 
 		head -2 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
@@ -54,7 +54,7 @@ less_vim() {
 			disable_x11=1
 
 		head -4 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^[0-9]+/ {t=1} END {exit 1-t}' && \
-			scrolloff="$(head -4 < /tmp/vimpager_opts_$$ | tail -1|sed -e 's/[^0-9]//g')"
+			scrolloff=`head -4 < /tmp/vimpager_opts_$$ | tail -1 | sed -e 's/.*//'`
 
 		rm -f /tmp/vimpager_opts_$$
 	else
@@ -347,4 +347,4 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 # Wei Dai <x@wei23.net>
 # Iftekharul Haque <iftekharul.haque@gmail.com>
 
-# vim:noet ts=8 sts=8 sw=8:
+# vim:noet ts=8 sts=8 sw=8 tw=0:
