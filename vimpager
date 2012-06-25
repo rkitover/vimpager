@@ -16,6 +16,7 @@ case `uname -s` in
         Darwin) osx=1; bsd=1 ;;
 	CYGWIN*) cygwin=1 ;;
 	MINGW*) msys=1 ;;
+	OpenBSD) openbsd=1; bsd=1 ;;
 	*) bsd=1 ;;
 esac
 
@@ -261,6 +262,8 @@ do_ptree() {
 		ptree $$
 	elif [ -n "$cygwin" -o -n "$msys" ]; then
 		ps | awk '{ print $1 "\t" $2 "\t" $NF }' | awk_pstree $$
+	elif [ -n "$openbsd" ]; then
+		ps awo pid=,ppid=,command= | awk_pstree $$
 	else
 		# Tested on Linux and OS X
 		ps awo pid=,ppid=,comm= | awk_pstree $$
