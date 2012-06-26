@@ -18,8 +18,8 @@ DESCRIPTION
 A slightly more sophisticated replacement for less.sh that also supports
 being set as the PAGER environment variable. Displays man pages,
 perldocs and python documentation properly. Works on Linux, Solaris,
-FreeBSD, OSX, Cygwin and msys. Should work on most other systems as
-well.
+FreeBSD, OpenBSD, OSX, Cygwin and msys. Should work on most other
+systems as well.
 
 On GitHub: http://github.com/rkitover/vimpager
 
