@@ -145,14 +145,14 @@ less_vim() {
 				--cmd 'runtime! macros/less.vim' \
 				-u $vimrc \
 				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> | noremap q :q<CR>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				"${@:--}"
 			else
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
 				--cmd 'runtime! macros/less.vim' \
 				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> | noremap q :q<CR>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				"${@:--}"
 			fi
 			;;
@@ -220,7 +220,7 @@ less_vim() {
 				--cmd 'runtime! macros/less.vim ' \
 				-u $vimrc \
 				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> | noremap q :q<CR>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
 				-c "set lines=$lines | set columns=$cols" \
@@ -230,7 +230,7 @@ less_vim() {
 				--cmd 'let vimpager=1' \
 				--cmd 'runtime! macros/less.vim ' \
 				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> | noremap q :q<CR>' \
+				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
 				-c "${colors:-echo}" \
 				-c "${restore:-echo}" \
 				-c "set lines=$lines | set columns=$cols" \
