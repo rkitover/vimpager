@@ -20,6 +20,34 @@ case `uname -s` in
 	*) bsd=1 ;;
 esac
 
+# Detect terminal size
+if command -v tput > /dev/null; then
+	# this is the only way it works on Cygwin
+	trap "rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+
+	tput cols  > /tmp/vimpager_cols_$$
+	tput lines > /tmp/vimpager_lines_$$
+
+	cols=`cat /tmp/vimpager_cols_$$`
+	lines=`cat /tmp/vimpager_lines_$$`
+
+	rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$
+fi
+
+# msys has no tput, this doesn't work on Cygwin by the way
+if [ -z "$cols" ] && command -v bash >/dev/null; then
+	cols=`bash -i -c 'echo $COLUMNS'`
+	lines=`bash -i -c 'echo $LINES'`
+fi
+
+# If we are unable to detect lines/columns, maximize
+# the window.
+if [ -z "$cols" ]; then
+	cols=999
+	lines=999
+	no_pass_thru=1 # force loading vimpager
+fi
+
 less_vim() {
 	vimrc=""
 
@@ -188,32 +216,6 @@ less_vim() {
 				fi
 			fi
 
-			if command -v tput > /dev/null; then
-				# this is the only way it works on Cygwin
-				trap "rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
-
-				tput cols  > /tmp/vimpager_cols_$$
-				tput lines > /tmp/vimpager_lines_$$
-
-				cols=`cat /tmp/vimpager_cols_$$`
-				lines=`cat /tmp/vimpager_lines_$$`
-
-				rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$
-			fi
-
-			# msys has no tput, this doesn't work on Cygwin by the way
-			if [ -z "$cols" ] && command -v bash >/dev/null; then
-				cols=`bash -i -c 'echo $COLUMNS'`
-				lines=`bash -i -c 'echo $LINES'`
-			fi
-
-			# If we are unable to detect lines/columns, maximize
-			# the window.
-			if [ -z "$cols" ]; then
-				cols=999
-				lines=999
-			fi
-
 			if [ -n "$vimrc" ]; then
 				$vim_cmd \
 				--cmd 'let vimpager=1' \
@@ -284,11 +286,50 @@ mkdir -m 0700 /tmp/vimpager_$$
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
 
-col_b() {
+# Normally, filter outputs ANSI-escape-code-free content to STDERR.
+# When content is short, filter outputs content with ANSI escape codes to STDOUT.
+filter() {
+	content=
+	OLDIFS="$IFS"
+	# ts: tab stop
+	# nl: number of physycal lines
+	# dh: display height
+	# dw: display width
+	ts=8; nl=0; dh=$((lines-2)); dw=$((cols))
+	[ -z "$no_pass_thru" ] && while [ $nl -le $dh ]; do
+		IFS='
+'
+		read -r line || exec printf %s "$content"
+		content="$content$line
+"
+		nl=$((nl+1))
+
+		# w: line width
+		# t: number of consecutive tabs
+		w=0; t=$((2+${#line}+1))
+		IFS='	'
+		for a in .	$line.
+		do
+			if [ $w -gt 0 ]; then
+				w=$((w+ts-w%ts))
+				t=$((t-1))
+			fi
+			w=$((w+${#a}))
+			t=$((t-${#a}))
+		done
+		w=$((w-8+t*ts-1))
+
+		nl=$((nl+(w-1)/dw))
+	done
+	IFS="$OLDIFS"
 	if [ "x$have_perl" != "x" ]; then
-		perl -CIOL -pe 'no warnings "utf8"; s/.\010//g'
+		( printf %s "$content"; exec /bin/cat ) | \
+			sed -e 's/\[[^m]*m//g' "$@" | \
+			perl -CIOL -pe 'no warnings "utf8"; s/.\010//g' >&2
 	else
-		sed -e 's/.//g'
+		( printf %s "$content"; exec /bin/cat ) | \
+			sed -e 's/\[[^m]*m//g' "$@" | \
+			sed -e 's/.//g' >&2
 	fi
 }
 
@@ -297,9 +338,9 @@ filename=`echo "$filename" | tr '/' '_'`
 filename="/tmp/vimpager_${$}/$filename"
 
 case "$@" in
-	*.gz) gunzip -c "$@" | sed -e 's/\[[^m]*m//g' | col_b > "$filename" ;;
-	*.Z) uncompress -c "$@" | sed -e 's/\[[^m]*m//g' | col_b > "$filename" ;;
-	*) sed -e 's/\[[^m]*m//g' "$@" | col_b > "$filename" ;;
+	*.gz) gunzip -c "$@" | filter 2> "$filename" ;;
+	*.Z) uncompress -c "$@" | filter 2> "$filename" ;;
+	*) filter 2> "$filename" ;;
 esac
 
 # if file is zero length, or one blank line (cygwin) exit immediately
