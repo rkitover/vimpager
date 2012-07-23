@@ -356,5 +356,6 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 # Anselm Strauss <amsibamsi@gmail.com>
 # Anisse Astier <anisse@astier.eu>
 # Simon Olofsson <simon@olofsson.de>
+# lickel: Adam Lickel <adam@lickel.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
