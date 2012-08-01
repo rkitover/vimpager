@@ -20,6 +20,10 @@ case `uname -s` in
 	*) bsd=1 ;;
 esac
 
+# Use the real TEMP directory on windows in case we are using a native vim/gvim
+tmp=/tmp
+[ -n "$msys" -o -n "$cygwin" ] && tmp=`printf "%s\n" "$TEMP" | tr '\\' /`
+
 # Detect terminal size
 if command -v tput > /dev/null; then
 	# this is the only way it works on Cygwin
@@ -48,162 +52,169 @@ if [ -z "$cols" ]; then
 	no_pass_thru=1 # force loading vimpager
 fi
 
-less_vim() {
-	vimrc=""
+# determine location of vimrc
+if [ -n "$VIMPAGER_RC" ]; then
+	vimrc=$VIMPAGER_RC
+elif [ -f ~/.vimpagerrc ]; then
+	vimrc=~/.vimpagerrc
+elif [ -f ~/_vimpagerrc ]; then
+	vimrc=~/_vimpagerrc
+fi
 
-	if [ -n "$VIMPAGER_RC" ]; then
-		vimrc=$VIMPAGER_RC
-	elif [ -n "$msys" ]; then
-		if [ -f ~/_vimpagerrc ]; then
-			vimrc=~/_vimpagerrc
-		elif [ -f ~/.vimpagerrc ]; then
-			vimrc=~/.vimpagerrc
-		fi
-	elif [ -f ~/.vimpagerrc ]; then
-		vimrc=~/.vimpagerrc
-	elif [ -f ~/_vimpagerrc ]; then
-		vimrc=~/_vimpagerrc
+if [ -z "$vimrc" ]; then
+	trap "rm -f ${tmp}/vimpager_vimrc_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+
+	vim -E -c 'call writefile([ $MYVIMRC, $VIM ], "'$tmp'/vimpager_vimrc_'$$'") | q' </dev/tty
+	vimrc=`head -1 ${tmp}/vimpager_vimrc_$$`
+	vim_dir=`tail -1 ${tmp}/vimpager_vimrc_$$`
+
+	rm -f ${tmp}/vimpager_vimrc_$$
+fi
+
+# read settings
+trap "rm -f ${tmp}/vimpager_opts_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+
+vim -u $vimrc -E -c '
+	if !exists("vimpager_use_gvim")
+		let vimpager_use_gvim=0
+	endif
+	
+	if !exists("vimpager_disable_x11")
+		let vimpager_disable_x11=0
+	endif
+	
+	if !exists("vimpager_scrolloff")
+		let vimpager_scrolloff=5
+	endif
+	
+	if !exists("vimpager_passthrough")
+		let vimpager_passthrough=0
+	endif
+
+	if !exists("vimpager_background")
+		let vimpager_background="dark"
+	endif
+	
+	if !exists("vimpager_passthrough_colors")
+		let vimpager_passthrough_colors="slate"
+	endif
+
+	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, vimpager_background, vimpager_passthrough_colors ], "'$tmp'/vimpager_opts_'$$'")
+	
+	quit
+' </dev/tty
+
+[ "`head -1 < ${tmp}/vimpager_opts_$$`" = 1 ] && use_gvim=1
+
+[ "`head -2 < ${tmp}/vimpager_opts_$$ | tail -1`" = 1 ] && disable_x11=1
+
+scrolloff=`head -3 < ${tmp}/vimpager_opts_$$ | tail -1`
+
+[ "`head -4 < ${tmp}/vimpager_opts_$$ | tail -1`" = 0 ] && no_pass_thru=1
+
+if [ "$no_pass_thru" = 0 ]; then
+	# check if arithmetic expansion works, passthrough mode relies on it
+	if [ x`echo $((2+2)) 2>/dev/null` != x4 ]; then
+		no_pass_thru=1
 	fi
+fi
 
-	if [ -z "$msys" ]; then
-		trap "rm -f /tmp/vimpager_opts_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+background=`head -5 < ${tmp}/vimpager_opts_$$ | tail -1`
 
-		# the echo "foo" is to skip the color codes and make matching the first line easier
+colors=`head -6 < ${tmp}/vimpager_opts_$$ | tail -1`
 
-		if [ -n "$vimrc" ]; then
-			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif | echo 0' -c q < /dev/tty) > /tmp/vimpager_opts_$$
-		else
-			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif | echo 0' -c q < /dev/tty) > /tmp/vimpager_opts_$$
-		fi
+rm -f ${tmp}/vimpager_opts_$$
 
-		head -2 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
+if [ -n "$msys" -o -n "$cygwin" ]; then
+	# msys/cygwin may be using a native vim, and if we're not in a real
+	# console the native vim will not work, so we have to use gvim.
+
+	if [ "x$TERM" != "xdumb" -a "x$TERM" != "xcygwin" -a "x$TERM" != "x" ]; then
+		if command -v vim 2>/dev/null | awk '$1 ~ /^\/(cygdrive\/)?[a-z]\// {t=1} END {exit 1-t}'; then
 			use_gvim=1
-
-		head -3 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
-			disable_x11=1
-
-		head -4 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^[0-9]+/ {t=1} END {exit 1-t}' && \
-			scrolloff=`head -4 < /tmp/vimpager_opts_$$ | tail -1 | sed -e 's/.*//'`
-
-		rm -f /tmp/vimpager_opts_$$
-	else
-		# The above doesn't work on msys for some reason, so we use
-		# grep.
-
-		_vimrc_file="${vimrc:-~/_vimrc}"
-
-		if [ ! -e "$_vimrc_file" ]; then
-			_vimrc_file=~/.vimrc
 		fi
-
-		use_gvim=`grep '^[ \t]*\<let[ \t]\+vimpager_use_gvim[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
-
-		disable_x11=`grep '^[ \t]*\<let[ \t]\+vimpager_disable_x11[ \t]\+=[ \t]\+1' "$_vimrc_file" 2>/dev/null | head -1`
-
-		scrolloff=`grep '^[ \t]*\<let[ \t]\+vimpager_scrolloff[ \t]\+=[ \t]\+[0-9]+' "$_vimrc_file" 2>/dev/null | head -1`
-
-		# msys may not be installed with an msys vim, and if we're
-		# not in a real console the native Windows vim will not
-		# work, so we have to use gvim.
-
-		if [ "x$TERM" != "xdumb" -a "x$TERM" != "xcygwin" -a "x$TERM" != "x" ]; then
-			if [ \( ! -x /bin/vim \) -a \( ! -x /usr/bin/vim \) -a \( ! -x /usr/local/bin/vim \) ]; then
-				use_gvim=1
-			fi
-		fi
-
-		unset _vimrc_file
 	fi
+fi
 
-        if [ -n "$use_gvim" ]; then
-                if [ -n "$osx" ]; then
-			if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
-				vim_cmd="mvim -R"
-			else
-				vim_cmd="vim -R"
-			fi
-		elif [ -n "$cygwin" ]; then
-			if command -v gvim >/dev/null; then
-				# The Cygwin gvim uses X
-				if ldd `command -v gvim` 2>/dev/null \
-				   | awk '$1 ~ /cygwin/ {t=1} END { exit 1-t }'; then
-					if [ -z "$DISPLAY" ]; then
-						vim_cmd="vim -R"
-					else
-						vim_cmd='gvim -R'
-					fi
-				elif [ -z "$SSH_CONNECTION" ]; then
-					vim_cmd='gvim -R'
-				else
-					vim_cmd="vim -R"
+if [ -n "$use_gvim" ]; then
+	# find the .gvimrc
+	[ -e $HOME/.gvimrc ] && gvimrc=$HOME/.gvimrc
+
+	if [ -n "$msys" -o -n "$cygwin" ]; then
+		if command -v gvim 2>/dev/null | awk '$1 ~ /^\/(cygdrive\/)?[a-z]\// {t=1} END {exit 1-t}'; then
+			if [ -e $HOME/_gvimrc ]; then
+				gvimrc=$HOME/_gvimrc
+			elif [ -z "$gvimrc" ]; then
+				if [ -e "${vim_dir}/_gvimrc" ]; then
+					gvimrc=$vim_dir/_gvimrc
+				elif [ -e "${vim_dir}/.gvimrc" ]; then
+					gvimrc=$vim_dir/.gvimrc
 				fi
-			else
-				vim_cmd="vim -R"
-			fi
-		elif [ -n "$msys" ]; then
-			if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
-				vim_cmd='gvim -R'
-			else
-				vim_cmd="vim -R"
-			fi
-		elif [ -z "$DISPLAY" ]; then
-			vim_cmd='vim -R'
-		else
-			if command -v gvim >/dev/null; then
-				vim_cmd='gvim -R'
-			else
-				vim_cmd="vim -R"
 			fi
 		fi
-	else
-	        vim_cmd='vim -R'
 	fi
 
-	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
+	# determine if this is an ssh session and/or $DISPLAY is set
+	if [ -n "$osx" ]; then
+		if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
+			vim_cmd="mvim -R"
+		else
+			vim_cmd="vim -R"
+		fi
+	elif [ -n "$cygwin" ]; then
+		if command -v gvim >/dev/null; then
+			# The Cygwin gvim uses X
+			if ldd `command -v gvim` 2>/dev/null \
+			   | awk '$1 ~ /cygwin/ {t=1} END { exit 1-t }'; then
+				if [ -z "$DISPLAY" ]; then
+					vim_cmd="vim -R"
+				else
+					vim_cmd='gvim -R'
+				fi
+			elif [ -z "$SSH_CONNECTION" ]; then
+				vim_cmd='gvim -R'
+			else
+				vim_cmd="vim -R"
+			fi
+		else
+			vim_cmd="vim -R"
+		fi
+	elif [ -n "$msys" ]; then
+		if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
+			vim_cmd='gvim -R'
+		else
+			vim_cmd="vim -R"
+		fi
+	elif [ -z "$DISPLAY" ]; then
+		vim_cmd='vim -R'
+	else
+		if command -v gvim >/dev/null; then
+			vim_cmd='gvim -R'
+		else
+			vim_cmd="vim -R"
+		fi
+	fi
+else
+	vim_cmd='vim -R'
+fi
 
+rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
+
+less_vim() {
 	case $vim_cmd in
 		vim*)
 			if [ -n "$disable_x11" ]; then
 				vim_cmd="$vim_cmd -X"
 			fi
 
-			if [ -n "$vimrc" ]; then
-				$vim_cmd \
-				--cmd 'let vimpager=1' \
-				--cmd 'runtime! macros/less.vim' \
+			$vim_cmd \
 				-u $vimrc \
-				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
+				--cmd 'let vimpager=1 | runtime! macros/less.vim' \
+				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>" \
 				"${@:--}"
-			else
-				$vim_cmd \
-				--cmd 'let vimpager=1' \
-				--cmd 'runtime! macros/less.vim' \
-				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
-				"${@:--}"
-			fi
 			;;
 		*) # gvim or mvim GUI
-			if [ -f ~/.gvimrc ]; then
-				gvimrc=~/.gvimrc
-			elif [ -f ~/_gvimrc ]; then
-				gvimrc=~/_gvimrc
-			elif [ -n "$cygwin" ]; then
-# this from Corinna at http://cygwin.com/ml/cygwin/2010-08/msg00246.html
-				_sid=$(grep "^$USER:" /etc/passwd | sed -e 's/[^:]*:[^:]*:[^:]*:[^:]*:[^:]*,\(S-1-5-[^:]*\):.*/\1/')
-				_prof=$(cat /proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows\ NT/CurrentVersion/ProfileList/${_sid}/ProfileImagePath)
-
-				if [ -f "${_prof}/_gvimrc" ]; then
-					gvimrc="${_prof}/_gvimrc"
-				elif [ -f "${_prof}/.gvimrc" ]; then
-					gvimrc="${_prof}/.gvimrc"
-				fi
-
-				unset _sid
-				unset _prof
-			fi
-
 			[ -n "$gvimrc" ] && colors=`grep guifg $gvimrc 2>/dev/null | head -1`
 
 			# Check if the user maximized the window in ~/_gvimrc on Win32, if
@@ -216,28 +227,13 @@ less_vim() {
 				fi
 			fi
 
-			if [ -n "$vimrc" ]; then
-				$vim_cmd \
-				--cmd 'let vimpager=1' \
-				--cmd 'runtime! macros/less.vim ' \
+			$vim_cmd \
 				-u $vimrc \
-				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
-				-c "${colors:-echo}" \
-				-c "${restore:-echo}" \
-				-c "set lines=$lines | set columns=$cols" \
+				--cmd 'let vimpager=1 | runtime! macros/less.vim' \
+				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> |
+				    ${colors:-echo} | ${restore:-echo} | set lines=$lines | set columns=$cols" \
 				"${@:--}" &
-			else
-				$vim_cmd \
-				--cmd 'let vimpager=1' \
-				--cmd 'runtime! macros/less.vim ' \
-				-c 'set scrolloff='${scrolloff:-5}' | set foldlevel=999 | set nonu | silent! set nornu' \
-				-c 'nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>' \
-				-c "${colors:-echo}" \
-				-c "${restore:-echo}" \
-				-c "set lines=$lines | set columns=$cols" \
-				"${@:--}" &
-			fi
 			;;
 	esac
 
@@ -279,9 +275,9 @@ fi
 
 extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
-trap "rm -rf /tmp/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
+trap "rm -rf ${tmp}/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-mkdir -m 0700 /tmp/vimpager_$$
+mkdir -m 0700 ${tmp}/vimpager_$$
 
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
@@ -289,38 +285,41 @@ command -v perl > /dev/null && \
 # Normally, filter outputs ANSI-escape-code-free content to STDERR.
 # When content is short, filter outputs content with ANSI escape codes to STDOUT.
 filter() {
-	content=
-	OLDIFS="$IFS"
-	# ts: tab stop
-	# nl: number of physycal lines
-	# dh: display height
-	# dw: display width
-	ts=8; nl=0; dh=$((lines-2)); dw=$((cols))
-	[ -z "$no_pass_thru" ] && while [ $nl -le $dh ]; do
-		IFS='
+	if [ -z "$no_pass_thru" ]; then
+		content=
+		OLDIFS="$IFS"
+		# ts: tab stop
+		# nl: number of physycal lines
+		# dh: display height
+		# dw: display width
+		ts=8; nl=0; dh=$((lines-2)); dw=$((cols))
+
+		while [ $nl -le $dh ]; do
+			IFS='
 '
-		read -r line || exec printf %s "$content"
-		content="$content$line
+			read -r line || exec printf %s "$content"
+			content="$content$line
 "
-		nl=$((nl+1))
+			nl=$((nl+1))
 
-		# w: line width
-		# t: number of consecutive tabs
-		w=0; t=$((2+${#line}+1))
-		IFS='	'
-		for a in .	$line.
-		do
-			if [ $w -gt 0 ]; then
-				w=$((w+ts-w%ts))
-				t=$((t-1))
-			fi
-			w=$((w+${#a}))
-			t=$((t-${#a}))
+			# w: line width
+			# t: number of consecutive tabs
+			w=0; t=$((2+${#line}+1))
+			IFS='	'
+			for a in .	$line.
+			do
+				if [ $w -gt 0 ]; then
+					w=$((w+ts-w%ts))
+					t=$((t-1))
+				fi
+				w=$((w+${#a}))
+				t=$((t-${#a}))
+			done
+			w=$((w-8+t*ts-1))
+
+			nl=$((nl+(w-1)/dw))
 		done
-		w=$((w-8+t*ts-1))
-
-		nl=$((nl+(w-1)/dw))
-	done
+	fi
 	IFS="$OLDIFS"
 	if [ "x$have_perl" != "x" ]; then
 		( printf %s "$content"; exec /bin/cat ) | \
@@ -335,12 +334,12 @@ filter() {
 
 filename=${@:-stdin}
 filename=`echo "$filename" | tr '/' '_'`
-filename="/tmp/vimpager_${$}/$filename"
+filename="${tmp}/vimpager_${$}/$filename"
 
 case "$@" in
 	*.gz) gunzip -c "$@" | filter 2> "$filename" ;;
 	*.Z) uncompress -c "$@" | filter 2> "$filename" ;;
-	*) filter 2> "$filename" ;;
+	*) cat "${@:--}" | filter 2> "$filename" ;;
 esac
 
 # if file is zero length, or one blank line (cygwin) exit immediately
@@ -358,24 +357,13 @@ fi
 
 less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 
-# terminal vim on OSX can screw up the terminal
-# (but doesn't anymore for some reason...)
-#if [ -n "$osx" ]; then
-#	case $vim_cmd in
-#		vim*)
-#			reset
-#			clear
-#			;;
-#	esac
-#fi
-
 # Give gvim/mvim time to open the file.
 # On Cygwin we must also wait for the process to exit before the file can
 # be deleted.
 (
-	while [ -d /tmp/vimpager_$$ ]; do
+	while [ -d ${tmp}/vimpager_$$ ]; do
 		sleep 3
-		rm -rf /tmp/vimpager_$$ 2>/dev/null
+		rm -rf ${tmp}/vimpager_$$ 2>/dev/null
 		rm -f gvim.exe.stackdump 2>/dev/null
 	done
 ) &
