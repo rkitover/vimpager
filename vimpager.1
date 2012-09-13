@@ -29,11 +29,11 @@ To use a different vimrc with vimpager, put your settings into a
 ~/.vimpagerrc or a file pointed to by the VIMPAGER_RC environment
 variable.
 .PP
-To disable loading plugins, put \[lq]set noloadplugins\[rq] into a
-~/.vimpagerrc file.
+To disable loading plugins, put "set noloadplugins" into a ~/.vimpagerrc
+file.
 .PP
-You can also switch on the \[lq]vimpager\[rq] variable in your vimrc to
-set alternate settings for vimpager.
+You can also switch on the "vimpager" variable in your vimrc to set
+alternate settings for vimpager.
 .PP
 Put the following into your .vimrc/.vimpagerrc if you want to use
 gvim/MacVim for your pager window:
@@ -41,6 +41,15 @@ gvim/MacVim for your pager window:
 .nf
 \f[C]
 let\ vimpager_use_gvim\ =\ 1
+\f[]
+.fi
+.PP
+To pass through text that is smaller than the terminal height (without
+highlighting, at present) use this:
+.IP
+.nf
+\f[C]
+let\ vimpager_passthrough\ =\ 1
 \f[]
 .fi
 .PP
@@ -62,8 +71,8 @@ let\ vimpager_scrolloff\ =\ 5
 \f[]
 .fi
 .PP
-The process tree of vimpager is available in the
-\[lq]vimpager_ptree\[rq] variable, an example usage is as follows:
+The process tree of vimpager is available in the "vimpager_ptree"
+variable, an example usage is as follows:
 .IP
 .nf
 \f[C]

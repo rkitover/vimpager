@@ -44,6 +44,11 @@ gvim/MacVim for your pager window:
 
     let vimpager_use_gvim = 1
 
+To pass through text that is smaller than the terminal height (without
+highlighting, at present) use this:
+
+    let vimpager_passthrough = 1
+
 To start vim with -X (no x11 connection, a bit faster startup) put the
 following into your .vimrc/.vimpagerrc:
 
