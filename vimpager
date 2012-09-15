@@ -71,6 +71,8 @@ if [ -z "$vimrc" ]; then
 	rm -f ${tmp}/vimpager_vimrc_$$
 fi
 
+[ -z "$vimrc" ] && vimrc=NORC
+
 # read settings
 trap "rm -f ${tmp}/vimpager_opts_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
