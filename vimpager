@@ -64,9 +64,8 @@ fi
 if [ -z "$vimrc" ]; then
 	trap "rm -f ${tmp}/vimpager_vimrc_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-	vim -E -c 'call writefile([ $MYVIMRC, $VIM ], "'$tmp'/vimpager_vimrc_'$$'") | q' </dev/tty
+	vim -E -c 'call writefile([ $MYVIMRC ], "'$tmp'/vimpager_vimrc_'$$'") | q' </dev/tty
 	vimrc=`head -1 ${tmp}/vimpager_vimrc_$$`
-	vim_dir=`tail -1 ${tmp}/vimpager_vimrc_$$`
 
 	rm -f ${tmp}/vimpager_vimrc_$$
 fi
@@ -93,15 +92,7 @@ vim -u $vimrc -E -c '
 		let vimpager_passthrough=0
 	endif
 
-	if !exists("vimpager_background")
-		let vimpager_background="dark"
-	endif
-	
-	if !exists("vimpager_passthrough_colors")
-		let vimpager_passthrough_colors="slate"
-	endif
-
-	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, vimpager_background, vimpager_passthrough_colors ], "'$tmp'/vimpager_opts_'$$'")
+	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, $VIM ], "'$tmp'/vimpager_opts_'$$'")
 	
 	quit
 ' </dev/tty
@@ -121,9 +112,7 @@ if [ "$no_pass_thru" = 0 ]; then
 	fi
 fi
 
-background=`head -5 < ${tmp}/vimpager_opts_$$ | tail -1`
-
-colors=`head -6 < ${tmp}/vimpager_opts_$$ | tail -1`
+vim_dir=`head -5 < ${tmp}/vimpager_opts_$$ | tail -1`
 
 rm -f ${tmp}/vimpager_opts_$$
 
