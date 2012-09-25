@@ -59,6 +59,8 @@ elif [ -f ~/.vimpagerrc ]; then
 	vimrc=~/.vimpagerrc
 elif [ -f ~/_vimpagerrc ]; then
 	vimrc=~/_vimpagerrc
+elif [ -f /etc/vimpagerrc ]; then
+	vimrc=/etc/vimpagerrc
 fi
 
 if [ -z "$vimrc" ]; then
