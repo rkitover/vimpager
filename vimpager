@@ -10,7 +10,7 @@ if [ ! -t 1 ]; then
 	exec cat "$@"
 fi
 
-case `uname -s` in
+case $(uname -s) in
 	Linux) linux=1 ;;
 	SunOS) solaris=1 ;;
         Darwin) osx=1; bsd=1 ;;
@@ -22,7 +22,7 @@ esac
 
 # Use the real TEMP directory on windows in case we are using a native vim/gvim
 tmp=/tmp
-[ -n "$msys" -o -n "$cygwin" ] && tmp=`printf "%s\n" "$TEMP" | tr '\\' /`
+[ -n "$msys" -o -n "$cygwin" ] && tmp=$(printf "%s\n" "$TEMP" | tr '\\' /)
 
 # Detect terminal size
 if command -v tput > /dev/null; then
@@ -32,16 +32,16 @@ if command -v tput > /dev/null; then
 	tput cols  > /tmp/vimpager_cols_$$
 	tput lines > /tmp/vimpager_lines_$$
 
-	cols=`cat /tmp/vimpager_cols_$$`
-	lines=`cat /tmp/vimpager_lines_$$`
+	cols=$(cat /tmp/vimpager_cols_$$)
+	lines=$(cat /tmp/vimpager_lines_$$)
 
 	rm -f /tmp/vimpager_cols_$$ /tmp/vimpager_lines_$$
 fi
 
 # msys has no tput, this doesn't work on Cygwin by the way
 if [ -z "$cols" ] && command -v bash >/dev/null; then
-	cols=`bash -i -c 'echo $COLUMNS'`
-	lines=`bash -i -c 'echo $LINES'`
+	cols=$(bash -i -c 'echo $COLUMNS')
+	lines=$(bash -i -c 'echo $LINES')
 fi
 
 # If we are unable to detect lines/columns, maximize
@@ -67,7 +67,7 @@ if [ -z "$vimrc" ]; then
 	trap "rm -f ${tmp}/vimpager_vimrc_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 	vim -E -c 'call writefile([ $MYVIMRC ], "'$tmp'/vimpager_vimrc_'$$'") | q' </dev/tty
-	vimrc=`head -1 ${tmp}/vimpager_vimrc_$$`
+	vimrc=$(head -1 ${tmp}/vimpager_vimrc_$$)
 
 	rm -f ${tmp}/vimpager_vimrc_$$
 fi
@@ -99,22 +99,22 @@ vim -u $vimrc -E -c '
 	quit
 ' </dev/tty
 
-[ "`head -1 < ${tmp}/vimpager_opts_$$`" = 1 ] && use_gvim=1
+[ "$(head -1 < ${tmp}/vimpager_opts_$$)" = 1 ] && use_gvim=1
 
-[ "`head -2 < ${tmp}/vimpager_opts_$$ | tail -1`" = 1 ] && disable_x11=1
+[ "$(head -2 < ${tmp}/vimpager_opts_$$ | tail -1)" = 1 ] && disable_x11=1
 
-scrolloff=`head -3 < ${tmp}/vimpager_opts_$$ | tail -1`
+scrolloff=$(head -3 < ${tmp}/vimpager_opts_$$ | tail -1)
 
-[ "`head -4 < ${tmp}/vimpager_opts_$$ | tail -1`" = 0 ] && no_pass_thru=1
+[ "$(head -4 < ${tmp}/vimpager_opts_$$ | tail -1)" = 0 ] && no_pass_thru=1
 
 if [ "$no_pass_thru" = 0 ]; then
 	# check if arithmetic expansion works, passthrough mode relies on it
-	if [ x`echo $((2+2)) 2>/dev/null` != x4 ]; then
+	if [ x$(echo $((2+2)) 2>/dev/null) != x4 ]; then
 		no_pass_thru=1
 	fi
 fi
 
-vim_dir=`head -5 < ${tmp}/vimpager_opts_$$ | tail -1`
+vim_dir=$(head -5 < ${tmp}/vimpager_opts_$$ | tail -1)
 
 rm -f ${tmp}/vimpager_opts_$$
 
@@ -157,7 +157,7 @@ if [ -n "$use_gvim" ]; then
 	elif [ -n "$cygwin" ]; then
 		if command -v gvim >/dev/null; then
 			# The Cygwin gvim uses X
-			if ldd `command -v gvim` 2>/dev/null \
+			if ldd $(command -v gvim) 2>/dev/null \
 			   | awk '$1 ~ /cygwin/ {t=1} END { exit 1-t }'; then
 				if [ -z "$DISPLAY" ]; then
 					vim_cmd="vim -R"
@@ -208,12 +208,12 @@ less_vim() {
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
-			[ -n "$gvimrc" ] && colors=`grep guifg $gvimrc 2>/dev/null | head -1`
+			[ -n "$gvimrc" ] && colors=$(grep guifg $gvimrc 2>/dev/null | head -1)
 
 			# Check if the user maximized the window in ~/_gvimrc on Win32, if
 			# so restore on startup.
 			if [ -n "$gvimrc" -a \( -n "$cygwin" -o -n "$msys" \) ]; then
-				simalt=`grep simalt $gvimrc 2>/dev/null | head -1`
+				simalt=$(grep simalt $gvimrc 2>/dev/null | head -1)
 
 				if [ -n "$simalt" ]; then
 					restore="simalt ~r"
@@ -326,7 +326,7 @@ filter() {
 }
 
 filename=${@:-stdin}
-filename=`echo "$filename" | tr '/' '_'`
+filename=$(echo "$filename" | tr '/' '_')
 filename="${tmp}/vimpager_${$}/$filename"
 
 case "$@" in
@@ -337,15 +337,15 @@ esac
 
 # if file is zero length, or one blank line (cygwin) exit immediately
 if [ \( ! -s "$filename" \) \
-	-o \( \( "`cat \"$filename\"`" = "" \) \
-		-a \( "`wc -l \"$filename\" | awk '{print $1}'`" = "1" \) \) ]; then
+	-o \( \( "$(cat \"$filename\")" = "" \) \
+	-a \( "$(wc -l \"$filename\" | awk '{print $1}')" = "1" \) \) ]; then
 	exit
 fi
 
 # On cygwin it might be the win32 gvim, but windows paths work for cygwin
 # vim just fine as well.
 if [ -n "$cygwin" ]; then
-	filename=`cygpath -w "$filename"`
+	filename=$(cygpath -w "$filename")
 fi
 
 less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
