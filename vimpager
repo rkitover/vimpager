@@ -77,7 +77,7 @@ fi
 # read settings
 trap "rm -f ${tmp}/vimpager_opts_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-vim -u ${vimrc} -E -c '
+vim -u ${vimrc} -E --cmd 'set nocp' -c '
 	if !exists("vimpager_use_gvim")
 		let vimpager_use_gvim=0
 	endif
@@ -202,7 +202,7 @@ less_vim() {
 
 			${vim_cmd} \
 				-u ${vimrc} \
-				--cmd 'let vimpager=1 | runtime! macros/less.vim' \
+				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
 				    nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>" \
 				"${@:--}"
@@ -222,7 +222,7 @@ less_vim() {
 
 			${vim_cmd} \
 				-u ${vimrc} \
-				--cmd 'let vimpager=1 | runtime! macros/less.vim' \
+				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
 				    nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
