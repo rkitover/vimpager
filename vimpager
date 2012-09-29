@@ -135,6 +135,8 @@ if [ -n "${use_gvim}" ]; then
 
 	if [ -n "${msys}" -o -n "${cygwin}" ]; then
 		if command -v gvim 2>/dev/null | awk '$1 ~ /^\/(cygdrive\/)?[a-z]\// {t=1} END {exit 1-t}'; then
+			win32_native_gvim=1
+
 			if [ -e ${HOME}/_gvimrc ]; then
 				gvimrc=${HOME}/_gvimrc
 			elif [ -z "${gvimrc}" ]; then
@@ -157,8 +159,7 @@ if [ -n "${use_gvim}" ]; then
 	elif [ -n "${cygwin}" ]; then
 		if command -v gvim >/dev/null; then
 			# The Cygwin gvim uses X
-			if ldd $(command -v gvim) 2>/dev/null \
-			   | awk '$1 ~ /cygwin/ {t=1} END { exit 1-t }'; then
+			if [ -z "$win32_native_gvim" ]; then
 				if [ -z "${DISPLAY}" ]; then
 					vim_cmd="vim -R"
 				else
@@ -330,15 +331,25 @@ filename=$(echo "$filename" | tr '/' '_')
 filename="${tmp}/vimpager_${$}/${filename}"
 
 case "${@}" in
-	*.gz) gunzip -c "${@}" | filter 2> "${filename}" ;;
-	*.Z) uncompress -c "${@}" | filter 2> "${filename}" ;;
-	*) cat "${@:--}" | filter 2> "${filename}" ;;
+	*.gz) 
+		filename=$(echo ${filename} | sed -e 's/\.gz$//')
+		gunzip -c "${@}" | filter 2> "${filename}"
+		;;
+	*.Z)
+		filename=$(echo ${filename} | sed -e 's/\.Z$//')
+		uncompress -c "${@}" | filter 2> "${filename}"
+		;;
+	*)
+		cat "${@:--}" | filter 2> "${filename}"
+		;;
 esac
 
 # if file is zero length, or one blank line (cygwin) exit immediately
 if [ \( ! -s "${filename}" \) \
 	-o \( \( "$(cat "${filename}")" = "" \) \
 	-a \( "$(wc -l "${filename}" | awk '{print $1}')" = "1" \) \) ]; then
+
+	rm -rf "${tmp}/vimpager_${$}"
 	exit
 fi
 
@@ -355,7 +366,7 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # be deleted.
 (
 	while [ -d ${tmp}/vimpager_${$} ]; do
-		sleep 3
+		sleep 10
 		rm -rf ${tmp}/vimpager_${$} 2>/dev/null
 		rm -f gvim.exe.stackdump 2>/dev/null
 	done
