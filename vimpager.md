@@ -28,6 +28,9 @@ put these in your ~/.bashrc or ~/.zshrc
 To use a different vimrc with vimpager, put your settings into a ~/.vimpagerrc
 or a file pointed to by the VIMPAGER_RC environment variable.
 
+You can also have a global config file for all users in /etc/vimpagerrc, users
+can override it by creating a ~/.vimpagerrc.
+
 To disable loading plugins, put "set noloadplugins" into a ~/.vimpagerrc
 file.
 
