@@ -159,7 +159,7 @@ if [ -n "${use_gvim}" ]; then
 	elif [ -n "${cygwin}" ]; then
 		if command -v gvim >/dev/null; then
 			# The Cygwin gvim uses X
-			if [ -z "$win32_native_gvim" ]; then
+			if [ -z "${win32_native_gvim}" ]; then
 				if [ -z "${DISPLAY}" ]; then
 					vim_cmd="vim -R"
 				else
@@ -327,7 +327,7 @@ filter() {
 }
 
 filename=${@:-stdin}
-filename=$(echo "$filename" | tr '/' '_')
+filename=$(echo "${filename}" | tr '/' '_')
 filename="${tmp}/vimpager_${$}/${filename}"
 
 case "${@}" in

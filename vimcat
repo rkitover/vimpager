@@ -4,16 +4,16 @@
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
-  tmp_file=/tmp/vimcat_$$
-  trap "rm -f $tmp_file" HUP INT QUIT ILL TRAP KILL BUS TERM
+  tmp_file=/tmp/vimcat_${$}
+  trap "rm -f ${tmp_file}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-  script=`command -v $0`
+  script=$(command -v ${0})
 
-  vim -E -X -R -c "source $script | visual | bufdo call AnsiHighlight(\"$tmp_file\") | qa" "$@" </dev/tty >/dev/null 2>&1
+  vim -E -X -R -c "source ${script} | visual | bufdo call AnsiHighlight(\"${tmp_file}\") | qa" "${@}" </dev/tty >/dev/null 2>&1
 
-  cat $tmp_file
+  cat ${tmp_file}
 
-  rm -f $tmp_file
+  rm -f ${tmp_file}
 
   exit
 : endif
