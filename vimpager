@@ -335,6 +335,10 @@ case "${@}" in
 		filename=$(echo ${filename} | sed -e 's/\.gz$//')
 		gunzip -c "${@}" | filter 2> "${filename}"
 		;;
+	*.bz2)
+		filename=$(echo ${filename} | sed -e 's/\.bz2$//')
+		bunzip2 -c "${@}" | filter 2> "${filename}"
+		;;
 	*.Z)
 		filename=$(echo ${filename} | sed -e 's/\.Z$//')
 		uncompress -c "${@}" | filter 2> "${filename}"
@@ -362,7 +366,7 @@ fi
 less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tty
 
 # Give gvim/mvim time to open the file.
-# On Cygwin we must also wait for the process to exit before the file can
+# On Win32 we must also wait for the process to exit before the file can
 # be deleted.
 (
 	while [ -d ${tmp}/vimpager_${$} ]; do
