@@ -8,10 +8,13 @@ all: vimpager.1 README
 
 uninstall:
 	rm -f ${PREFIX}/bin/vimpager
+	rm -f ${PREFIX}/bin/vimcat
+	rm -f ${PREFIX}/man/man1/vimpager.1
 
 install:
 	${INSTALLDIR} ${DESTDIR}${PREFIX}/bin
 	${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/
+	${INSTALLBIN} vimcat ${DESTDIR}${PREFIX}/bin/
 	${INSTALLDIR} ${DESTDIR}${PREFIX}/man/man1
 	${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/man/man1
 
