@@ -330,21 +330,21 @@ filename=${@:-stdin}
 filename=$(echo "${filename}" | tr '/' '_')
 filename="${tmp}/vimpager_${$}/${filename}"
 
-case "${@,,}" in
+case $(echo "${@}" | tr 'A-Z' 'a-z') in
 	*.gz) 
-		filename=$(echo ${filename} | sed -e 's/\.gz$//')
+		filename=$(echo ${filename} | sed -e 's/\.[Gg][Zz]$//')
 		gunzip -c "${@}" | filter 2> "${filename}"
 		;;
 	*.bz2)
-		filename=$(echo ${filename} | sed -e 's/\.bz2$//')
+		filename=$(echo ${filename} | sed -e 's/\.[Bb][Zz]2$//')
 		bunzip2 -c "${@}" | filter 2> "${filename}"
 		;;
 	*.xz)
-		filename=$(echo ${filename} | sed -e 's/\.xz$//')
+		filename=$(echo ${filename} | sed -e 's/\.[Xx][Zz]$//')
 		xzcat -c "${@}" | filter 2> "${filename}"
 		;;
 	*.z)
-		filename=$(echo ${filename} | sed -e 's/\.Z$//')
+		filename=$(echo ${filename} | sed -e 's/\.[Zz]$//')
 		uncompress -c "${@}" | filter 2> "${filename}"
 		;;
 	*)
