@@ -142,6 +142,8 @@ function! s:GroupToAnsi(groupnum)
     let retv .= ";4" . bg
   elseif exists('bg')
     let retv .= ";48;5;" . bg
+  else
+    let retv .= ";49"
   endif
 
   let retv .= "m"
