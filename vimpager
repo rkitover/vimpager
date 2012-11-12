@@ -52,19 +52,18 @@ if [ -z "${cols}" ]; then
 	no_pass_thru=1 # force loading vimpager
 fi
 
-# determine location of vimrc
+#erdetermine location of vimrc
+
+# first check for a user ~/.vimpagerrc
 if [ -n "${VIMPAGER_RC}" ]; then
 	vimrc=${VIMPAGER_RC}
 elif [ -f ~/.vimpagerrc ]; then
 	vimrc=~/.vimpagerrc
 elif [ -f ~/_vimpagerrc ]; then
 	vimrc=~/_vimpagerrc
-elif [ -f /usr/local/etc/vimpagerrc ]; then
-	vimrc=/usr/local/etc/vimpagerrc
-elif [ -f /etc/vimpagerrc ]; then
-	vimrc=/etc/vimpagerrc
 fi
 
+# then check if the user has a ~/.vimrc
 if [ -z "${vimrc}" ]; then
 	trap "rm -f ${tmp}/vimpager_vimrc_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
@@ -74,7 +73,16 @@ if [ -z "${vimrc}" ]; then
 	rm -f ${tmp}/vimpager_vimrc_${$}
 fi
 
-[ -z "${vimrc}" ] && vimrc=NORC
+# then check for a global /etc/vimpagerrc and fall back to NORC
+if [ -z "${vimrc}" ]; then
+	if [ -f /usr/local/etc/vimpagerrc ]; then
+		vimrc=/usr/local/etc/vimpagerrc
+	elif [ -f /etc/vimpagerrc ]; then
+		vimrc=/etc/vimpagerrc
+	else
+		vimrc=NORC
+	fi
+fi
 
 # read settings
 trap "rm -f ${tmp}/vimpager_opts_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
