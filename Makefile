@@ -16,7 +16,7 @@ uninstall:
 install:
 	${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/vimpager
 	${INSTALLBIN} vimcat ${DESTDIR}${PREFIX}/bin/vimcat
-	${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/share/man/man1/vimpager
+	${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/share/man/man1/vimpager.1
 	${INSTALLCONF} vimpagerrc ${DESTDIR}${SYSCONFDIR}/vimpagerrc
 
 man: vimpager.1
