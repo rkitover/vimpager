@@ -1,0 +1,7 @@
+" This is the system-wide default configuration file for vimpager.
+" Uncomment or add configuration options below to make them take effect
+" for all users on the system. These setting can be overwritten by
+" ~/.vimpagerrc, ~/_vimpagerrc or whatever file is in ${VIMPAGER_RC}.
+
+" use light fonts on dark background
+"set background=dark

@@ -1,8 +1,9 @@
 PREFIX?= /usr/local
+SYSCONFDIR?= ${PREFIX}/etc
 INSTALL?= install
-INSTALLDIR= ${INSTALL} -d
-INSTALLBIN= ${INSTALL} -m 555
-INSTALLMAN= ${INSTALL} -m 444
+INSTALLBIN= ${INSTALL} -D -m 555
+INSTALLMAN= ${INSTALL} -D -m 444
+INSTALLCONF= ${INSTALL} -D -m 644
 
 all: vimpager.1 README
 
@@ -10,13 +11,13 @@ uninstall:
 	rm -f ${PREFIX}/bin/vimpager
 	rm -f ${PREFIX}/bin/vimcat
 	rm -f ${PREFIX}/share/man/man1/vimpager.1
+	rm -f ${PREFIX}/etc/vimpagerrc
 
 install:
-	${INSTALLDIR} ${DESTDIR}${PREFIX}/bin
-	${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/
-	${INSTALLBIN} vimcat ${DESTDIR}${PREFIX}/bin/
-	${INSTALLDIR} ${DESTDIR}${PREFIX}/share/man/man1
-	${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/share/man/man1
+	${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/vimpager
+	${INSTALLBIN} vimcat ${DESTDIR}${PREFIX}/bin/vimcat
+	${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/share/man/man1/vimpager
+	${INSTALLCONF} vimpagerrc ${DESTDIR}${SYSCONFDIR}/vimpagerrc
 
 man: vimpager.1
 
