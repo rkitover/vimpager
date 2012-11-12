@@ -336,6 +336,26 @@ filter() {
 	fi
 }
 
+# Check for certain parameters to pass on to vim (or conceivably do something else)
+# Currently only checks for "+G" as in less which will start reading the file
+# at the end. Also supports just "+" as in vim.
+# Couldn't use getopt or getopts as neither supports options prepended with +
+checkAndProcessParameter() {
+    case "$1" in
+        "+G" | "+")
+               vim_cmd="${vim_cmd} +"
+               ;;
+        *)
+               return 1
+               ;;
+    esac
+    return 0
+}
+
+while checkAndProcessParameter $1; do
+    shift
+done
+
 filename=${@:-stdin}
 filename=$(echo "${filename}" | tr '/' '_')
 filename="${tmp}/vimpager_${$}/${filename}"
