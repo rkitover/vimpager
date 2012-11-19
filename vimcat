@@ -9,13 +9,28 @@
 
   script=$(command -v ${0})
 
-  vim -E -X -R -c "source ${script} | visual | bufdo call AnsiHighlight(\"${tmp_file}\") | qa" "${@}" </dev/tty >/dev/null 2>&1
+  for file in "${@}"
+  do
+    if [ "${#}" -ge 2 ]
+    then
+      echo "==> ${file} <=="
+    fi
 
-  cat ${tmp_file}
+    # Check that the file exists
+    if test -r "${file}" -a -f "${file}"; then
+      vim -E -X -R -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
+      cat ${tmp_file}
+      echo
+    else
+      echo "vcat: Cannot read file: ${file}" >&2
+    fi
+  done
 
-  rm -f ${tmp_file}
+  rm -f "${tmp_file}"
 
   exit
+
+: endfor
 : endif
 
 " AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
@@ -119,7 +134,7 @@ function! s:GroupToAnsi(groupnum)
     unlet bg
   endif
 
-  if !exists('bg') && !groupnum == hlID('Normal')
+  if !exists('bg')
     let bg = synIDattr(hlID('Normal'), 'bg', s:type)
     if bg == "" || bg == -1
       unlet bg
