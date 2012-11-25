@@ -66,6 +66,12 @@ example usage is as follows:
       endif
     endif
 
+# COMMAND LINE OPTIONS
+
+## + | +G
+
+Start at the end of the file, just like less.
+
 # CYGWIN NOTES
 The Cygwin gvim is very buggy, vimpager works correctly with the native
 Windows gvim, just put it in your PATH.

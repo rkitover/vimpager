@@ -71,6 +71,14 @@ variable, an example usage is as follows:
       endif
     endif
 
+COMMAND LINE OPTIONS
+====================
+
++ | +G
+------
+
+Start at the end of the file, just like less.
+
 CYGWIN NOTES
 ============
 
