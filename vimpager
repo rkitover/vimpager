@@ -25,17 +25,17 @@ tmp=/tmp
 [ -n "${msys}" -o -n "${cygwin}" ] && tmp=$(printf "%s\n" "${TEMP}" | tr '\\' /)
 
 # Detect terminal size
-if command -v tput > /dev/null; then
+if command -v tput >/dev/null; then
 	# this is the only way it works on Cygwin
-	trap "rm -f /tmp/vimpager_cols_${$} /tmp/vimpager_lines_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
+	trap "rm -f '${tmp}/vimpager_cols_${$}' '${tmp}/vimpager_lines_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-	tput cols  > /tmp/vimpager_cols_${$}
-	tput lines > /tmp/vimpager_lines_${$}
+	tput cols  > "${tmp}/vimpager_cols_${$}"
+	tput lines > "${tmp}/vimpager_lines_${$}"
 
-	cols=$(cat /tmp/vimpager_cols_${$})
-	lines=$(cat /tmp/vimpager_lines_${$})
+	cols=$(cat "${tmp}/vimpager_cols_${$}")
+	lines=$(cat "${tmp}/vimpager_lines_${$}")
 
-	rm -f /tmp/vimpager_cols_${$} /tmp/vimpager_lines_${$}
+	rm -f "${tmp}/vimpager_cols_${$}" "${tmp}/vimpager_lines_${$}"
 fi
 
 # msys has no tput, this doesn't work on Cygwin by the way
@@ -52,11 +52,50 @@ if [ -z "${cols}" ]; then
 	no_pass_thru=1 # force loading vimpager
 fi
 
-#erdetermine location of vimrc
+find_vim_dir() {
+	trap "rm -f '${tmp}/vimpager_vim_dir_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
+
+	vim -E -c 'call writefile([ $VIM ], "'${tmp}'/vimpager_vim_dir_'${$}'") | q' </dev/null
+	vim_dir=$(head -1 "${tmp}/vimpager_vim_dir_${$}")
+
+	rm -f "${tmp}/vimpager_vim_dir_${$}"
+}
+
+# this uses the heuristics described in :help startup
+find_rc() {
+	_cmd=$1
+	_rc_file=$2
+
+	[ -e "${HOME}/.${_rc_file}" ] && _rc="${HOME}/.${_rc_file}"
+
+	if [ -n "${msys}" -o -n "${cygwin}" ]; then
+		if command -v ${_cmd} 2>/dev/null | awk '$1 ~ /^\/(cygdrive\/)?[a-z]\// {t=1} END {exit 1-t}'; then
+			eval "win32_native_${cmd}=1"
+
+			if [ -e "${HOME}/_${_rc_file}" ]; then
+				_rc="${HOME}/_${_rc_file}"
+			elif [ -z "${_rc}" ]; then
+				[ -z "${vim_dir}" ] && find_vim_dir
+
+				if [ -e "${vim_dir}/_${_rc_file}" ]; then
+					_rc="${vim_dir}/_${_rc_file}"
+				elif [ -e "${vim_dir}/.${_rc_file}" ]; then
+					_rc="${vim_dir}/.${_rc_file}"
+				fi
+			fi
+		fi
+	fi
+
+	echo "${_rc}"
+
+	unset _cmd _rc_file _rc
+}
+
+# determine location of rc file
 
 # first check for a user ~/.vimpagerrc
 if [ -n "${VIMPAGER_RC}" ]; then
-	vimrc=${VIMPAGER_RC}
+	vimrc="${VIMPAGER_RC}"
 elif [ -f ~/.vimpagerrc ]; then
 	vimrc=~/.vimpagerrc
 elif [ -f ~/_vimpagerrc ]; then
@@ -64,14 +103,7 @@ elif [ -f ~/_vimpagerrc ]; then
 fi
 
 # then check if the user has a ~/.vimrc
-if [ -z "${vimrc}" ]; then
-	trap "rm -f ${tmp}/vimpager_vimrc_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
-
-	vim -E -c 'call writefile([ $MYVIMRC ], "'${tmp}'/vimpager_vimrc_'${$}'") | q' </dev/tty
-	vimrc=$(head -1 ${tmp}/vimpager_vimrc_${$})
-
-	rm -f ${tmp}/vimpager_vimrc_${$}
-fi
+[ -z "${vimrc}" ] && vimrc="$(find_rc vim vimrc)"
 
 # then check for a global /etc/vimpagerrc and fall back to NORC
 if [ -z "${vimrc}" ]; then
@@ -85,7 +117,7 @@ if [ -z "${vimrc}" ]; then
 fi
 
 # read settings
-trap "rm -f ${tmp}/vimpager_opts_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
+trap "rm -f '${tmp}/vimpager_opts_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 	if !exists("vimpager_use_gvim")
@@ -104,18 +136,18 @@ vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 		let vimpager_passthrough=0
 	endif
 
-	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, $VIM ], "'${tmp}'/vimpager_opts_'${$}'")
+	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough ], "'${tmp}'/vimpager_opts_'${$}'")
 	
 	quit
-' </dev/tty
+' </dev/null
 
-[ "$(head -1 < ${tmp}/vimpager_opts_${$})" = 1 ] && use_gvim=1
+[ "$(head -1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
 
-[ "$(head -2 < ${tmp}/vimpager_opts_${$} | tail -1)" = 1 ] && disable_x11=1
+[ "$(head -2 < "${tmp}/vimpager_opts_${$}" | tail -1)" = 1 ] && disable_x11=1
 
-scrolloff=$(head -3 < ${tmp}/vimpager_opts_${$} | tail -1)
+scrolloff=$(head -3 < "${tmp}/vimpager_opts_${$}" | tail -1)
 
-[ "$(head -4 < ${tmp}/vimpager_opts_${$} | tail -1)" = 0 ] && no_pass_thru=1
+[ "$(head -4 < "${tmp}/vimpager_opts_${$}" | tail -1)" = 0 ] && no_pass_thru=1
 
 if [ "${no_pass_thru}" = 0 ]; then
 	# check if arithmetic expansion works, passthrough mode relies on it
@@ -124,9 +156,7 @@ if [ "${no_pass_thru}" = 0 ]; then
 	fi
 fi
 
-vim_dir=$(head -5 < ${tmp}/vimpager_opts_${$} | tail -1)
-
-rm -f ${tmp}/vimpager_opts_${$}
+rm -f "${tmp}/vimpager_opts_${$}"
 
 if [ -n "${msys}" -o -n "${cygwin}" ]; then
 	# msys/cygwin may be using a native vim, and if we're not in a real
@@ -141,23 +171,7 @@ fi
 
 if [ -n "${use_gvim}" ]; then
 	# find the .gvimrc
-	[ -e ${HOME}/.gvimrc ] && gvimrc=${HOME}/.gvimrc
-
-	if [ -n "${msys}" -o -n "${cygwin}" ]; then
-		if command -v gvim 2>/dev/null | awk '$1 ~ /^\/(cygdrive\/)?[a-z]\// {t=1} END {exit 1-t}'; then
-			win32_native_gvim=1
-
-			if [ -e ${HOME}/_gvimrc ]; then
-				gvimrc=${HOME}/_gvimrc
-			elif [ -z "${gvimrc}" ]; then
-				if [ -e "${vim_dir}/_gvimrc" ]; then
-					gvimrc=${vim_dir}/_gvimrc
-				elif [ -e "${vim_dir}/.gvimrc" ]; then
-					gvimrc=${vim_dir}/.gvimrc
-				fi
-			fi
-		fi
-	fi
+	gvimrc="$(find_rc gvim gvimrc)"
 
 	# determine if this is an ssh session and/or $DISPLAY is set
 	if [ -n "${osx}" ]; then
@@ -258,7 +272,7 @@ awk_pstree() {
 	}'
 }
 
-do_ptree() {
+_do_ptree() {
 	if [ -n "${solaris}" ]; then
 		# Tested on Solaris 8 and 10
 		ptree ${$}
@@ -272,6 +286,11 @@ do_ptree() {
 	fi
 }
 
+# silence warnings about DY* variables on OSX
+do_ptree() {
+	_do_ptree "$@" 2>/dev/null
+}
+
 # Check if called from man, perldoc or pydoc
 if do_ptree | awk '$2 ~ /(^|\/)(man|perl(doc)?([0-9.]*)?|py(thon|doc|doc2))/ {t=1} END { exit 1-t }'; then
 	extra_c="set ft=man"
@@ -279,9 +298,9 @@ fi
 
 extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
-trap "rm -rf ${tmp}/vimpager_${$}" HUP INT QUIT ILL TRAP KILL BUS TERM
+trap "rm -rf '${tmp}/vimpager_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-mkdir -m 0700 ${tmp}/vimpager_${$}
+mkdir -m 0700 "${tmp}/vimpager_${$}"
 
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
@@ -289,9 +308,9 @@ command -v perl > /dev/null && \
 # Normally, filter outputs ANSI-escape-code-free content to STDERR.
 # When content is short, filter outputs content with ANSI escape codes to STDOUT.
 filter() {
+	OLDIFS="${IFS}"
 	if [ -z "${no_pass_thru}" ]; then
 		content=
-		OLDIFS="${IFS}"
 		# ts: tab stop
 		# nl: number of physycal lines
 		# dh: display height
@@ -403,9 +422,9 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # On Win32 we must also wait for the process to exit before the file can
 # be deleted.
 (
-	while [ -d ${tmp}/vimpager_${$} ]; do
+	while [ -d "${tmp}/vimpager_${$}" ]; do
 		sleep 10
-		rm -rf ${tmp}/vimpager_${$} 2>/dev/null
+		rm -rf "${tmp}/vimpager_${$}" 2>/dev/null
 		rm -f gvim.exe.stackdump 2>/dev/null
 	done
 ) &
@@ -429,5 +448,7 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # Simon Olofsson <simon@olofsson.de>
 # lickel: Adam Lickel <adam@lickel.com>
 # eworm-de: Christian Hesse <mail@eworm.de>
+# krijesta: Chris Chambers <krijesta@google.com>
+# vincer: vince rosso <vince@locationlabs.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
