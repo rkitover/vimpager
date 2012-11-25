@@ -215,7 +215,7 @@ less_vim() {
 				-u "${vimrc}" \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>" \
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>" \
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
@@ -235,7 +235,7 @@ less_vim() {
 				-u "${vimrc}" \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> |
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
 				"${@:--}" &
 			;;
