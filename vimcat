@@ -120,11 +120,6 @@ function! s:GroupToAnsi(groupnum)
     let fg = temp
   endif
 
-  if fg >= 8 && fg < 16
-    let fg -= 8
-    let bd = 1
-  endif
-
   if fg == "" || fg == -1
     unlet fg
   endif
@@ -155,13 +150,17 @@ function! s:GroupToAnsi(groupnum)
 
   if exists('fg') && fg < 8
     let retv .= ";3" . fg
-  elseif exists('fg')
+  elseif exists('fg')  && fg < 16    "use aixterm codes
+    let retv .= ";9" . (fg - 8)
+  elseif exists('fg')                "use xterm256 codes
     let retv .= ";38;5;" . fg
   endif
 
   if exists('bg') && bg < 8
     let retv .= ";4" . bg
-  elseif exists('bg')
+  elseif exists('bg') && bg < 16     "use aixterm codes
+    let retv .= ";10" . (bg - 8)
+  elseif exists('bg')                "use xterm256 codes
     let retv .= ";48;5;" . bg
   else
     let retv .= ";49"
