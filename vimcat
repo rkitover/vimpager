@@ -16,9 +16,15 @@
       echo "==> ${file} <=="
     fi
 
+    if [ -f ~/.vimcatrc ]; then
+        vimcatrc_arg="-u ~/.vimcatrc"
+    else
+        vimcatrc_arg=""
+    fi
+    
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
-      vim -E -X -R -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
+      vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
       cat ${tmp_file}
       echo
     else
