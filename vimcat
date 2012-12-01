@@ -16,9 +16,15 @@
       echo "==> ${file} <=="
     fi
 
+    if [ -f ~/.vimcatrc ]; then
+        vimcatrc_arg="-u ~/.vimcatrc"
+    else
+        vimcatrc_arg=""
+    fi
+    
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
-      vim -E -X -R -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
+      vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
       cat ${tmp_file}
       echo
     else
@@ -114,11 +120,6 @@ function! s:GroupToAnsi(groupnum)
     let fg = temp
   endif
 
-  if fg >= 8 && fg < 16
-    let fg -= 8
-    let bd = 1
-  endif
-
   if fg == "" || fg == -1
     unlet fg
   endif
@@ -149,13 +150,17 @@ function! s:GroupToAnsi(groupnum)
 
   if exists('fg') && fg < 8
     let retv .= ";3" . fg
-  elseif exists('fg')
+  elseif exists('fg')  && fg < 16    "use aixterm codes
+    let retv .= ";9" . (fg - 8)
+  elseif exists('fg')                "use xterm256 codes
     let retv .= ";38;5;" . fg
   endif
 
   if exists('bg') && bg < 8
     let retv .= ";4" . bg
-  elseif exists('bg')
+  elseif exists('bg') && bg < 16     "use aixterm codes
+    let retv .= ";10" . (bg - 8)
+  elseif exists('bg')                "use xterm256 codes
     let retv .= ";48;5;" . bg
   else
     let retv .= ";49"
