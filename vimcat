@@ -9,10 +9,15 @@
 
   script=$(command -v ${0})
 
-  for file in "${@}"
+  files=("${@}")
+
+  if [ "${#}" -eq 0 ]; then
+    files[1]="-"
+  fi
+
+  for file in "${files[@]}"
   do
-    if [ "${#}" -ge 2 ]
-    then
+    if [ "${#files[@]}" -ge 2 ]; then
       echo "==> ${file} <=="
     fi
 
@@ -21,7 +26,12 @@
     else
         vimcatrc_arg=""
     fi
-    
+
+    if [ "${file}" = "-" ]; then
+      cat - >${tmp_file}
+      file=${tmp_file}
+    fi
+
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
       vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
@@ -37,6 +47,7 @@
   exit
 
 : endfor
+: endif
 : endif
 
 " AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
