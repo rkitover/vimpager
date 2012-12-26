@@ -471,5 +471,6 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # eworm-de: Christian Hesse <mail@eworm.de>
 # krijesta: Chris Chambers <krijesta@google.com>
 # vincer: vince rosso <vince@locationlabs.com>
+# justinkb: Paul Mulders <justinkb@gmail.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
