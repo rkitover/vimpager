@@ -17,6 +17,7 @@ case $(uname -s) in
 	CYGWIN*) cygwin=1 ;;
 	MINGW*) msys=1 ;;
 	OpenBSD) openbsd=1; bsd=1 ;;
+	FreeBSD) freebsd=1; bsd=1 ;;
 	*) bsd=1 ;;
 esac
 
@@ -258,6 +259,24 @@ less_vim() {
 	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 }
 
+awk_pstree_freebsd() {
+	awk -v mypid=${1} '{
+		cmd[$1]=$3
+		ppid[$1]=$2
+		arg[$1]=$4
+	}
+	END {
+		while (mypid != 1 && cmd[mypid]) {
+			if (cmd[mypid] == "/bin/sh" && arg[mypid] == "/usr/bin/man")
+				ptree=mypid " /usr/bin/man\n" ptree
+			else
+				ptree=mypid " " cmd[mypid] "\n" ptree
+			mypid=ppid[mypid]
+		}
+		print ptree
+	}'
+}
+
 awk_pstree() {
 	awk -v mypid=${1} '{
 		cmd[$1]=$3
@@ -280,6 +299,8 @@ _do_ptree() {
 		ps | awk '{ print $1 "\t" $2 "\t" $NF }' | awk_pstree ${$}
 	elif [ -n "${openbsd}" ]; then
 		ps awo pid=,ppid=,command= | awk_pstree ${$}
+	elif [ -n "${freebsd}" ]; then
+		ps aw -o pid= -o ppid= -o command= | awk_pstree_freebsd ${$}
 	else
 		# Tested on Linux and OS X
 		ps awo pid=,ppid=,comm= | awk_pstree ${$}
