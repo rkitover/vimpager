@@ -165,6 +165,8 @@ function! s:GroupToAnsi(groupnum)
     let retv .= ";9" . (fg - 8)
   elseif exists('fg')                "use xterm256 codes
     let retv .= ";38;5;" . fg
+  else
+    let retv .= ";39"
   endif
 
   if exists('bg') && bg < 8
