@@ -154,6 +154,7 @@ function! s:GroupToAnsi(groupnum)
   endif
 
   let retv = "\<Esc>[22;24;25;27;28"
+  let retv = "\<Esc>[39"
 
   if bd
     let retv .= ";1"
