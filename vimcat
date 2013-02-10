@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #!/usr/bin/env vim
 #! This is a bash script that executes itself as a vimscript to do its work
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
@@ -38,7 +38,7 @@
       cat ${tmp_file}
       echo
     else
-      echo "vcat: Cannot read file: ${file}" >&2
+      echo "$0: Cannot read file: ${file}" >&2
     fi
   done
 
