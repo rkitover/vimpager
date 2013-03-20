@@ -18,6 +18,7 @@ case $(uname -s) in
 	MINGW*) msys=1 ;;
 	OpenBSD) openbsd=1; bsd=1 ;;
 	FreeBSD) freebsd=1; bsd=1 ;;
+	NetBSD) netbsd=1; bsd=1 ;;
 	*) bsd=1 ;;
 esac
 
@@ -301,6 +302,8 @@ _do_ptree() {
 		ps awo pid=,ppid=,command= | awk_pstree ${$}
 	elif [ -n "${freebsd}" ]; then
 		ps aw -o pid= -o ppid= -o command= | awk_pstree_freebsd ${$}
+	elif [ -n "${netbsd}" ]; then
+		ps aw -o pid= -o ppid= -o command= | awk_pstree ${$}
 	else
 		# Tested on Linux and OS X
 		ps awo pid=,ppid=,comm= | awk_pstree ${$}
