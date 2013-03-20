@@ -13,8 +13,8 @@ cat *some_file* | vimpager
 # DESCRIPTION
 A slightly more sophisticated replacement for less.sh that also supports being
 set as the PAGER environment variable. Displays man pages, perldocs and python
-documentation properly. Works on Linux, Solaris, FreeBSD, OpenBSD, OSX, Cygwin
-and msys. Should work on most other systems as well.
+documentation properly. Works on Linux, Solaris, FreeBSD, NetBSD, OpenBSD, OSX,
+Cygwin and msys. Should work on most other systems as well.
 
 On GitHub: <http://github.com/rkitover/vimpager>
 
