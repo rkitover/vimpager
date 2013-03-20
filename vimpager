@@ -2,7 +2,7 @@
 
 # Script for using ViM as a PAGER.
 # Based on Bram's less.sh.
-# Version 1.7.9
+# Version 1.8.0
 # git://github.com/rkitover/vimpager.git
 
 # Just pass through if not on a tty
@@ -475,5 +475,6 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # krijesta: Chris Chambers <krijesta@google.com>
 # vincer: vince rosso <vince@locationlabs.com>
 # justinkb: Paul Mulders <justinkb@gmail.com>
+# nonakap: NONAKA Kimihiro <nonakap@gmail.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
