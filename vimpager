@@ -111,7 +111,7 @@ if [ -n "${VIMPAGER_RC}" ]; then
 	vimrc="${VIMPAGER_RC}"
 elif [ -f ~/.vimpagerrc ]; then
 	vimrc=~/.vimpagerrc
-else [ -f ~/.vim/vimpagerrc ]; then
+elif [ -f ~/.vim/vimpagerrc ]; then
 	vimrc=~/.vim/vimpagerrc
 elif [ -f ~/_vimpagerrc ]; then
 	vimrc=~/_vimpagerrc
