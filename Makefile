@@ -4,8 +4,9 @@ INSTALL?= install
 INSTALLBIN= ${INSTALL} -D -m 555
 INSTALLMAN= ${INSTALL} -D -m 444
 INSTALLCONF= ${INSTALL} -D -m 644
+COPYFILE= ${INSTALL} -D -m 644
 
-all: vimpager.1 README
+all: vimpager.1 README README.md
 
 uninstall:
 	rm -f ${PREFIX}/bin/vimpager
@@ -28,5 +29,8 @@ vimpager.1: vimpager.md
 README: vimpager.md
 	pandoc -s -w plain vimpager.md -o README
 	dos2unix README
+
+README.md: vimpager.md
+	${COPYFILE} vimpager.md README.md
 
 .PHONY: all install uninstall man
