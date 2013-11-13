@@ -111,6 +111,8 @@ if [ -n "${VIMPAGER_RC}" ]; then
 	vimrc="${VIMPAGER_RC}"
 elif [ -f ~/.vimpagerrc ]; then
 	vimrc=~/.vimpagerrc
+elif [ -f ~/.vim/vimpagerrc ]; then
+	vimrc=~/.vim/vimpagerrc
 elif [ -f ~/_vimpagerrc ]; then
 	vimrc=~/_vimpagerrc
 fi
@@ -136,21 +138,21 @@ vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 	if !exists("vimpager_use_gvim")
 		let vimpager_use_gvim=0
 	endif
-	
+
 	if !exists("vimpager_disable_x11")
 		let vimpager_disable_x11=0
 	endif
-	
+
 	if !exists("vimpager_scrolloff")
 		let vimpager_scrolloff=5
 	endif
-	
+
 	if !exists("vimpager_passthrough")
 		let vimpager_passthrough=0
 	endif
 
 	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough ], "'${tmp}'/vimpager_opts_'${$}'")
-	
+
 	quit
 ' </dev/null
 
@@ -415,7 +417,7 @@ filename=$(echo "${filename}" | tr '/' '_')
 filename="${tmp}/vimpager_${$}/${filename}"
 
 case $(echo "${@}" | tr 'A-Z' 'a-z') in
-	*.gz) 
+	*.gz)
 		filename=$(echo ${filename} | sed -e 's/\.[Gg][Zz]$//')
 		gunzip -c "${@}" | filter 2> "${filename}"
 		;;
@@ -463,7 +465,7 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # be deleted.
 (
 	while [ -d "${tmp}/vimpager_${$}" ]; do
-		sleep 10 
+		sleep 10
 		rm -rf "${tmp}/vimpager_${$}" 2>/dev/null
 		rm -f gvim.exe.stackdump 2>/dev/null
 	done
