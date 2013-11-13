@@ -4,6 +4,11 @@
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
+  # Just pass through if not on a tty
+  if [ ! -t 1 ]; then
+    exec cat "${@}"
+  fi
+
   tmp_file=/tmp/vimcat_${$}
   trap "rm -f ${tmp_file}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
@@ -47,6 +52,7 @@
   exit
 
 : endfor
+: endif
 : endif
 : endif
 
