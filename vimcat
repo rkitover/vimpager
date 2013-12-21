@@ -14,6 +14,15 @@
 
   script=$(command -v ${0})
 
+  # check for arguments to pass to vim
+  while [ $# -gt 0 ] ; do
+    case "${1}" in
+      "-c") shift; extra_c="${1}"; shift ;; 
+        -*) echo "bad option '${1}'" ; exit 1 ;;
+         *) break ;;
+    esac
+  done
+
   files=("${@}")
 
   if [ "${#}" -eq 0 ]; then
@@ -39,7 +48,7 @@
 
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
-      vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
+      vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
       cat ${tmp_file}
       echo
     else
@@ -52,6 +61,7 @@
   exit
 
 : endfor
+: endwhile
 : endif
 : endif
 : endif

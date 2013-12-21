@@ -396,20 +396,13 @@ filter() {
 # Currently only checks for "+G" as in less which will start reading the file
 # at the end. Also supports just "+" as in vim.
 # Couldn't use getopt or getopts as neither supports options prepended with +
-checkAndProcessParameter() {
-    case "$1" in
-        "+G" | "+")
-               vim_cmd="${vim_cmd} +"
-               ;;
-        *)
-               return 1
-               ;;
-    esac
-    return 0
-}
-
-while checkAndProcessParameter $1; do
-    shift
+while [ $# -gt 0 ] ; do
+        case "$1" in
+                "+G"|"+") vim_cmd="${vim_cmd} +"; shift ;;
+                    "-c") shift; extra_c="$1"; shift ;; 
+                      -*) echo "bad option '$1'" ; exit 1 ;;
+                       *) break ;;
+         esac
 done
 
 filename=${@:-stdin}
