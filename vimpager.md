@@ -72,6 +72,10 @@ example usage is as follows:
 
 Start at the end of the file, just like less.
 
+## -c cmd
+
+Run a vim command after opening the file.
+
 # CYGWIN NOTES
 
 The Cygwin gvim is very buggy, vimpager works correctly with the native

@@ -19,6 +19,12 @@ To use a different vimrc with vimcat, put your settings into a ~/.vimcatrc.
 
 To disable loading plugins, put "set noloadplugins" into a ~/.vimcatrc file.
 
+# COMMAND LINE OPTIONS
+
+## -c cmd
+
+Run a vim command after opening the file.
+
 # LICENSE AND COPYRIGHT
 
 Copyright (c) 2013, Rafael Kitover
