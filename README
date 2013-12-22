@@ -1,6 +1,6 @@
 VIMPAGER(1) vimpager user manual
-Rafael Kitover rkitover@cpan.org
-April 25, 2013
+Rafael Kitover rkitover@gmail.com
+November 24, 2013
 
 NAME
 ====
@@ -30,19 +30,20 @@ To use it as as your PAGER: put these in your ~/.bashrc or ~/.zshrc
     alias zless=$PAGER
 
 To use a different vimrc with vimpager, put your settings into a
-~/.vimpagerrc or a file pointed to by the VIMPAGER_RC environment
-variable.
+~/.vimpagerrc or ~/.vim/vimpagerrc or a file pointed to by the
+VIMPAGER_RC environment variable.
 
 You can also have a global config file for all users in /etc/vimpagerrc,
-users can override it by creating a ~/.vimpagerrc.
+users can override it by creating a ~/.vimpagerrc or a
+~/.vim/vimpagerrc.
 
-To disable loading plugins, put "set noloadplugins" into a ~/.vimpagerrc
+To disable loading plugins, put "set noloadplugins" into a vimpagerrc
 file.
 
 You can also switch on the "vimpager" variable in your vimrc to set
 alternate settings for vimpager.
 
-Put the following into your .vimrc/.vimpagerrc if you want to use
+Put the following into your .vimrc/vimpagerrc if you want to use
 gvim/MacVim for your pager window:
 
     let vimpager_use_gvim = 1
@@ -53,12 +54,12 @@ highlighting, at present) use this:
     let vimpager_passthrough = 1
 
 To start vim with -X (no x11 connection, a bit faster startup) put the
-following into your .vimrc/.vimpagerrc:
+following into your .vimrc/vimpagerrc:
 
     let vimpager_disable_x11 = 1
 
 The scroll offset (:help scrolloff), may be specified by placing the
-following into your .vimrc/.vimpagerrc (default = 5, disable = 0):
+following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
     let vimpager_scrolloff = 5
 
@@ -79,6 +80,11 @@ COMMAND LINE OPTIONS
 
 Start at the end of the file, just like less.
 
+-c cmd
+------
+
+Run a vim command after opening the file.
+
 CYGWIN NOTES
 ============
 
@@ -88,7 +94,7 @@ Windows gvim, just put it in your PATH.
 LICENSE AND COPYRIGHT
 =====================
 
-Copyright (c) 2013, Rafael Kitover
+Copyright (c) 2013, Rafael Kitover rkitover@gmail.com
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

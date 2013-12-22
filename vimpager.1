@@ -1,4 +1,4 @@
-.TH "VIMPAGER" "1" "April 25, 2013" "vimpager user manual" ""
+.TH "VIMPAGER" "1" "November 24, 2013" "vimpager user manual" ""
 .SH NAME
 .PP
 vimpager \- less.sh replacement
@@ -26,19 +26,20 @@ alias\ zless=$PAGER
 .fi
 .PP
 To use a different vimrc with vimpager, put your settings into a
-~/.vimpagerrc or a file pointed to by the VIMPAGER_RC environment
-variable.
+~/.vimpagerrc or ~/.vim/vimpagerrc or a file pointed to by the
+VIMPAGER_RC environment variable.
 .PP
 You can also have a global config file for all users in /etc/vimpagerrc,
-users can override it by creating a ~/.vimpagerrc.
+users can override it by creating a ~/.vimpagerrc or a
+~/.vim/vimpagerrc.
 .PP
-To disable loading plugins, put "set noloadplugins" into a ~/.vimpagerrc
+To disable loading plugins, put "set noloadplugins" into a vimpagerrc
 file.
 .PP
 You can also switch on the "vimpager" variable in your vimrc to set
 alternate settings for vimpager.
 .PP
-Put the following into your .vimrc/.vimpagerrc if you want to use
+Put the following into your .vimrc/vimpagerrc if you want to use
 gvim/MacVim for your pager window:
 .IP
 .nf
@@ -57,7 +58,7 @@ let\ vimpager_passthrough\ =\ 1
 .fi
 .PP
 To start vim with \-X (no x11 connection, a bit faster startup) put the
-following into your .vimrc/.vimpagerrc:
+following into your .vimrc/vimpagerrc:
 .IP
 .nf
 \f[C]
@@ -66,7 +67,7 @@ let\ vimpager_disable_x11\ =\ 1
 .fi
 .PP
 The scroll offset (:help scrolloff), may be specified by placing the
-following into your .vimrc/.vimpagerrc (default = 5, disable = 0):
+following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 .IP
 .nf
 \f[C]
@@ -99,7 +100,7 @@ The Cygwin gvim is very buggy, vimpager works correctly with the native
 Windows gvim, just put it in your PATH.
 .SH LICENSE AND COPYRIGHT
 .PP
-Copyright (c) 2013, Rafael Kitover
+Copyright (c) 2013, Rafael Kitover <rkitover@gmail.com>
 .PP
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -125,4 +126,4 @@ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 .SH AUTHORS
-Rafael Kitover <rkitover@cpan.org>.
+Rafael Kitover <rkitover@gmail.com>.
