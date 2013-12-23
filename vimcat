@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #!/usr/bin/env vim
 #! This is a bash script that executes itself as a vimscript to do its work
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
@@ -8,6 +8,35 @@
   if [ ! -t 1 ]; then
     exec cat "${@}"
   fi
+# try to find a better shell, especially on Solaris
+
+  PATH=/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin:$PATH
+
+  if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
+          IN_BASH=1
+          export IN_BASH
+          exec bash "$0" "$@"
+  elif [ -z "$IN_BASH" ] && [ -z "$IN_KSH" ]; then
+          if command -v dtksh >/dev/null; then
+                  IN_KSH=1
+                  export IN_KSH
+                  exec dtksh "$0" "$@"
+          elif [ -x /usr/xpg4/bin/sh ]; then
+                  IN_KSH=1
+                  export IN_KSH
+                  exec /usr/xpg4/bin/sh "$0" "$@"
+          elif command -v ksh93 >/dev/null; then
+                  IN_KSH=1
+                  export IN_KSH
+                  exec ksh93 "$0" "$@"
+          elif command -v ksh >/dev/null; then
+                  IN_KSH=1
+                  export IN_KSH
+                  exec ksh "$0" "$@"
+          fi
+  fi
+
+  # hopefully we're now POSIX
 
   tmp_file=/tmp/vimcat_${$}
   trap "rm -f ${tmp_file}" HUP INT QUIT ILL TRAP KILL BUS TERM
@@ -62,6 +91,8 @@
 
 : endfor
 : endwhile
+: endif
+: endif
 : endif
 : endif
 : endif
