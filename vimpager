@@ -270,11 +270,13 @@ less_vim() {
 				vim_cmd="${vim_cmd} -X"
 			fi
 
+# 'unmap h' has to be the very last command in -c, to disable the less.vim help screen
 			${vim_cmd} \
 				-u "${vimrc}" \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u>" \
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> |
+				    nnoremap <Up> 1<C-u> | unmap h" \
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
@@ -294,8 +296,10 @@ less_vim() {
 				-u "${vimrc}" \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> | nnoremap <Up> 1<C-u> |
-				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> |
+				    nnoremap <Up> 1<C-u> |
+				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols} |
+				    unmap h" \
 				"${@:--}" &
 			;;
 	esac
