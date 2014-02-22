@@ -110,6 +110,7 @@ find_rc() {
 	_rc_file=$2
 
 	[ -e "${HOME}/.${_rc_file}" ] && _rc="${HOME}/.${_rc_file}"
+	[ -z "${_rc}" ] && [ -e "${HOME}/_${_rc_file}" ] && _rc="${HOME}/_${_rc_file}"
 
 	if [ -n "${msys}" -o -n "${cygwin}" ]; then
 		if command -v ${_cmd} 2>/dev/null | grep_q '^\/(cygdrive\/)?[a-z]\/'; then
