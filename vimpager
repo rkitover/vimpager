@@ -468,7 +468,7 @@ case $(echo "${@}" | tr 'A-Z' 'a-z') in
 esac
 
 # dumb man detection when the pstree heuristic fails
-if head -n 6 "${filename}" | grep_q '^NAME$'; then
+if head -n 12 "${filename}" | grep_q '^NAME$'; then
 	extra_c='set ft=man'
 fi
 
