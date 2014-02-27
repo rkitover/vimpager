@@ -49,7 +49,7 @@
   # check for arguments to pass to vim
   while [ $# -gt 0 ] ; do
     case "${1}" in
-      "-c") shift; extra_c="${1}"; shift ;; 
+      "-c") shift; extra_c="${1}"; shift ;;
         -*) echo "bad option '${1}'" ; exit 1 ;;
          *) break ;;
     esac
