@@ -99,7 +99,7 @@ find_vim_dir() {
 	trap "rm -f '${tmp}/vimpager_vim_dir_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 	vim -E -c 'call writefile([ $VIM ], "'${tmp}'/vimpager_vim_dir_'${$}'") | q' </dev/null
-	vim_dir=$(head -1 "${tmp}/vimpager_vim_dir_${$}")
+	vim_dir=$(head -n 1 "${tmp}/vimpager_vim_dir_${$}")
 
 	rm -f "${tmp}/vimpager_vim_dir_${$}"
 }
@@ -187,13 +187,13 @@ vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 	quit
 ' </dev/null
 
-[ "$(head -1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
+[ "$(head -n 1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
 
-[ "$(head -2 < "${tmp}/vimpager_opts_${$}" | tail -1)" = 1 ] && disable_x11=1
+[ "$(head -n 2 < "${tmp}/vimpager_opts_${$}" | tail -n 1)" = 1 ] && disable_x11=1
 
-scrolloff=$(head -3 < "${tmp}/vimpager_opts_${$}" | tail -1)
+scrolloff=$(head -n 3 < "${tmp}/vimpager_opts_${$}" | tail -n 1)
 
-[ "$(head -4 < "${tmp}/vimpager_opts_${$}" | tail -1)" = 0 ] && no_pass_thru=1
+[ "$(head -n 4 < "${tmp}/vimpager_opts_${$}" | tail -n 1)" = 0 ] && no_pass_thru=1
 
 if [ "${no_pass_thru}" = 0 ]; then
 	# check if arithmetic expansion works, passthrough mode relies on it
@@ -282,12 +282,12 @@ less_vim() {
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
-			[ -n "${gvimrc}" ] && colors=$(grep guifg ${gvimrc} 2>/dev/null | head -1)
+			[ -n "${gvimrc}" ] && colors=$(grep guifg ${gvimrc} 2>/dev/null | head -n 1)
 
 			# Check if the user maximized the window in ~/_gvimrc on Win32, if
 			# so restore on startup.
 			if [ -n "${gvimrc}" -a \( -n "${cygwin}" -o -n "${msys}" \) ]; then
-				simalt=$(grep simalt "${gvimrc}" 2>/dev/null | head -1)
+				simalt=$(grep simalt "${gvimrc}" 2>/dev/null | head -n 1)
 
 				if [ -n "${simalt}" ]; then
 					restore="simalt ~r"
@@ -468,7 +468,7 @@ case $(echo "${@}" | tr 'A-Z' 'a-z') in
 esac
 
 # dumb man detection when the pstree heuristic fails
-if head -6 "${filename}" | grep_q '^NAME$'; then
+if head -n 6 "${filename}" | grep_q '^NAME$'; then
 	extra_c='set ft=man'
 fi
 
