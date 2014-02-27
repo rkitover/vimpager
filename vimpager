@@ -435,7 +435,7 @@ filter() {
 while [ $# -gt 0 ] ; do
         case "$1" in
                 "+G"|"+") vim_cmd="${vim_cmd} +"; shift ;;
-                    "-c") shift; extra_c="$1"; shift ;; 
+                    "-c") shift; extra_c="$1"; shift ;;
                       -*) echo "bad option '$1'" ; exit 1 ;;
                        *) break ;;
          esac
