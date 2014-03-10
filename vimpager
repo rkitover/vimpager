@@ -63,6 +63,46 @@ grep_q() {
 	' "$@"
 }
 
+head_n() {
+	_lines=$1
+	shift
+
+	if [ -z "$_head_syntax" ]; then
+		_head1_test=`echo xx | head -n 1 2>/dev/null`
+		if [ "$_head1_test" = "xx" ]; then
+			_head_syntax=new
+		else
+			_head_syntax=old
+		fi
+	fi
+
+	if [ "$_head_syntax" = "new" ]; then
+		head -n $_lines "$@"
+	else
+		head -$_lines "$@"
+	fi
+}
+
+tail_n() {
+	_lines=$1
+	shift
+
+	if [ -z "$_tail_syntax" ]; then
+		_tail1_test=`echo xx | tail -n 1 2>/dev/null`
+		if [ "$_tail1_test" = "xx" ]; then
+			_tail_syntax=new
+		else
+			_tail_syntax=old
+		fi
+	fi
+
+	if [ "$_tail_syntax" = "new" ]; then
+		tail -n $_lines "$@"
+	else
+		tail -$_lines "$@"
+	fi
+}
+
 # Use the real TEMP directory on windows in case we are using a native vim/gvim
 tmp=/tmp
 [ -n "${msys}" -o -n "${cygwin}" ] && tmp=$(printf "%s\n" "${TEMP}" | tr '\\' /)
@@ -99,7 +139,7 @@ find_vim_dir() {
 	trap "rm -f '${tmp}/vimpager_vim_dir_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 	vim -E -c 'call writefile([ $VIM ], "'${tmp}'/vimpager_vim_dir_'${$}'") | q' </dev/null
-	vim_dir=$(head -n 1 "${tmp}/vimpager_vim_dir_${$}")
+	vim_dir=$(head_n 1 "${tmp}/vimpager_vim_dir_${$}")
 
 	rm -f "${tmp}/vimpager_vim_dir_${$}"
 }
@@ -187,13 +227,13 @@ vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 	quit
 ' </dev/null
 
-[ "$(head -n 1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
+[ "$(head_n 1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
 
-[ "$(head -n 2 < "${tmp}/vimpager_opts_${$}" | tail -n 1)" = 1 ] && disable_x11=1
+[ "$(head_n 2 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" = 1 ] && disable_x11=1
 
-scrolloff=$(head -n 3 < "${tmp}/vimpager_opts_${$}" | tail -n 1)
+scrolloff=$(head_n 3 < "${tmp}/vimpager_opts_${$}" | tail_n 1)
 
-[ "$(head -n 4 < "${tmp}/vimpager_opts_${$}" | tail -n 1)" = 0 ] && no_pass_thru=1
+[ "$(head_n 4 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" = 0 ] && no_pass_thru=1
 
 if [ "${no_pass_thru}" = 0 ]; then
 	# check if arithmetic expansion works, passthrough mode relies on it
@@ -282,12 +322,12 @@ less_vim() {
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
-			[ -n "${gvimrc}" ] && colors=$(grep guifg ${gvimrc} 2>/dev/null | head -n 1)
+			[ -n "${gvimrc}" ] && colors=$(grep guifg ${gvimrc} 2>/dev/null | head_n 1)
 
 			# Check if the user maximized the window in ~/_gvimrc on Win32, if
 			# so restore on startup.
 			if [ -n "${gvimrc}" -a \( -n "${cygwin}" -o -n "${msys}" \) ]; then
-				simalt=$(grep simalt "${gvimrc}" 2>/dev/null | head -n 1)
+				simalt=$(grep simalt "${gvimrc}" 2>/dev/null | head_n 1)
 
 				if [ -n "${simalt}" ]; then
 					restore="simalt ~r"
@@ -468,7 +508,7 @@ case $(echo "${@}" | tr 'A-Z' 'a-z') in
 esac
 
 # dumb man detection when the pstree heuristic fails
-if head -n 12 "${filename}" | grep_q '^NAME$'; then
+if head_n 12 "${filename}" | grep_q '^NAME$'; then
 	extra_c='set ft=man'
 fi
 
