@@ -277,8 +277,8 @@ less_vim() {
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "nnoremap <Up> 1<C-u>" \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> |
-				    unmap h" \
+				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d>" \
+				-c "unmap h" \
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
@@ -300,8 +300,8 @@ less_vim() {
 				-c "nnoremap <Up> 1<C-u>" \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
 				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> |
-				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols} |
-				    unmap h" \
+				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
+				-c "unmap h" \
 				"${@:--}" &
 			;;
 	esac
