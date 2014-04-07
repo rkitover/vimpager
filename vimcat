@@ -10,7 +10,7 @@
   fi
 # try to find a better shell, especially on Solaris
 
-  PATH=/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin:$PATH
+  PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
 
   if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
     IN_BASH=1
