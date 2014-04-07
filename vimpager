@@ -2,7 +2,7 @@
 
 # Script for using ViM as a PAGER.
 # Based on Bram's less.sh.
-# Version 1.8.7
+# Version 1.8.8
 # git://github.com/rkitover/vimpager.git
 
 # Just pass through if not on a tty
