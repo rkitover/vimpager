@@ -25,12 +25,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-awk '
+if command -v gawk >/dev/null; then
+    awk=gawk
+elif command -v nawk >/dev/null; then
+    awk=nawk
+elif command -v mawk >/dev/null; then
+    awk=mawk
+elif [ -x /usr/xpg4/bin/awk ]; then
+    awk=/usr/xpg4/bin/awk
+elif command -v awk >/dev/null; then
+    # plain solaris 10 awk won't work, no functions
+    awk=awk
+else
+    echo "No awk found!" >&2
+    exit 1
+fi
+
+$awk '
 BEGIN {
     charset=" !\"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
 }
 
-function ord(char) {
+function charval(char) {
     return index(charset, char) + 32 - 1;
 }
 
@@ -42,7 +58,7 @@ function ord(char) {
 
     if (cnt == "`") next;
 
-    cnt = ord(cnt) - 32;
+    cnt = charval(cnt) - 32;
 
     enc = substr($0, 2, length($0) - 1);
 
@@ -53,10 +69,10 @@ function ord(char) {
         grp = substr(enc, pos, 4);
         gsub(/`/, " ", grp); # zero bytes
 
-        c1 = ord(substr(grp, 1, 1)) - 32;
-        c2 = ord(substr(grp, 2, 1)) - 32;
-        c3 = ord(substr(grp, 3, 1)) - 32;
-        c4 = ord(substr(grp, 4, 1)) - 32;
+        c1 = charval(substr(grp, 1, 1)) - 32;
+        c2 = charval(substr(grp, 2, 1)) - 32;
+        c3 = charval(substr(grp, 3, 1)) - 32;
+        c4 = charval(substr(grp, 4, 1)) - 32;
 
         char_val = bit_or(c4, bit_or(bit_or(bit_left(c3, 6), bit_left(c2, 12)), bit_left(c1, 18)));
 

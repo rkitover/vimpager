@@ -28,7 +28,7 @@ BEGIN {
     charset=" !\"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
 }
 
-function ord(char) {
+function charval(char) {
     return index(charset, char) + 32 - 1;
 }
 
@@ -40,7 +40,7 @@ function ord(char) {
 
     if (cnt == "`") next;
 
-    cnt = ord(cnt) - 32;
+    cnt = charval(cnt) - 32;
 
     enc = substr($0, 2, length($0) - 1);
 
@@ -51,10 +51,10 @@ function ord(char) {
         grp = substr(enc, pos, 4);
         gsub(/`/, " ", grp); # zero bytes
 
-        c1 = ord(substr(grp, 1, 1)) - 32;
-        c2 = ord(substr(grp, 2, 1)) - 32;
-        c3 = ord(substr(grp, 3, 1)) - 32;
-        c4 = ord(substr(grp, 4, 1)) - 32;
+        c1 = charval(substr(grp, 1, 1)) - 32;
+        c2 = charval(substr(grp, 2, 1)) - 32;
+        c3 = charval(substr(grp, 3, 1)) - 32;
+        c4 = charval(substr(grp, 4, 1)) - 32;
 
         char_val = or(c4, or(or(lshift(c3, 6), lshift(c2, 12)), lshift(c1, 18)));
 
