@@ -106,12 +106,17 @@ tail_n() {
 # Use the real TEMP directory on windows in case we are using a native vim/gvim
 tmp=/tmp
 [ -n "${msys}" -o -n "${cygwin}" ] && tmp=$(printf "%s\n" "${TEMP}" | tr '\\' /)
+# Create a safe directory in which we place all other tempfiles.
+tmp="${tmp}/vimpager_${$}"
+mkdir -m 700 "${tmp}" || {
+    echo Could not create temporary directory ${tmp} >&2
+    exit 1
+}
+# this is the only way it works on Cygwin
+trap "rm -rf ${tmp}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 # Detect terminal size
 if command -v tput >/dev/null; then
-	# this is the only way it works on Cygwin
-	trap "rm -f '${tmp}/vimpager_cols_${$}' '${tmp}/vimpager_lines_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
-
 	tput cols  > "${tmp}/vimpager_cols_${$}"
 	tput lines > "${tmp}/vimpager_lines_${$}"
 
@@ -136,8 +141,6 @@ if [ -z "${cols}" ]; then
 fi
 
 find_vim_dir() {
-	trap "rm -f '${tmp}/vimpager_vim_dir_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
-
 	vim -E -c 'call writefile([ $VIM ], "'${tmp}'/vimpager_vim_dir_'${$}'") | q' </dev/null
 	vim_dir=$(head_n 1 "${tmp}/vimpager_vim_dir_${$}")
 
@@ -203,8 +206,6 @@ if [ -z "${vimrc}" ]; then
 fi
 
 # read settings
-trap "rm -f '${tmp}/vimpager_opts_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
-
 vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 	if !exists("vimpager_use_gvim")
 		let vimpager_use_gvim=0
@@ -411,8 +412,6 @@ fi
 
 extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
-trap "rm -rf '${tmp}/vimpager_${$}'" HUP INT QUIT ILL TRAP KILL BUS TERM
-
 mkdir -m 0700 "${tmp}/vimpager_${$}"
 
 command -v perl > /dev/null && \
@@ -533,9 +532,9 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # On Win32 we must also wait for the process to exit before the file can
 # be deleted.
 (
-	while [ -d "${tmp}/vimpager_${$}" ]; do
+	while [ -d "${tmp}" ]; do
 		sleep 10
-		rm -rf "${tmp}/vimpager_${$}" 2>/dev/null
+		rm -rf "${tmp}" 2>/dev/null
 		rm -f gvim.exe.stackdump 2>/dev/null
 	done
 ) &
