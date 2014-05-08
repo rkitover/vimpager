@@ -42,12 +42,12 @@
   # hopefully we're now POSIX
 
   tmp_dir=/tmp/vimcat_${$}
-  mkdir -m 700 $tmp_dir || {
-    echo Could not create temporary directory $tmp_dir >&2
+  mkdir -m 700 ${tmp_dir} || {
+    echo Could not create temporary directory ${tmp_dir} >&2
     exit 1
   }
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
-  tmp_file=$tmp_dir/vimcat
+  tmp_file=${tmp_dir}/vimcat
 
   script=$(command -v ${0})
 
