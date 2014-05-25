@@ -112,11 +112,11 @@ mkdir -m 700 "${tmp}" || {
     echo Could not create temporary directory ${tmp} >&2
     exit 1
 }
-# this is the only way it works on Cygwin
 trap "rm -rf ${tmp}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 # Detect terminal size
 if command -v tput >/dev/null; then
+        # this is the only way it works on Cygwin
 	tput cols  > "${tmp}/vimpager_cols_${$}"
 	tput lines > "${tmp}/vimpager_lines_${$}"
 
@@ -539,7 +539,7 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 	done
 ) &
 
-# Copyright (c) 2013, Rafael Kitover <rkitover@gmail.com>
+# Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -587,5 +587,7 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # lucc: Lucas Hoffmann <l-m-h@web.de>
 # aroig: Abdo Roig-Maranges <abdo.roig@gmail.com>
 # mortonfox: Morton Fox <github@mortonfox.otherinbox.com>
+# mapeiqi88: <mapeiqi88@gmail.com>
+# snordhausen: Stefan Nordhausen <stefan.nordhausen@axiros.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
