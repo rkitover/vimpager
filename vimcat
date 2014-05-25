@@ -80,9 +80,11 @@
 
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
-      vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
-      cat ${tmp_file}
-      echo
+      if test -s "${file}"; then
+        vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
+        cat ${tmp_file}
+        echo
+      fi
     else
       echo "$0: Cannot read file: ${file}" >&2
     fi
