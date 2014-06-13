@@ -223,7 +223,11 @@ vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 		let vimpager_passthrough=0
 	endif
 
-	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough ], "'${tmp}'/vimpager_opts_'${$}'")
+	if !exists("vimpager_ansiesc")
+		let vimpager_ansiesc=exists(":AnsiEsc")
+	endif
+
+	call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, vimpager_ansiesc ], "'${tmp}'/vimpager_opts_'${$}'")
 
 	quit
 ' </dev/null
@@ -242,6 +246,8 @@ if [ "${no_pass_thru}" = 0 ]; then
 		no_pass_thru=1
 	fi
 fi
+
+[ "$(head_n 5 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" != 0 ] && ansiesc=1
 
 rm -f "${tmp}/vimpager_opts_${$}"
 
@@ -316,6 +322,7 @@ less_vim() {
 			${vim_cmd} \
 				-u "${vimrc}" \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
+				-c 'if exists(":AnsiEsc") | autocmd VimEnter * :AnsiEsc" | endif' \
 				-c "nnoremap <Up> 1<C-u>" \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
 				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d>" \
@@ -338,6 +345,7 @@ less_vim() {
 			${vim_cmd} \
 				-u "${vimrc}" \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
+				-c 'if exists(":AnsiEsc") | autocmd VimEnter * :AnsiEsc" | endif' \
 				-c "nnoremap <Up> 1<C-u>" \
 				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
 				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> |
@@ -458,13 +466,21 @@ filter() {
 	IFS="${OLDIFS}"
 	if [ "x${have_perl}" != "x" ]; then
 		( printf %s "${content}"; exec /bin/cat ) | \
-			sed -e 's/\[[^m]*m//g' "${@}" | \
+			ansi_filter | \
 			perl -CIOL -pe 'no warnings "utf8"; s/.\010//g' >&2
 	else
 		( printf %s "${content}"; exec /bin/cat ) | \
-			sed -e 's/\[[^m]*m//g' "${@}" | \
+			ansi_filter | \
 			sed -e 's/.//g' >&2
 	fi
+}
+
+ansi_filter() {
+	if [ -z "${ansiesc}" ]; then
+		sed -e 's/\[[^m]*m//g' "${@}"
+       	else
+		cat
+       	fi
 }
 
 # Check for certain parameters to pass on to vim (or conceivably do something else)

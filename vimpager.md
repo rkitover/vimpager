@@ -58,6 +58,12 @@ following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
     let vimpager_scrolloff = 5
 
+By default vimpager filters out ANSI escape codes before displaying
+contents. To keep these codes in the output, add the following into your
+.vimrc/vimpagerrc (default = 0, unless the ":AnsiEsc" command is available):
+
+    let vimpager_ansiesc = 1
+
 The process tree of vimpager is available in the "vimpager_ptree" variable, an
 example usage is as follows:
 
