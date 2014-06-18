@@ -25,6 +25,12 @@ put these in your ~/.bashrc or ~/.zshrc
     alias less=$PAGER
     alias zless=$PAGER
 
+Or on Ubuntu where you need to 'sudo make install' it will install to /usr/local/bin
+
+    export PAGER=/usr/local/bin/vimpager
+    alias less=$PAGER
+    alias zless=$PAGER
+
 To use a different vimrc with vimpager, put your settings into a ~/.vimpagerrc
 or ~/.vim/vimpagerrc or a file pointed to by the VIMPAGER_RC environment
 variable.
