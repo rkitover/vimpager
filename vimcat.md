@@ -27,7 +27,10 @@ Run a vim command after opening the file.
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2013, Rafael Kitover <rkitover@gmail.com>
+Copyright (c)
+
+ * 2013, Rafael Kitover <rkitover@gmail.com>
+ * 2014, Renato Silva (MSYS2 fix)
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

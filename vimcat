@@ -2,6 +2,7 @@
 #!/usr/bin/env vim
 #! This is a bash script that executes itself as a vimscript to do its work
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
+#! See vimcat.md for copyright information
 
 : if 0
   # Just pass through if not on a tty
@@ -40,12 +41,21 @@
   fi
 
   # hopefully we're now POSIX
-
-  tmp_dir=/tmp/vimcat_${$}
-  mkdir -m 700 ${tmp_dir} || {
+   
+  if [ -z "${MSYSTEM}" ]; then
+    tmp_dir=/tmp
+    mkdir_options="-m 700"
+  else
+    # MSYS2 is a little tricky, we're gonna stick to the user's private temp
+    # since its mkdir doesn't like the --mode option
+    tmp_dir="${ORIGINAL_TEMP}"
+  fi  
+  tmp_dir="${tmp_dir}/vimcat_${$}"
+  mkdir ${mkdir_options} ${tmp_dir} || {
     echo Could not create temporary directory ${tmp_dir} >&2
     exit 1
   }
+
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
   tmp_file=${tmp_dir}/vimcat
 
