@@ -42,13 +42,13 @@
 
   # hopefully we're now POSIX
    
-  if [ -z "${MSYSTEM}" ]; then
+  if [ -z "${MSYSTEM}" -o -z "${temp}" ]; then
     tmp_dir=/tmp
     mkdir_options="-m 700"
   else
     # MSYS2 is a little tricky, we're gonna stick to the user's private temp
     # since its mkdir doesn't like the --mode option
-    tmp_dir="${ORIGINAL_TEMP}"
+    tmp_dir=$(cygpath --unix "${temp}")
   fi  
   tmp_dir="${tmp_dir}/vimcat_${$}"
   mkdir ${mkdir_options} ${tmp_dir} || {
