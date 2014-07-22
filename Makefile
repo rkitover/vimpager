@@ -8,7 +8,7 @@ INSTALLMAN?= ${INSTALL} -m 444
 INSTALLCONF?= ${INSTALL} -m 644
 COPYFILE?= ${INSTALL} -m 644
 
-all: vimpager.1 README README.md
+all: vimpager.1 vimcat.1 README README.md
 
 uninstall:
 	rm -f ${PREFIX}/bin/vimpager
