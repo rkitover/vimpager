@@ -103,15 +103,20 @@ tail_n() {
 	fi
 }
 
-# Use the real TEMP directory on windows in case we are using a native vim/gvim
-tmp=/tmp
-[ -n "${msys}" -o -n "${cygwin}" ] && tmp=$(printf "%s\n" "${TEMP}" | tr '\\' /)
+if [ -n "${msys}" -o -n "${cygwin}" ]; then
+	# Use the real TEMP directory on windows in case we are
+	# using a native vim/gvim...
+	tmp="$(printf "%s\n" "${TEMP}" | tr '\\' /)"
+else
+	# ... and /tmp otherwise
+	tmp="/tmp"
+fi
 # Create a safe directory in which we place all other tempfiles.
 tmp="${tmp}/vimpager_${$}"
-mkdir -m 700 "${tmp}" || {
-    echo Could not create temporary directory ${tmp} >&2
+if ! mkdir -m 700 "${tmp}"; then
+    echo "Could not create temporary directory ${tmp}" >&2
     exit 1
-}
+fi
 trap "rm -rf ${tmp}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 # Detect terminal size
