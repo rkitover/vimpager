@@ -417,8 +417,6 @@ fi
 
 extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
-mkdir -m 0700 "${tmp}/vimpager_${$}"
-
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
 
@@ -487,7 +485,7 @@ done
 
 filename=${@:-stdin}
 filename=$(echo "${filename}" | tr '/' '_')
-filename="${tmp}/vimpager_${$}/${filename}"
+filename="${tmp}/${filename}"
 
 case $(echo "${@}" | tr 'A-Z' 'a-z') in
 	*.gz)
@@ -521,7 +519,7 @@ if [ \( ! -s "${filename}" \) \
 	-o \( \( "$(cat "${filename}")" = "" \) \
 	-a \( "$(wc -l "${filename}" | awk '{print $1}')" = "1" \) \) ]; then
 
-	rm -rf "${tmp}/vimpager_${$}"
+	rm -rf "${tmp}"
 	exit
 fi
 
