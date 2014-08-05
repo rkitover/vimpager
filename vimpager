@@ -103,17 +103,23 @@ tail_n() {
 	fi
 }
 
+mkdir_options="-m 700"
+
 if [ -n "${msys}" -o -n "${cygwin}" ]; then
 	# Use the real TEMP directory on windows in case we are
 	# using a native vim/gvim...
 	tmp="$(printf "%s\n" "${TEMP}" | tr '\\' /)"
+        if [ -n "${msys}" -a -n "${temp}" ]; then
+            # MSYS2 does not support mkdir's --mode option
+            mkdir_options=""
+        fi
 else
 	# ... and /tmp otherwise
 	tmp="/tmp"
 fi
 # Create a safe directory in which we place all other tempfiles.
 tmp="${tmp}/vimpager_${$}"
-if ! mkdir -m 700 "${tmp}"; then
+if ! mkdir ${mkdir_options} "${tmp}"; then
     echo "Could not create temporary directory ${tmp}" >&2
     exit 1
 fi
@@ -542,7 +548,8 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 	done
 ) &
 
-# Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com>
+# Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com> and
+# Contributors (below.)
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -592,5 +599,6 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # mortonfox: Morton Fox <github@mortonfox.otherinbox.com>
 # mapeiqi88: <mapeiqi88@gmail.com>
 # snordhausen: Stefan Nordhausen <stefan.nordhausen@axiros.com>
+# renatosilva: Renato Silva <br.renatosilva@gmail.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:

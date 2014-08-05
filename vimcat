@@ -2,7 +2,6 @@
 #!/usr/bin/env vim
 #! This is a bash script that executes itself as a vimscript to do its work
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
-#! See vimcat.md for copyright information
 
 : if 0
   # Just pass through if not on a tty
@@ -42,19 +41,26 @@
 
   # hopefully we're now POSIX
    
-  if [ -z "${MSYSTEM}" -o -z "${temp}" ]; then
-    tmp_dir=/tmp
-    mkdir_options="-m 700"
-  else
-    # MSYS2 is a little tricky, we're gonna stick to the user's private temp
-    # since its mkdir doesn't like the --mode option
-    tmp_dir=$(cygpath --unix "${temp}")
-  fi  
+  tmp_dir=/tmp
+  mkdir_options="-m 700"
+
+  case $(uname -s) in
+    MINGW*)  
+      if [ -n "${temp}" ]; then
+        # MSYS2 is a little tricky, we're gonna stick to the user's private temp
+        # since its mkdir doesn't like the --mode option
+        tmp_dir=$(cygpath --unix "${temp}")
+        mkdir_options=""
+      fi
+    ;;
+  esac
+
   tmp_dir="${tmp_dir}/vimcat_${$}"
-  mkdir ${mkdir_options} ${tmp_dir} || {
+
+  if ! mkdir ${mkdir_options} ${tmp_dir}; then
     echo Could not create temporary directory ${tmp_dir} >&2
     exit 1
-  }
+  fi 
 
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
   tmp_file=${tmp_dir}/vimcat
@@ -111,6 +117,12 @@
 
 : endfor
 : endwhile
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
 : endif
 : endif
 : endif
@@ -283,7 +295,8 @@ function! AnsiHighlight(output_file)
   return writefile(retv, a:output_file)
 endfunction
 
-" See copyright in the vimscript above.
+" See copyright in the vims cript above (for the vim script) and in
+" vimcat.md for the whole script.
 "
 " The list of contributors is at the bottom of the vimpager script in this
 " project.
