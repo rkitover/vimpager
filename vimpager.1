@@ -1,10 +1,23 @@
-.TH "VIMPAGER" "1" "November 24, 2013" "vimpager user manual" ""
+.TH VIMPAGER 1 "August 4, 2014" "vimpager user manual"
 .SH NAME
 .PP
-vimpager \- less.sh replacement
+vimpager - less.sh replacement
 .SH SYNOPSIS
 .PP
-cat \f[I]some_file\f[] | vimpager
+vimpager \[aq]some file\[aq]
+.PP
+# or (this won\[aq]t always syntax highlight as well)
+.PP
+cat \[aq]some file\[aq] | vimpager
+.SH INSTALL
+.IP
+.nf
+\f[C]
+git\ clone\ git://github.com/rkitover/vimpager
+cd\ vimpager
+sudo\ make\ install
+\f[]
+.fi
 .SH DESCRIPTION
 .PP
 A slightly more sophisticated replacement for less.sh that also supports
@@ -19,7 +32,7 @@ To use it as as your PAGER: put these in your ~/.bashrc or ~/.zshrc
 .IP
 .nf
 \f[C]
-export\ PAGER=~/bin/vimpager
+export\ PAGER=/usr/local/bin/vimpager
 alias\ less=$PAGER
 alias\ zless=$PAGER
 \f[]
@@ -57,7 +70,7 @@ let\ vimpager_passthrough\ =\ 1
 \f[]
 .fi
 .PP
-To start vim with \-X (no x11 connection, a bit faster startup) put the
+To start vim with -X (no x11 connection, a bit faster startup) put the
 following into your .vimrc/vimpagerrc:
 .IP
 .nf
@@ -81,7 +94,7 @@ variable, an example usage is as follows:
 .nf
 \f[C]
 if\ exists("vimpager")
-\ \ if\ exists("vimpager_ptree")\ &&\ vimpager_ptree[\-2]\ ==\ \[aq]wman\[aq]
+\ \ if\ exists("vimpager_ptree")\ &&\ vimpager_ptree[-2]\ ==\ \[aq]wman\[aq]
 \ \ \ \ set\ ft=man
 \ \ endif
 endif
@@ -91,7 +104,7 @@ endif
 .SS + | +G
 .PP
 Start at the end of the file, just like less.
-.SS \-c cmd
+.SS -c cmd
 .PP
 Run a vim command after opening the file.
 .SH CYGWIN NOTES

@@ -1,6 +1,6 @@
 % VIMPAGER(1) vimpager user manual
 % Rafael Kitover <rkitover@gmail.com>
-% November 24, 2013
+% August 4, 2014
 
 # NAME
 
@@ -8,7 +8,19 @@ vimpager - less.sh replacement
 
 # SYNOPSIS
 
-cat *some_file* | vimpager
+vimpager 'some file'
+
+&#35; or (this won't always syntax highlight as well)
+
+cat 'some file' | vimpager
+
+# INSTALL
+
+```bash
+git clone git://github.com/rkitover/vimpager
+cd vimpager
+sudo make install
+```
 
 # DESCRIPTION
 A slightly more sophisticated replacement for less.sh that also supports being
@@ -20,12 +32,6 @@ On GitHub: <http://github.com/rkitover/vimpager>
 
 To use it as as your PAGER:
 put these in your ~/.bashrc or ~/.zshrc
-
-    export PAGER=~/bin/vimpager
-    alias less=$PAGER
-    alias zless=$PAGER
-
-Or on Ubuntu where you need to 'sudo make install' it will install to /usr/local/bin
 
     export PAGER=/usr/local/bin/vimpager
     alias less=$PAGER
