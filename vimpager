@@ -103,15 +103,20 @@ tail_n() {
 	fi
 }
 
-# Use the real TEMP directory on windows in case we are using a native vim/gvim
-tmp=/tmp
-[ -n "${msys}" -o -n "${cygwin}" ] && tmp=$(printf "%s\n" "${TEMP}" | tr '\\' /)
+if [ -n "${msys}" -o -n "${cygwin}" ]; then
+	# Use the real TEMP directory on windows in case we are
+	# using a native vim/gvim...
+	tmp="$(printf "%s\n" "${TEMP}" | tr '\\' /)"
+else
+	# ... and /tmp otherwise
+	tmp="/tmp"
+fi
 # Create a safe directory in which we place all other tempfiles.
 tmp="${tmp}/vimpager_${$}"
-mkdir -m 700 "${tmp}" || {
-    echo Could not create temporary directory ${tmp} >&2
+if ! mkdir -m 700 "${tmp}"; then
+    echo "Could not create temporary directory ${tmp}" >&2
     exit 1
-}
+fi
 trap "rm -rf ${tmp}" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 # Detect terminal size
@@ -412,8 +417,6 @@ fi
 
 extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
-mkdir -m 0700 "${tmp}/vimpager_${$}"
-
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
 
@@ -482,7 +485,7 @@ done
 
 filename=${@:-stdin}
 filename=$(echo "${filename}" | tr '/' '_')
-filename="${tmp}/vimpager_${$}/${filename}"
+filename="${tmp}/${filename}"
 
 case $(echo "${@}" | tr 'A-Z' 'a-z') in
 	*.gz)
@@ -516,7 +519,7 @@ if [ \( ! -s "${filename}" \) \
 	-o \( \( "$(cat "${filename}")" = "" \) \
 	-a \( "$(wc -l "${filename}" | awk '{print $1}')" = "1" \) \) ]; then
 
-	rm -rf "${tmp}/vimpager_${$}"
+	rm -rf "${tmp}"
 	exit
 fi
 
