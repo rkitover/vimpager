@@ -600,5 +600,7 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tt
 # mapeiqi88: <mapeiqi88@gmail.com>
 # snordhausen: Stefan Nordhausen <stefan.nordhausen@axiros.com>
 # renatosilva: Renato Silva <br.renatosilva@gmail.com>
+# dragon788: <dragon788@users.noreply.github.com>
+# ahamad-s: donnie' <ahamad-s@users.noreply.github.com>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:
