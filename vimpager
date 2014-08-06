@@ -311,7 +311,7 @@ main() {
 		filename=$(cygpath -w "${filename}")
 	fi
 	
-	less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tty
+	vim_less -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "${filename}" </dev/tty
 	
 	# Give gvim/mvim time to open the file.
 	# On Win32 we must also wait for the process to exit before the file can
@@ -389,6 +389,9 @@ extract_bundled_scripts() {
 	(
 		cd "${tmp}/extra_vim_home"
 
+		mkdir macros
+		(cd macros; less_vim)
+
 		if [ -n "${ansiesc_available}" ]; then
 			ansiesc_tar
 		fi
@@ -396,7 +399,7 @@ extract_bundled_scripts() {
 }
 
 # this actually runs vim or gvim
-less_vim() {
+vim_less() {
 	extract_bundled_scripts
 
 	case ${vim_cmd} in
@@ -411,16 +414,14 @@ less_vim() {
 				ansi_command='silent echo'
 			fi
 
-# 'unmap h' has to be the very last command in -c, to disable the less.vim help screen
+# 'map h h' has to be the very last command in -c, to disable the less.vim help screen
 			${vim_cmd} \
 				-u "${vimrc}" \
-				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
+				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "${ansi_command}" \
-				-c "nnoremap <Up> 1<C-u>" \
-				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d>" \
-				-c "unmap h" \
+				-c "set scrolloff=${scrolloff:-5}" \
+				-c "map h :normal! h<CR>" \
 				"${@:--}"
 			;;
 		*) # gvim or mvim GUI
@@ -438,14 +439,12 @@ less_vim() {
 
 			${vim_cmd} \
 				-u "${vimrc}" \
-				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
+				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "${ansi_command}" \
-				-c "nnoremap <Up> 1<C-u>" \
-				-c "set scrolloff=${scrolloff:-5} | set foldlevel=999 | set nonu | silent! set nornu |
-				    nmap <ESC>u :nohlsearch<cr> | noremap q :<C-u>q<CR> | nnoremap <Down> 1<C-d> |
+				-c "set scrolloff=${scrolloff:-5} |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
-				-c "unmap h" \
+				-c "map h :normal! h<CR>" \
 				"${@:--}" &
 			;;
 	esac
@@ -3125,6 +3124,134 @@ G````````````````````````````````````````````````````
 end
 EOF
 # END OF ansiesc.tar
+}
+
+less_vim() {
+	(cat <<'EOF') | uudecode
+begin 644 less.vim
+M(B!6:6T@<V-R:7!T('1O('=O<FL@;&EK92`B;&5S<R(*(B!-86EN=&%I;F5R
+M.@E"<F%M($UO;VQE;F%A<B`\0G)A;4!V:6TN;W)G/@HB($QA<W0@0VAA;F=E
+M.@DR,#$T($UA>2`Q,PH*(B!!=F]I9"!L;V%D:6YG('1H:7,@9FEL92!T=VEC
+M92P@86QL;W<@=&AE('5S97(@=&\@9&5F:6YE(&AI<R!O=VX@<V-R:7!T+@II
+M9B!E>&ES=',H(FQO861E9%]L97-S(BD*("!F:6YI<V@*96YD:68*;&5T(&QO
+M861E9%]L97-S(#T@,0H*(B!)9B!N;W0@<F5A9&EN9R!F<F]M('-T9&EN+"!S
+M:VEP(&9I;&5S('1H870@8V%N)W0@8F4@<F5A9"X*(B!%>&ET(&EF('1H97)E
+M(&ES(&YO(&9I;&4@870@86QL+@II9B!A<F=C*"D@/B`P"B`@;&5T(',Z:2`]
+M(#`*("!W:&EL92`Q"B`@("!I9B!F:6QE<F5A9&%B;&4H87)G=BAS.FDI*0H@
+M("`@("!I9B!S.FD@(3T@,`H)<VQE97`@,PH@("`@("!E;F1I9@H@("`@("!B
+M<F5A:PH@("`@96YD:68*("`@(&EF(&ES9&ER96-T;W)Y*&%R9W8H<SII*2D*
+M("`@("`@96-H;VUS9R`B4VMI<'!I;F<@9&ER96-T;W)Y("(@+B!A<F=V*',Z
+M:2D*("`@(&5L<V5I9B!G971F=&EM92AA<F=V*',Z:2DI(#P@,`H@("`@("!E
+M8VAO;7-G(")3:VEP<&EN9R!N;VXM97AI<W1I;F<@9FEL92`B("X@87)G=BAS
+M.FDI"B`@("!E;'-E"B`@("`@(&5C:&]M<V<@(E-K:7!P:6YG('5N<F5A9&%B
+M;&4@9FEL92`B("X@87)G=BAS.FDI"B`@("!E;F1I9@H@("`@96-H;R`B7&XB
+M"B`@("!L970@<SII(#T@<SII("L@,0H@("`@:68@<SII(#T](&%R9V,H*0H@
+M("`@("!Q=6ET"B`@("!E;F1I9@H@("`@;F5X=`H@(&5N9'=H:6QE"F5N9&EF
+M"@IS970@;F]C<`IS>6YT87@@;VX*<V5T('-O/3`*<V5T(&AL<V5A<F-H"G-E
+M="!I;F-S96%R8V@*;F]H;'-E87)C:`HB($1O;B=T(')E;65M8F5R(&9I;&4@
+M;F%M97,@86YD('!O<VET:6]N<PIS970@=FEM:6YF;ST*<V5T(&YO=W,*(B!)
+M;FAI8FET('-C<F5E;B!U<&1A=&5S('=H:6QE('-E87)C:&EN9PIL970@<SIL
+M>B`]("9L>@IS970@;'H*<V5T(&9O;&1L979E;#TY.3DY"G-E="!N;VYU"G-I
+M;&5N="$@<V5T(&YO<FYU"@HB(%5S960@869T97(@96%C:"!C;VUM86YD.B!P
+M=70@8W5R<V]R(&%T(&5N9"!A;F0@9&ES<&QA>2!P;W-I=&EO;@II9B`F=W)A
+M<`H@(&YO<F5M87`@/%-)1#Y,($PP.G)E9')A=SQ#4CXZ9FEL93Q#4CX*("!A
+M=2!6:6U%;G1E<B`J(&YO<FUA;"$@3#`*96QS90H@(&YO<F5M87`@/%-)1#Y,
+M($QG,#IR961R87<\0U(^.F9I;&4\0U(^"B`@874@5FEM16YT97(@*B!N;W)M
+M86PA($QG,`IE;F1I9@H*(B!7:&5N(')E861I;F<@9G)O;2!S=&1I;B!D;VXG
+M="!C;VYS:61E<B!T:&4@9FEL92!M;V1I9FEE9"X*874@5FEM16YT97(@*B!S
+M970@;F]M;V0*"B(@0V%N)W0@;6]D:69Y('1H92!T97AT"G-E="!N;VUA"@HB
+M($=I=F4@:&5L<`IN;W)E;6%P(&@@.F-A;&P@/%-)1#Y(96QP*"D\0U(^"FUA
+M<"!((&@*9G5N(2!S.DAE;'`H*0H@(&5C:&\@(CQ3<&%C93X@("!/;F4@<&%G
+M92!F;W)W87)D("`@("`@("`@(&(@("`@("`@("!/;F4@<&%G92!B86-K=V%R
+M9"(*("!E8VAO(")D("`@("`@("`@2&%L9B!A('!A9V4@9F]R=V%R9"`@("`@
+M("!U("`@("`@("`@2&%L9B!A('!A9V4@8F%C:W=A<F0B"B`@96-H;R`B/$5N
+M=&5R/B`@($]N92!L:6YE(&9O<G=A<F0@("`@("`@("`@:R`@("`@("`@($]N
+M92!L:6YE(&)A8VMW87)D(@H@(&5C:&\@(D<@("`@("`@("!%;F0@;V8@9FEL
+M92`@("`@("`@("`@("`@(&<@("`@("`@("!3=&%R="!O9B!F:6QE(@H@(&5C
+M:&\@(DXE("`@("`@("!P97)C96YT86=E(&EN(&9I;&4B"B`@96-H;R`B7&XB
+M"B`@96-H;R`B+W!A='1E<FX@(%-E87)C:"!F;W(@<&%T=&5R;B`@("`@("`@
+M/W!A='1E<FX@(%-E87)C:"!B86-K=V%R9"!F;W(@<&%T=&5R;B(*("!E8VAO
+M(")N("`@("`@("`@;F5X="!P871T97)N(&UA=&-H("`@("`@("!.("`@("`@
+M("`@4')E=FEO=7,@<&%T=&5R;B!M871C:"(*("!E8VAO(")<;B(*("!E8VAO
+M("(Z;CQ%;G1E<CX@3F5X="!F:6QE("`@("`@("`@("`@("`@("`Z<#Q%;G1E
+M<CX@4')E=FEO=7,@9FEL92(*("!E8VAO(")<;B(*("!E8VAO(")Q("`@("`@
+M("`@475I="`@("`@("`@("`@("`@("`@("`@("!V("`@("`@("`@161I="!F
+M:6QE(@H@(&QE="!I(#T@:6YP=70H(DAI="!%;G1E<B!T;R!C;VYT:6YU92(I
+M"F5N9&9U;@H*(B!38W)O;&P@;VYE('!A9V4@9F]R=V%R9`IN;W)E;6%P(#QS
+M8W)I<'0^(#Q3<&%C93X@.F-A;&P@/%-)1#Y.97AT4&%G92@I/$-2/CQ3240^
+M3`IM87`@/$,M5CX@/%-P86-E/@IM87`@9B`\4W!A8V4^"FUA<"`\0RU&/B`\
+M4W!A8V4^"FUA<"`\4&%G941O=VX^(#Q3<&%C93X*;6%P(#QK4&%G941O=VX^
+M(#Q3<&%C93X*;6%P(#Q3+41O=VX^(#Q3<&%C93X*;6%P('H@/%-P86-E/@IM
+M87`@/$5S8SX\4W!A8V4^(#Q3<&%C93X*9G5N(2!S.DYE>'1086=E*"D*("!I
+M9B!L:6YE*"(N(BD@/3T@;&EN92@B)"(I"B`@("!I9B!A<F=I9'@H*2`K(#$@
+M/CT@87)G8R@I"B`@("`@("(@1&]N)W0@<75I="!A="!T:&4@96YD(&]F('1H
+M92!L87-T(&9I;&4*("`@("`@<F5T=7)N"B`@("!E;F1I9@H@("`@;F5X=`H@
+M("`@,0H@(&5L<V4*("`@(&5X92`B;F]R;6%L(2!</$,M1CXB"B`@96YD:68*
+M96YD9G5N"@HB(%)E+7)E860@9FEL92!A;F0@<&%G92!F;W)W87)D(")T86EL
+M("UF(@IM87`@1B`Z93Q#4CY'/%-)1#Y,.G-L965P(#$\0U(^1@H*(B!38W)O
+M;&P@:&%L9B!A('!A9V4@9F]R=V%R9`IN;W)E;6%P(#QS8W)I<'0^(&0@/$,M
+M1#X\4TE$/DP*;6%P(#Q#+40^(&0*"B(@4V-R;VQL(&]N92!L:6YE(&9O<G=A
+M<F0*;F]R96UA<"`\<V-R:7!T/B`\0U(^(#Q#+44^/%-)1#Y,"FUA<"`\0RU.
+M/B`\0U(^"FUA<"!E(#Q#4CX*;6%P(#Q#+44^(#Q#4CX*;6%P(&H@/$-2/@IM
+M87`@/$,M2CX@/$-2/@IM87`@/$1O=VX^(#$\0RUD/@H*(B!38W)O;&P@;VYE
+M('!A9V4@8F%C:W=A<F0*;F]R96UA<"`\<V-R:7!T/B!B(#Q#+4(^/%-)1#Y,
+M"FUA<"`\0RU"/B!B"FUA<"`\4&%G955P/B!B"FUA<"`\:U!A9V55<#X@8@IM
+M87`@/%,M57`^(&(*;6%P('<@8@IM87`@/$5S8SYV(&(*"B(@4V-R;VQL(&AA
+M;&8@82!P86=E(&)A8VMW87)D"FYO<F5M87`@/'-C<FEP=#X@=2`\0RU5/CQ3
+M240^3`IN;W)E;6%P(#QS8W)I<'0^(#Q#+54^(#Q#+54^/%-)1#Y,"@HB(%-C
+M<F]L;"!O;F4@;&EN92!B86-K=V%R9`IN;W)E;6%P(#QS8W)I<'0^(&L@/$,M
+M63X\4TE$/DP*;6%P('D@:PIM87`@/$,M63X@:PIM87`@/$,M4#X@:PIM87`@
+M/$,M2SX@:PIM87`@/%5P/B`Q/$,M=3X*"B(@4F5D<F%W"FYO<F5M87`@/'-C
+M<FEP=#X@<B`\0RU,/CQ3240^3`IN;W)E;6%P(#QS8W)I<'0^(#Q#+5(^(#Q#
+M+4P^/%-)1#Y,"FYO<F5M87`@/'-C<FEP=#X@4B`\0RU,/CQ3240^3`H*(B!3
+M=&%R="!O9B!F:6QE"FYO<F5M87`@/'-C<FEP=#X@9R!G9SQ3240^3`IM87`@
+M/"!G"FUA<"`\17-C/CP@9PIM87`@/$AO;64^(&<*;6%P(#QK2&]M93X@9PH*
+M(B!%;F0@;V8@9FEL90IN;W)E;6%P(#QS8W)I<'0^($<@1SQ3240^3`IM87`@
+M/B!'"FUA<"`\17-C/CX@1PIM87`@/$5N9#X@1PIM87`@/&M%;F0^($<*"B(@
+M1V\@=&\@<&5R8V5N=&%G90IN;W)E;6%P(#QS8W)I<'0^("4@)3Q3240^3`IM
+M87`@<"`E"@HB(%-E87)C:`IN;W)E;6%P(#QS8W)I<'0^("\@2"0Z8V%L;"`\
+M4TE$/D9O<G=A<F0H*3Q#4CXO"FEF("9W<F%P"B`@;F]R96UA<"`\<V-R:7!T
+M/B`_($@P.F-A;&P@/%-)1#Y"86-K=V%R9"@I/$-2/C\*96QS90H@(&YO<F5M
+M87`@/'-C<FEP=#X@/R!(9S`Z8V%L;"`\4TE$/D)A8VMW87)D*"D\0U(^/PIE
+M;F1I9@H*(B!E<V,M=2!T;R!T=7)N(&]F9B!S96%R8V@@:&EG:&QI9VAT:6YG
+M(&QI:V4@:6X@;&5S<PIN;F]R96UA<"`\15-#/G4@.FYO:&QS96%R8V@\0U(^
+M"@IF=6XA(',Z1F]R=V%R9"@I"B`@(B!396%R8VAI;F<@9F]R=V%R9`H@(&YO
+M<F5M87`@/'-C<FEP=#X@;B!()&YZ=#Q3240^3`H@(&EF("9W<F%P"B`@("!N
+M;W)E;6%P(#QS8W)I<'0^($X@2#!.>G0\4TE$/DP*("!E;'-E"B`@("!N;W)E
+M;6%P(#QS8W)I<'0^($X@2&<P3GIT/%-)1#Y,"B`@96YD:68*("!C;F]R96UA
+M<"`\<VEL96YT/B`\<V-R:7!T/B`\0U(^(#Q#4CXZ8W5N;6%P(#QL=#Y#4CX\
+M0U(^>G0\4TE$/DP*96YD9G5N"@IF=6XA(',Z0F%C:W=A<F0H*0H@("(@4V5A
+M<F-H:6YG(&)A8VMW87)D"B`@:68@)G=R87`*("`@(&YO<F5M87`@/'-C<FEP
+M=#X@;B!(,&YZ=#Q3240^3`H@(&5L<V4*("`@(&YO<F5M87`@/'-C<FEP=#X@
+M;B!(9S!N>G0\4TE$/DP*("!E;F1I9@H@(&YO<F5M87`@/'-C<FEP=#X@3B!(
+M)$YZ=#Q3240^3`H@(&-N;W)E;6%P(#QS:6QE;G0^(#QS8W)I<'0^(#Q#4CX@
+M/$-2/CIC=6YM87`@/&QT/D-2/CQ#4CYZ=#Q3240^3`IE;F1F=6X*"F-A;&P@
+M<SI&;W)W87)D*"D*8W5N;6%P(#Q#4CX*"B(@475I='1I;F<*;F]R96UA<"!Q
+M(#H\0RUU/G$\0U(^"@HB(%-W:71C:"!T;R!E9&ET:6YG("AS=VET8V@@;V9F
+M(&QE<W,@;6]D92D*;6%P('8@.G-I;&5N="!C86QL(#Q3240^16YD*"D\0U(^
+M"F9U;B$@<SI%;F0H*0H@('-E="!S8W)O;&QO9F8],`H@('-E="!M80H@(&EF
+M(&5X:7-T<R@G<SIL>B<I"B`@("!L970@)FQZ(#T@<SIL>@H@(&5N9&EF"B`@
+M=6YM87`@:`H@('5N;6%P($@*("!U;FUA<"`\4W!A8V4^"B`@=6YM87`@/$,M
+M5CX*("!U;FUA<"!F"B`@=6YM87`@/$,M1CX*("!U;FUA<"!Z"B`@=6YM87`@
+M/$5S8SX\4W!A8V4^"B`@=6YM87`@1@H@('5N;6%P(&0*("!U;FUA<"`\0RU$
+M/@H@('5N;6%P(#Q#4CX*("!U;FUA<"`\0RU./@H@('5N;6%P(&4*("!U;FUA
+M<"`\0RU%/@H@('5N;6%P(&H*("!U;FUA<"`\0RU*/@H@('5N;6%P(&(*("!U
+M;FUA<"`\0RU"/@H@('5N;6%P('<*("!U;FUA<"`\17-C/G8*("!U;FUA<"!U
+M"B`@=6YM87`@/$,M53X*("!U;FUA<"!K"B`@=6YM87`@>0H@('5N;6%P(#Q#
+M+5D^"B`@=6YM87`@/$,M4#X*("!U;FUA<"`\0RU+/@H@('5N;6%P('(*("!U
+M;FUA<"`\0RU2/@H@('5N;6%P(%(*("!U;FUA<"!G"B`@=6YM87`@/`H@('5N
+M;6%P(#Q%<V,^/`H@('5N;6%P($<*("!U;FUA<"`^"B`@=6YM87`@/$5S8SX^
+M"B`@=6YM87`@)0H@('5N;6%P('`*("!U;FUA<"!N"B`@=6YM87`@3@H@('5N
+M;6%P('$*("!U;FUA<"!V"B`@=6YM87`@+PH@('5N;6%P(#\*("!U;FUA<"`\
+M57`^"B`@=6YM87`@/$1O=VX^"B`@=6YM87`@/%!A9V5$;W=N/@H@('5N;6%P
+M(#QK4&%G941O=VX^"B`@=6YM87`@/%!A9V55<#X*("!U;FUA<"`\:U!A9V55
+M<#X*("!U;FUA<"`\4RU$;W=N/@H@('5N;6%P(#Q3+55P/@H@('5N;6%P(#Q(
+M;VUE/@H@('5N;6%P(#QK2&]M93X*("!U;FUA<"`\16YD/@H@('5N;6%P(#QK
+916YD/@IE;F1F=6X*"B(@=FEM.B!S=STR"@``
+`
+end
+EOF
+# END OF less.vim
 }
 
 main "$@"
