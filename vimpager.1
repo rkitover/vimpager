@@ -18,6 +18,16 @@ cd\ vimpager
 sudo\ make\ install
 \f[]
 .fi
+.PP
+In your ~/.bashrc add the following:
+.IP
+.nf
+\f[C]
+export\ PAGER=/usr/local/bin/vimpager
+alias\ less=$PAGER
+alias\ zless=$PAGER
+\f[]
+.fi
 .SH DESCRIPTION
 .PP
 A slightly more sophisticated replacement for less.sh that also supports
@@ -27,16 +37,6 @@ Works on Linux, Solaris, FreeBSD, NetBSD, OpenBSD, OSX, Cygwin and msys.
 Should work on most other systems as well.
 .PP
 On GitHub: <http://github.com/rkitover/vimpager>
-.PP
-To use it as as your PAGER: put these in your ~/.bashrc or ~/.zshrc
-.IP
-.nf
-\f[C]
-export\ PAGER=/usr/local/bin/vimpager
-alias\ less=$PAGER
-alias\ zless=$PAGER
-\f[]
-.fi
 .PP
 To use a different vimrc with vimpager, put your settings into a
 ~/.vimpagerrc or ~/.vim/vimpagerrc or a file pointed to by the
@@ -107,6 +107,36 @@ Start at the end of the file, just like less.
 .SS -c cmd
 .PP
 Run a vim command after opening the file.
+.SH ANSI ESCAPE SEQUENCES AND OVERSTRIKES
+.PP
+If your source is using ANSI escape codes, the AnsiEsc plugin will be
+used to show them, rather than the normal vim highlighting, however read
+the caveats below.
+If this is not possible, they will be stripped out and normal vim
+highlighting will be used instead.
+.PP
+Overstrikes such as in man pages will always be removed.
+.PP
+vimpager bundles the
+AnsiEsc (http://www.vim.org/scripts/script.php?script_id=4979) plugin
+(it is expanded at runtime, there is nothing you have to do to enable
+it.)
+.PP
+However, your vim must have been compiled with the \[aq]conceal\[aq]
+feature enabled.
+To check, try
+.IP
+.nf
+\f[C]
+:echo\ has("conceal")
+\f[]
+.fi
+.PP
+if the result is \[aq]1\[aq] you have conceal, if it\[aq]s \[aq]0\[aq]
+you do not, and the AnsiEsc plugin will not be enabled.
+.PP
+If you\[aq]re on a Mac, the system vim does not enable this feature,
+install vim from Homebrew and you will be good to go.
 .SH CYGWIN NOTES
 .PP
 The Cygwin gvim is very buggy, vimpager works correctly with the native

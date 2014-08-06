@@ -1,0 +1,1 @@
+AnsiEsc.vmb: call delete('/Users/rkitover/src/vimpager/ansiesc//autoload/AnsiEsc.vim')|call delete('/Users/rkitover/src/vimpager/ansiesc//doc/AnsiEsc.txt')|call delete('/Users/rkitover/src/vimpager/ansiesc//plugin/cecutil.vim')|call delete('/Users/rkitover/src/vimpager/ansiesc//plugin/AnsiEscPlugin.vim')

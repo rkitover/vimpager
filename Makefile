@@ -8,7 +8,29 @@ INSTALLMAN?= ${INSTALL} -m 444
 INSTALLCONF?= ${INSTALL} -m 644
 COPYFILE?= ${INSTALL} -m 644
 
-all: vimpager.1 vimcat.1 README README.md
+all: vimpager vimpager.1 vimcat.1 README README.md
+
+vimpager: ansiesc.tar.uu
+	mv vimpager vimpager.work
+	awk '\
+	    /^begin [0-9]* ansiesc.tar/ { exit } \
+	    { print } \
+	' vimpager.work > vimpager
+	cat ansiesc.tar.uu >> vimpager
+	echo EOF >> vimpager
+	awk '\
+	    BEGIN { skip = 1 } \
+	    /^# END OF ansiesc.tar/ { skip = 0 } \
+	    skip == 1 { next } \
+	    { print } \
+	' vimpager.work >> vimpager
+	rm -f vimpager.work ansiesc.tar.uu
+	chmod +x vimpager
+
+ansiesc.tar.uu: ansiesc/autoload/AnsiEsc.vim ansiesc/doc/AnsiEsc.txt ansiesc/doc/tags ansiesc/plugin/AnsiEscPlugin.vim ansiesc/plugin/cecutil.vim
+	(cd ansiesc; tar cf ../ansiesc.tar .)
+	uuencode ansiesc.tar ansiesc.tar > ansiesc.tar.uu
+	rm -f ansiesc.tar
 
 uninstall:
 	rm -f ${PREFIX}/bin/vimpager

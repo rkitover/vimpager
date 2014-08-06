@@ -22,6 +22,14 @@ cd vimpager
 sudo make install
 ```
 
+In your ~/.bashrc add the following:
+
+```bash
+export PAGER=/usr/local/bin/vimpager
+alias less=$PAGER
+alias zless=$PAGER
+```
+
 # DESCRIPTION
 A slightly more sophisticated replacement for less.sh that also supports being
 set as the PAGER environment variable. Displays man pages, perldocs and python
@@ -29,13 +37,6 @@ documentation properly. Works on Linux, Solaris, FreeBSD, NetBSD, OpenBSD, OSX,
 Cygwin and msys. Should work on most other systems as well.
 
 On GitHub: <http://github.com/rkitover/vimpager>
-
-To use it as as your PAGER:
-put these in your ~/.bashrc or ~/.zshrc
-
-    export PAGER=/usr/local/bin/vimpager
-    alias less=$PAGER
-    alias zless=$PAGER
 
 To use a different vimrc with vimpager, put your settings into a ~/.vimpagerrc
 or ~/.vim/vimpagerrc or a file pointed to by the VIMPAGER_RC environment
@@ -88,6 +89,33 @@ Start at the end of the file, just like less.
 ## -c cmd
 
 Run a vim command after opening the file.
+
+# ANSI ESCAPE SEQUENCES AND OVERSTRIKES
+
+If your source is using ANSI escape codes, the AnsiEsc plugin will be
+used to show them, rather than the normal vim highlighting, however read
+the caveats below. If this is not possible, they will be stripped out
+and normal vim highlighting will be used instead.
+
+Overstrikes such as in man pages will always be removed.
+
+vimpager bundles the
+[AnsiEsc](http://www.vim.org/scripts/script.php?script_id=4979)
+plugin (it is expanded at runtime,
+there is nothing you have to do to enable it.)
+
+However, your vim must have been compiled with the 'conceal' feature
+enabled. To check, try
+
+```vim
+:echo has("conceal")
+```
+
+if the result is '1' you have conceal, if it's '0' you do not, and the
+AnsiEsc plugin will not be enabled.
+
+If you're on a Mac, the system vim does not enable this feature, install
+vim from Homebrew and you will be good to go.
 
 # CYGWIN NOTES
 
