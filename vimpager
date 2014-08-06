@@ -597,6 +597,8 @@ uudecode_sh() {
 		return
 	fi
 
+	echo "*** PLEASE INSTALL 'uudecode', falling back to *VERY SLOW* shell version." >&2
+
 	bs=0
 	while read -rs t ; do
 		if [ "$bs" -eq 1 ] ; then
