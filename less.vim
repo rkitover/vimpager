@@ -50,6 +50,8 @@ set lz
 set foldlevel=9999
 set nonu
 silent! set nornu
+set nomodeline
+set scrolloff=5
 
 " Used after each command: put cursor at end and display position
 if &wrap
@@ -211,6 +213,7 @@ noremap q :<C-u>q<CR>
 map v :silent call <SID>End()<CR>
 fun! s:End()
   set scrolloff=0
+  set modeline
   set ma
   if exists('s:lz')
     let &lz = s:lz
