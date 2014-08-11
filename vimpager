@@ -145,9 +145,12 @@ main() {
 		if !exists("vimpager_passthrough")
 			let vimpager_passthrough=0
 		endif
+	
+		if !exists("vimpager_ansiesc_available")
+			let vimpager_ansiesc_available=1
+		endif
 
-
-		call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, has("conceal") ], "'${tmp}'/vimpager_opts_'${$}'")
+		call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, vimpager_ansiesc_available, has("conceal") ], "'${tmp}'/vimpager_opts_'${$}'")
 	
 		quit
 	' </dev/null
