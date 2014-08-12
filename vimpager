@@ -146,12 +146,17 @@ main() {
 			let vimpager_passthrough=0
 		endif
 
+		let use_ansiesc = 0
 
-		call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, has("conceal") ], "'${tmp}'/vimpager_opts_'${$}'")
+		if has("conceal") && (!exists("vimpager_disable_ansiesc") || vimpager_disable_ansiesc == 0)
+			let use_ansiesc = 1
+		endif
+
+		call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, use_ansiesc ], "'${tmp}'/vimpager_opts_'${$}'")
 	
 		quit
 	' </dev/null
-	
+
 	[ "$(head_n 1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
 	
 	[ "$(head_n 2 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" = 1 ] && disable_x11=1
@@ -3976,5 +3981,6 @@ main "$@"
 # ahamad-s: donnie' <ahamad-s@users.noreply.github.com>
 # SethMilliken: Seth Milliken <seth.milliken@urbanairship.com>
 # trapd00r: Magnus Woldrich <m@japh.se>
+# ghedo: Alessandro Ghedini <alessandro@ghedini.me>
 
 # vim:noet ts=8 sts=8 sw=8 tw=0:

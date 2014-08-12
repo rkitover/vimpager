@@ -100,6 +100,18 @@ if\ exists("vimpager")
 endif
 \f[]
 .fi
+.PP
+To disable the use of AnsiEsc.vim to display ANSI colors in the source,
+set:
+.IP
+.nf
+\f[C]
+let\ vimpager_disable_ansiesc\ =\ 1
+\f[]
+.fi
+.PP
+see the section "ANSI ESCAPE SEQUENCES AND OVERSTRIKES" for more
+details.
 .SH COMMAND LINE OPTIONS
 .SS + | +G
 .PP
@@ -136,14 +148,26 @@ if the result is \[aq]1\[aq] you have conceal, if it\[aq]s \[aq]0\[aq]
 you do not, and the AnsiEsc plugin will not be enabled.
 .PP
 If you\[aq]re on a Mac, the system vim does not enable this feature,
-install vim from Homebrew and you will be good to go.
+install vim from Homebrew.
+.PP
+To disable the use of AnsiEsc.vim, set:
+.IP
+.nf
+\f[C]
+let\ vimpager_disable_ansiesc\ =\ 1
+\f[]
+.fi
+.PP
+in your .vimrc.
 .SH CYGWIN NOTES
 .PP
 The Cygwin gvim is very buggy, vimpager works correctly with the native
 Windows gvim, just put it in your PATH.
 .SH LICENSE AND COPYRIGHT
 .PP
-Copyright (c) 2013, Rafael Kitover <rkitover@gmail.com>
+Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com> and contributors
+(see the list of CONTRIBUTORS at the bottom of the \[aq]vimpager\[aq]
+file.)
 .PP
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

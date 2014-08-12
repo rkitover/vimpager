@@ -54,31 +54,51 @@ settings for vimpager.
 Put the following into your .vimrc/vimpagerrc if you want to use gvim/MacVim
 for your pager window:
 
-    let vimpager_use_gvim = 1
+```vim
+let vimpager_use_gvim = 1
+```
 
 To pass through text that is smaller than the terminal height (without
 highlighting, at present) use this:
 
-    let vimpager_passthrough = 1
+```vim
+let vimpager_passthrough = 1
+```
 
 To start vim with -X (no x11 connection, a bit faster startup) put the following
 into your .vimrc/vimpagerrc:
 
-    let vimpager_disable_x11 = 1
+```vim
+let vimpager_disable_x11 = 1
+```
 
 The scroll offset (:help scrolloff), may be specified by placing the 
 following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
-    let vimpager_scrolloff = 5
+```vim
+let vimpager_scrolloff = 5
+```
 
 The process tree of vimpager is available in the "vimpager_ptree" variable, an
 example usage is as follows:
 
-    if exists("vimpager")
-      if exists("vimpager_ptree") && vimpager_ptree[-2] == 'wman'
-        set ft=man
-      endif
-    endif
+```vim
+if exists("vimpager")
+  if exists("vimpager_ptree") && vimpager_ptree[-2] == 'wman'
+    set ft=man
+  endif
+endif
+```
+
+To disable the use of AnsiEsc.vim to display ANSI colors in the source,
+set:
+
+```vim
+let vimpager_disable_ansiesc = 1
+```
+
+see the section "ANSI ESCAPE SEQUENCES AND OVERSTRIKES" for more
+details.
 
 # COMMAND LINE OPTIONS
 
@@ -115,7 +135,15 @@ if the result is '1' you have conceal, if it's '0' you do not, and the
 AnsiEsc plugin will not be enabled.
 
 If you're on a Mac, the system vim does not enable this feature, install
-vim from Homebrew and you will be good to go.
+vim from Homebrew.
+
+To disable the use of AnsiEsc.vim, set:
+
+```vim
+let vimpager_disable_ansiesc = 1
+```
+
+in your .vimrc.
 
 # CYGWIN NOTES
 
@@ -124,7 +152,8 @@ Windows gvim, just put it in your PATH.
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2013, Rafael Kitover <rkitover@gmail.com>
+Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com> and contributors
+(see the list of CONTRIBUTORS at the bottom of the 'vimpager' file.)
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
