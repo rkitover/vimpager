@@ -453,7 +453,7 @@ vim_less() {
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5}" \
 				-c "map h :normal! h<CR>" \
-				-c "silent! e ${filename}" \
+				-c "set nomodeline fdl=9999 | silent! e ${filename}" \
 				"${@}"
 			;;
 		*) # gvim or mvim GUI
@@ -477,7 +477,7 @@ vim_less() {
 				-c "set scrolloff=${scrolloff:-5} |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
 				-c "map h :normal! h<CR>" \
-				-c "silent! e ${filename}" \
+				-c "set nomodeline fdl=9999 | silent! e ${filename}" \
 				"${@}" &
 			;;
 	esac
