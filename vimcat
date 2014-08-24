@@ -71,6 +71,7 @@
   while [ $# -gt 0 ] ; do
     case "${1}" in
       "-c") shift; extra_c="${1}"; shift ;;
+      "--") shift; break ;;
         -*) echo "bad option '${1}'" ; exit 1 ;;
          *) break ;;
     esac
@@ -102,7 +103,7 @@
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
-        vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" "${file}" </dev/tty >/dev/null 2>&1
+        vim -E -X -R -i NONE $vimcatrc_arg -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         cat ${tmp_file}
         echo
       fi

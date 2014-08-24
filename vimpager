@@ -262,6 +262,7 @@ main() {
 	        case "$1" in
 	                "+G"|"+") vim_cmd="${vim_cmd} +"; shift ;;
 	                    "-c") shift; extra_c="$1"; shift ;;
+			    "--") shift; break ;;
 	                      -*) echo "bad option '$1'" ; exit 1 ;;
 	                       *) break ;;
 	         esac
@@ -274,31 +275,31 @@ main() {
 	case $(echo "${@}" | tr 'A-Z' 'a-z') in
 		*.gz)
 			filename=$(echo ${filename} | sed -e 's/\.[Gg][Zz]$//')
-			gunzip -c "${@}" | filter 2> "${filename}"
+			gunzip -c -- "${@}" | filter 2> "${filename}"
 			;;
 		*.bz2)
 			filename=$(echo ${filename} | sed -e 's/\.[Bb][Zz]2$//')
-			bunzip2 -c "${@}" | filter 2> "${filename}"
+			bunzip2 -c -- "${@}" | filter 2> "${filename}"
 			;;
 		*.xz)
 			filename=$(echo ${filename} | sed -e 's/\.[Xx][Zz]$//')
-			xzcat -c "${@}" | filter 2> "${filename}"
+			xzcat -c -- "${@}" | filter 2> "${filename}"
 			;;
 		*.z)
 			filename=$(echo ${filename} | sed -e 's/\.[Zz]$//')
-			uncompress -c "${@}" | filter 2> "${filename}"
+			uncompress -c -- "${@}" | filter 2> "${filename}"
 			;;
 		*)
-			cat "${@:--}" | filter 2> "${filename}"
+			cat -- "${@:--}" | filter 2> "${filename}"
 			;;
 	esac
 
 	# check for ANSI codes and strip if not using ansiesc
 	if grep_q '\[[^m]*m' "${filename}"; then
 		if [ -z "${ansiesc_available}" -o -n "${force_strip_ansi}" ]; then
-			mv "${filename}" "${filename}.work"
-			cat "${filename}.work" | ansi_filter > "${filename}"
-			rm -f "${filename}.work"
+			mv -- "${filename}" "${filename}.work"
+			cat -- "${filename}.work" | ansi_filter > "${filename}"
+			rm -f -- "${filename}.work"
 		else
 			use_ansiesc=1
 		fi
@@ -312,13 +313,13 @@ main() {
 
 	# if it's a man page, remove starting blank lines, or the C syntax highlighting fails
 	if [ -n "${is_man}" ]; then
-		mv "${filename}" "${filename}.work"
+		mv -- "${filename}" "${filename}.work"
 		awk '
 			BEGIN { skipblank=1 }
 			/^[ \t]*$/ { if (!skipblank) print }
 			/[^ \t]/ { skipblank=0; print }
 		' "${filename}.work" > "${filename}"
-		rm -f "${filename}.work"
+		rm -f -- "${filename}.work"
 	fi
 	
 	# if file is zero length, or one blank line (cygwin) exit immediately
@@ -375,9 +376,9 @@ head_n() {
 	fi
 
 	if [ "$_head_syntax" = "new" ]; then
-		head -n $_lines "$@"
+		head -n $_lines -- "$@"
 	else
-		head -$_lines "$@"
+		head -$_lines -- "$@"
 	fi
 }
 
@@ -395,9 +396,9 @@ tail_n() {
 	fi
 
 	if [ "$_tail_syntax" = "new" ]; then
-		tail -n $_lines "$@"
+		tail -n $_lines -- "$@"
 	else
-		tail -$_lines "$@"
+		tail -$_lines -- "$@"
 	fi
 }
 
