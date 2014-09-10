@@ -78,8 +78,8 @@ main() {
 	# Detect terminal size
 	if command -v tput >/dev/null; then
 	        # this is the only way it works on Cygwin
-		tput cols  > "${tmp}/vimpager_cols_${$}"
-		tput lines > "${tmp}/vimpager_lines_${$}"
+		tput cols  > "${tmp}/vimpager_cols_${$}" 2>/dev/null
+		tput lines > "${tmp}/vimpager_lines_${$}" 2>/dev/null
 	
 		cols=$(cat "${tmp}/vimpager_cols_${$}")
 		lines=$(cat "${tmp}/vimpager_lines_${$}")
