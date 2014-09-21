@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/bin/sh
 
-# uudecode for perl 4 and 5, decodes stdin to stdout
+# uudecode in GNU awk (and some others, like OpenBSD) decodes stdin to stdout
 #
 # Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com>
 #
@@ -23,50 +23,52 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-<>;
+gawk '
+BEGIN {
+    charset=" !\"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
+}
 
-while (<>) {
-    last if /^end$/;
+function ord(char) {
+    return index(charset, char) + 32 - 1;
+}
 
-    $cnt = ord(substr($_, 0, 1));
+/^begin / { next }
+/^end$/   { exit }
 
-    next if $cnt == 96; # ord("`") == 96, zero bytes line
+{
+    cnt = substr($0, 1, 1);
 
-    $cnt -= 32;
+    if (cnt == "`") next;
 
-    $enc = substr($_, 1);
+    cnt = ord(cnt) - 32;
 
-    chop $enc;
+    enc = substr($0, 2, length($0) - 1);
 
-    $chars = 0;
-    $pos   = 0;
+    chars = 0;
+    pos   = 1;
 
-    while ($chars < $cnt) {
-        $grp = substr($enc, $pos, 4);
+    while (chars < cnt) {
+        grp = substr(enc, pos, 4);
+        gsub(/`/, " ", grp); # zero bytes
 
-        $grp =~ s/\`/ /g; # zero bytes
+        c1 = ord(substr(grp, 1, 1)) - 32;
+        c2 = ord(substr(grp, 2, 1)) - 32;
+        c3 = ord(substr(grp, 3, 1)) - 32;
+        c4 = ord(substr(grp, 4, 1)) - 32;
 
-        $c1 = (ord(substr($grp, 0, 1)) - 32);
-        $c2 = (ord(substr($grp, 1, 1)) - 32);
-        $c3 = (ord(substr($grp, 2, 1)) - 32);
-        $c4 = (ord(substr($grp, 3, 1)) - 32);
+        char_val = or(c4, or(or(lshift(c3, 6), lshift(c2, 12)), lshift(c1, 18)));
 
-        $char_val = $c4 | ($c3 << 6) | ($c2 << 12) | ($c1 << 18);
+        char[1] = sprintf("%c", rshift(and(char_val, 16711680), 16));
+        char[2] = sprintf("%c", rshift(and(char_val, 65280),     8));
+        char[3] = sprintf("%c", and(char_val, 255));
 
-        @chars = ();
+        for (i = 1; i <= 3 && chars < cnt; i++) {
+            printf("%s", char[i]);
 
-        push(@chars,
-            pack('c', (($char_val & 0xff0000) >> 16)),
-            pack('c', (($char_val & 0x00ff00) >>  8)),
-            pack('c', (($char_val & 0x0000ff)      ))
-        );
-
-        while (@chars && $chars < $cnt) {
-            print shift @chars;
-
-            $chars++;
+            chars++;
         }
 
-        $pos += 4;
+        pos += 4;
     }
 }
+'
