@@ -74,11 +74,11 @@ function charval(char) {
         c3 = charval(substr(grp, 3, 1)) - 32;
         c4 = charval(substr(grp, 4, 1)) - 32;
 
-        char_val = bit_or(c4, bit_or(bit_or(bit_left(c3, 6), bit_left(c2, 12)), bit_left(c1, 18)));
+        chars_bits = bit_or(c4, bit_or(bit_or(bit_left(c3, 6), bit_left(c2, 12)), bit_left(c1, 18)));
 
-        char[1] = sprintf("%c", bit_right(bit_and(char_val, 16711680), 16));
-        char[2] = sprintf("%c", bit_right(bit_and(char_val, 65280),     8));
-        char[3] = sprintf("%c", bit_and(char_val, 255));
+        char[1] = sprintf("%c", bit_right(bit_and(chars_bits, 16711680), 16));
+        char[2] = sprintf("%c", bit_right(bit_and(chars_bits, 65280),     8));
+        char[3] = sprintf("%c", bit_and(chars_bits, 255));
 
         for (i = 1; i <= 3 && chars < cnt; i++) {
             printf("%s", char[i]);
