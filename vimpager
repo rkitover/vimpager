@@ -237,12 +237,13 @@ main() {
 	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 	
 	ptree=$(do_ptree)
-	
+
 	# Check if called from man, perldoc or pydoc
-	if echo "${ptree}" | grep_q '(^|\/)(man|py(thon|doc|doc2))'; then
+	if echo "${ptree}" | grep_q '(^([0-9]*[ \t]*)*|\/)(man|py(thon|doc|doc[0-9]))'; then
 		extra_c='set ft=man'
 		is_man=1
-	elif echo "${ptree}" | grep_q '(^|\/)perl(doc)?([0-9.]*)?'; then
+		force_strip_ansi=1
+	elif echo "${ptree}" | grep_q '(^([0-9]*[ \t]*)*|\/)perl(doc)?([0-9.]*)?'; then
 		extra_c='set ft=perldoc'
 		is_perldoc=1
 		force_strip_ansi=1
