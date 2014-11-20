@@ -54,45 +54,57 @@ esac
 
 main() {
 	mkdir_options="-m 700"
-	
+
 	if [ -n "${msys}" -o -n "${cygwin}" ]; then
 		# Use the real TEMP directory on windows in case we are
 		# using a native vim/gvim...
-		tmp="$(printf "%s\n" "${TEMP}" | tr '\\' /)"
-	        if [ -n "${msys}" -a -n "${temp}" ]; then
-	            # MSYS2 does not support mkdir's --mode option
-	            mkdir_options=""
-	        fi
+		#
+		# NOTE: sometimes TEMP=/tmp, this code handles that case as well
+
+		tmp="${TEMP}"
+
+		if command -v cygpath >/dev/null; then
+			tmp="$(cygpath -w "${tmp}")"
+		fi
+
+		tmp="$(printf "%s\n" "${tmp}" | tr '\\' /)"
+
+		# chmod doesn't work here, even in /tmp sometimes
+		mkdir_options=""
 	else
 		# ... and /tmp otherwise
 		tmp="/tmp"
 	fi
+
 	# Create a safe directory in which we place all other tempfiles.
 	tmp="${tmp}/vimpager_${$}"
 	if ! mkdir ${mkdir_options} "${tmp}"; then
 	    echo "Could not create temporary directory ${tmp}" >&2
 	    exit 1
 	fi
-	trap "rm -rf ${tmp}" HUP INT QUIT ILL TRAP KILL BUS TERM
-	
+	trap "rm -rf ${tmp} gvim.exe.stackdump" HUP INT QUIT ILL TRAP KILL BUS TERM
+
 	# Detect terminal size
 	if command -v tput >/dev/null; then
-	        # this is the only way it works on Cygwin
-		tput cols  > "${tmp}/vimpager_cols_${$}" 2>/dev/null
-		tput lines > "${tmp}/vimpager_lines_${$}" 2>/dev/null
-	
-		cols=$(cat "${tmp}/vimpager_cols_${$}")
-		lines=$(cat "${tmp}/vimpager_lines_${$}")
-	
-		rm -f "${tmp}/vimpager_cols_${$}" "${tmp}/vimpager_lines_${$}"
+	        # this is the only way it works on some versions of Cygwin
+
+		# 2>/dev/null makes tput not work, so don't do that
+		# we are just going to hope that tput errors don't happen
+		tput cols  > "${tmp}/cols"
+		tput lines > "${tmp}/lines"
+
+		cols=$(cat "${tmp}/cols")
+		lines=$(cat "${tmp}/lines")
+
+		rm -f "${tmp}/cols" "${tmp}/lines"
 	fi
-	
+
 	# msys has no tput, this doesn't work on Cygwin by the way
 	if [ -z "${cols}" ] && command -v bash >/dev/null; then
 		cols=$(bash -i -c 'echo ${COLUMNS}')
 		lines=$(bash -i -c 'echo ${LINES}')
 	fi
-	
+
 	# If we are unable to detect lines/columns, maximize
 	# the window.
 	if [ -z "${cols}" ]; then
@@ -100,9 +112,9 @@ main() {
 		lines=999
 		no_pass_thru=1 # force loading vimpager
 	fi
-	
+
 	# determine location of rc file
-	
+
 	# first check for a user ~/.vimpagerrc
 	if [ -n "${VIMPAGER_RC}" ]; then
 		vimrc="${VIMPAGER_RC}"
@@ -113,10 +125,10 @@ main() {
 	elif [ -f ~/_vimpagerrc ]; then
 		vimrc=~/_vimpagerrc
 	fi
-	
+
 	# then check if the user has a ~/.vimrc
 	[ -z "${vimrc}" ] && vimrc="$(find_rc vim vimrc)"
-	
+
 	# then check for a global /etc/vimpagerrc and fall back to NORC
 	if [ -z "${vimrc}" ]; then
 		if [ -f /usr/local/etc/vimpagerrc ]; then
@@ -127,21 +139,21 @@ main() {
 			vimrc=NORC
 		fi
 	fi
-	
+
 	# read settings
 	vim -u "${vimrc}" -E --cmd 'set nocp' -c '
 		if !exists("vimpager_use_gvim")
 			let vimpager_use_gvim=0
 		endif
-	
+
 		if !exists("vimpager_disable_x11")
 			let vimpager_disable_x11=0
 		endif
-	
+
 		if !exists("vimpager_scrolloff")
 			let vimpager_scrolloff=5
 		endif
-	
+
 		if !exists("vimpager_passthrough")
 			let vimpager_passthrough=0
 		endif
@@ -153,18 +165,18 @@ main() {
 		endif
 
 		call writefile([ vimpager_use_gvim, vimpager_disable_x11, vimpager_scrolloff, vimpager_passthrough, use_ansiesc ], "'${tmp}'/vimpager_opts_'${$}'")
-	
+
 		quit
 	' </dev/null
 
 	[ "$(head_n 1 < "${tmp}/vimpager_opts_${$}")" = 1 ] && use_gvim=1
-	
+
 	[ "$(head_n 2 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" = 1 ] && disable_x11=1
-	
+
 	scrolloff=$(head_n 3 < "${tmp}/vimpager_opts_${$}" | tail_n 1)
-	
+
 	[ "$(head_n 4 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" = 0 ] && no_pass_thru=1
-	
+
 	if [ "${no_pass_thru}" = 0 ]; then
 		# check if arithmetic expansion works, passthrough mode relies on it
 		if [ x$(echo $((2+2)) 2>/dev/null) != x4 ]; then
@@ -173,24 +185,24 @@ main() {
 	fi
 
 	[ "$(head_n 5 < "${tmp}/vimpager_opts_${$}" | tail_n 1)" != 0 ] && ansiesc_available=1
-	
+
 	rm -f "${tmp}/vimpager_opts_${$}"
-	
+
 	if [ -n "${msys}" -o -n "${cygwin}" ]; then
 		# msys/cygwin may be using a native vim, and if we're not in a real
 		# console the native vim will not work, so we have to use gvim.
-	
+
 		if [ "x${TERM}" != "xdumb" -a "x${TERM}" != "xcygwin" -a "x${TERM}" != "x" ]; then
 			if command -v vim 2>/dev/null | grep_q '^\/(cygdrive\/)?[a-z]\/'; then
 				use_gvim=1
 			fi
 		fi
 	fi
-	
+
 	if [ -n "${use_gvim}" ]; then
 		# find the .gvimrc
 		gvimrc="$(find_rc gvim gvimrc)"
-	
+
 		# determine if this is an ssh session and/or $DISPLAY is set
 		if [ -n "${osx}" ]; then
 			if [ -z "${SSH_CONNECTION}" ] && command -v mvim >/dev/null; then
@@ -233,9 +245,9 @@ main() {
 	else
 		vim_cmd='vim -R'
 	fi
-	
+
 	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
-	
+
 	ptree=$(do_ptree)
 
 	# Check if called from man, perldoc or pydoc
@@ -249,12 +261,12 @@ main() {
 		force_strip_ansi=1
 		not_man=1
 	fi
-	
+
 	extra_cmd="let vimpager_ptree=[$(echo "${ptree}" | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(vimpager_ptree, -1)"
 
 	command -v perl > /dev/null && \
 		perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
-	
+
 	# Check for certain parameters to pass on to vim (or conceivably do something else)
 	# Currently only checks for "+G" as in less which will start reading the file
 	# at the end. Also supports just "+" as in vim.
@@ -268,11 +280,11 @@ main() {
 	                       *) break ;;
 	         esac
 	done
-	
+
 	filename=${@:-stdin}
 	filename=$(echo "${filename}" | tr '/' '_')
 	filename="${tmp}/${filename}"
-	
+
 	case $(echo "${@}" | tr 'A-Z' 'a-z') in
 		*.gz)
 			filename=$(echo ${filename} | sed -e 's/\.[Gg][Zz]$//')
@@ -322,34 +334,23 @@ main() {
 		' "${filename}.work" > "${filename}"
 		rm -f -- "${filename}.work"
 	fi
-	
+
 	# if file is zero length, or one blank line (cygwin) exit immediately
 	if [ \( ! -s "${filename}" \) \
 		-o \( \( "$(cat "${filename}")" = "" \) \
 		-a \( "$(wc -l "${filename}" | awk '{print $1}')" = "1" \) \) ]; then
-	
+
 		rm -rf "${tmp}"
 		exit
 	fi
-	
+
 	# On cygwin it might be the win32 gvim, but windows paths work for cygwin
 	# vim just fine as well.
 	if [ -n "${cygwin}" ]; then
-		filename=$(cygpath -w "${filename}")
+		filename=$(cygpath -w "${filename}" | tr '\\' /)
 	fi
-	
+
 	vim_less -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" </dev/tty
-	
-	# Give gvim/mvim time to open the file.
-	# On Win32 we must also wait for the process to exit before the file can
-	# be deleted.
-	(
-		while [ -d "${tmp}" ]; do
-			sleep 10
-			rm -rf "${tmp}" 2>/dev/null
-			rm -f gvim.exe.stackdump 2>/dev/null
-		done
-	) &
 }
 
 # grep -q is often not available
@@ -441,7 +442,7 @@ vim_less() {
 			fi
 
 			if [ -n "${use_ansiesc}" ]; then
-				ansi_command='if exists(":AnsiEsc") | exe "autocmd VimEnter * :AnsiEsc" | exe "autocmd VimEnter * :set ts=8 sts=8 et buftype=nofile modifiable" | exe "autocmd VimEnter * :silent! retab" | endif'
+				ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set ts=8 sts=8 et buftype=nofile modifiable' | exe 'autocmd VimEnter * :silent! retab' | endif"
 			else
 				ansi_command='silent! echo'
 			fi
@@ -456,6 +457,7 @@ vim_less() {
 				-c "map h :normal! h<CR>" \
 				-c "set nomodeline fdl=9999 | silent! e ${filename}" \
 				"${@}"
+			rm -rf "${tmp}" gvim.exe.stackdump
 			;;
 		*) # gvim or mvim GUI
 			[ -n "${gvimrc}" ] && colors=$(grep guifg ${gvimrc} 2>/dev/null | head_n 1)
@@ -470,6 +472,8 @@ vim_less() {
 				fi
 			fi
 
+			(
+			trap "rm -rf "${tmp}" gvim.exe.stackdump" 0
 			${vim_cmd} \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
@@ -479,7 +483,8 @@ vim_less() {
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
 				-c "map h :normal! h<CR>" \
 				-c "set nomodeline fdl=9999 | silent! e ${filename}" \
-				"${@}" &
+				"${@}"
+			) &
 			;;
 	esac
 
