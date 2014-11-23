@@ -212,17 +212,17 @@ main() {
 			fi
 		elif [ -n "${cygwin}" ]; then
 			if command -v gvim >/dev/null; then
+				if [ -n "${SSH_CONNECTION}" ]; then
+					vim_cmd="vim -R"
 				# The Cygwin gvim uses X
-				if [ -z "${win32_native_gvim}" ]; then
+				elif [ -z "${win32_native_gvim}" ]; then
 					if [ -z "${DISPLAY}" ]; then
 						vim_cmd="vim -R"
 					else
 						vim_cmd='gvim -R'
 					fi
-				elif [ -z "${SSH_CONNECTION}" ]; then
-					vim_cmd='gvim -R'
 				else
-					vim_cmd="vim -R"
+					vim_cmd='gvim -R'
 				fi
 			else
 				vim_cmd="vim -R"
@@ -435,16 +435,16 @@ extract_bundled_scripts() {
 vim_less() {
 	extract_bundled_scripts
 
+	if [ -n "${use_ansiesc}" ]; then
+		ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set ts=8 sts=8 et buftype=nofile modifiable' | exe 'autocmd VimEnter * :silent! retab' | endif"
+	else
+		ansi_command='silent! echo'
+	fi
+
 	case ${vim_cmd} in
 		vim*)
 			if [ -n "${disable_x11}" ]; then
 				vim_cmd="${vim_cmd} -X"
-			fi
-
-			if [ -n "${use_ansiesc}" ]; then
-				ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set ts=8 sts=8 et buftype=nofile modifiable' | exe 'autocmd VimEnter * :silent! retab' | endif"
-			else
-				ansi_command='silent! echo'
 			fi
 
 # 'map h h' has to be the very last command in -c, to disable the less.vim help screen
