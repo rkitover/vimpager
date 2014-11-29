@@ -14,6 +14,13 @@ vimpager 'some file'
 
 cat 'some file' | vimpager
 
+# DEPENDENCIES
+
+## Debian
+* sharutils
+* pandoc
+* dos2unix
+
 # INSTALL
 
 ```bash
