@@ -597,7 +597,8 @@ filter() {
 		while [ ${nl} -le ${dh} ]; do
 			IFS='
 '
-			read -r line || exec printf %s "${content}"
+			read -r line
+			[ $? != 0 -a -z "$line" ] && exec printf %s "${content}"
 			content="${content}${line}
 "
 			nl=$((nl+1))
