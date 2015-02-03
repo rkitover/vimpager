@@ -86,11 +86,13 @@ man: vimpager.1 vimcat.1
 
 %.1: %.md
 	pandoc -s -w man $< -o $@
-	dos2unix $@
+	tr -d '\015' < $@ > $@.tmp
+	mv $@.tmp $@
 
 README: vimpager.md
 	pandoc -s -w plain vimpager.md -o README
-	dos2unix README
+	tr -d '\015' < README > README.tmp
+	mv README.tmp README
 
 README.md: vimpager.md
 	${COPYFILE} vimpager.md README.md

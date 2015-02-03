@@ -14,12 +14,15 @@ vimpager 'some file'
 
 cat 'some file' | vimpager
 
-# DEPENDENCIES
+# RUN-TIME DEPENDENCIES
 
-## Debian
-* sharutils
+* vim
+* sharutils or some uudecode (optional)
+
+# BUILD DEPENDENCIES
+
+* sharutils or some uuencode
 * pandoc
-* dos2unix
 
 # INSTALL
 

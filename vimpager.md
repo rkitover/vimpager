@@ -14,6 +14,16 @@ vimpager 'some file'
 
 cat 'some file' | vimpager
 
+# RUN-TIME DEPENDENCIES
+
+* vim
+* sharutils or some uudecode (optional)
+
+# BUILD DEPENDENCIES
+
+* sharutils or some uuencode
+* pandoc
+
 # INSTALL
 
 ```bash

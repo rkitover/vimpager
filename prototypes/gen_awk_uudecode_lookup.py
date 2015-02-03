@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env python
 
-# uudecode in GNU awk (and some others, like OpenBSD) decodes stdin to stdout
+# Generate lookup tables code to be placed in BEGIN for an awk lookup table
+# based uudecode utility.
 #
 # Copyright (c) 2015, Rafael Kitover <rkitover@gmail.com>
 #
@@ -23,58 +24,33 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-awk=awk
+from sys         import stdout, stderr
+from collections import defaultdict
 
-if command -v gawk >/dev/null; then
-    awk=gawk
-fi
+def escape(s):
+    return s.replace('\\', '\\\\').replace('"', '\\"').replace("'", "'\\''")
 
-$awk '
-BEGIN {
-    charset=" !\"#$%&'\''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
-}
+uu_chars = []
 
-function charval(char) {
-    return index(charset, char) + 32 - 1;
-}
+for i in range(0, 64):
+    uu_chars += chr(i + 32)
 
-/^begin / { next }
-/^end$/   { exit }
+left   = {}
+middle = {}
+right  = {}
 
-{
-    cnt = substr($0, 1, 1);
+for c1 in uu_chars:
+    for c2 in uu_chars:
+        left[  c1 + c2] = chr((( ord(c1) - 32) << 2)         + ((ord(c2) - 32) >> 4))
+        middle[c1 + c2] = chr((((ord(c1) - 32) << 4) & 0xFF) + ((ord(c2) - 32) >> 2))
+        right[ c1 + c2] = chr((((ord(c1) - 32) << 6) & 0xFF) + (ord(c2) - 32))
 
-    if (cnt == "`") next;
+lookup = defaultdict(list)
 
-    cnt = charval(cnt) - 32;
+for n, s, v in [("l", k, v) for k, v in left.iteritems()] + [("m", k, v) for k, v in middle.iteritems()] + [("r", k, v) for k, v in right.iteritems()]:
+    lookup[v].append('%s["%s"]' % (n, escape(s)))
 
-    enc = substr($0, 2, length($0) - 1);
+for c, slots in lookup.iteritems():
+    stdout.write("=".join(slots + [str(ord(c)) + ";"]))
 
-    chars = 0;
-    pos   = 1;
-
-    while (chars < cnt) {
-        grp = substr(enc, pos, 4);
-        gsub(/`/, " ", grp); # zero bytes
-
-        c1 = charval(substr(grp, 1, 1)) - 32;
-        c2 = charval(substr(grp, 2, 1)) - 32;
-        c3 = charval(substr(grp, 3, 1)) - 32;
-        c4 = charval(substr(grp, 4, 1)) - 32;
-
-        chars_bits = or(c4, or(or(lshift(c3, 6), lshift(c2, 12)), lshift(c1, 18)));
-
-        char[1] = sprintf("%c", rshift(and(chars_bits, 16711680), 16));
-        char[2] = sprintf("%c", rshift(and(chars_bits, 65280),     8));
-        char[3] = sprintf("%c", and(chars_bits, 255));
-
-        for (i = 1; i <= 3 && chars < cnt; i++) {
-            printf("%s", char[i]);
-
-            chars++;
-        }
-
-        pos += 4;
-    }
-}
-'
+print ""

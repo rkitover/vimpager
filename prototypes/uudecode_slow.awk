@@ -4,7 +4,7 @@
 #
 # It's not exactly lightning fast, but passable for reasonable sizes.
 #
-# Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com>
+# Copyright (c) 2015, Rafael Kitover <rkitover@gmail.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
