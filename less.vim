@@ -69,8 +69,8 @@ au VimEnter * set nomod
 set noma
 
 " Give help
-noremap h :call <SID>Help()<CR>
-map H h
+"noremap h :call <SID>Help()<CR>
+"map H h
 fun! s:Help()
   echo "<Space>   One page forward          b         One page backward"
   echo "d         Half a page forward       u         Half a page backward"
