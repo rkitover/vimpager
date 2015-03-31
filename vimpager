@@ -650,7 +650,7 @@ filter() {
 	fi
 }
 
-uudecode() {
+do_uudecode() {
 	# first see if uudecode is available
 	if command -v uudecode >/dev/null; then
 		command uudecode -o /dev/stdout
@@ -755,7 +755,7 @@ l[" \""]=l[" #"]=l["  "]=l[" !"]=l[" &"]=l[" '\''"]=l[" $"]=l[" %"]=l[" *"]=l[" 
 }
 
 ansiesc_tar() {
-	(cat <<'EOF') | uudecode | tar xf -
+	(cat <<'EOF') | do_uudecode | tar xf -
 begin 644 ansiesc.tar
 M+B\`````````````````````````````````````````````````````````
 M````````````````````````````````````````````````````````````
@@ -3290,7 +3290,7 @@ EOF
 }
 
 less_vim() {
-	(cat <<'EOF') | uudecode > less.vim
+	(cat <<'EOF') | do_uudecode > less.vim
 begin 644 less.vim
 M(B!6:6T@<V-R:7!T('1O('=O<FL@;&EK92`B;&5S<R(*(B!-86EN=&%I;F5R
 M.@E"<F%M($UO;VQE;F%A<B`\0G)A;4!V:6TN;W)G/@HB($QA<W0@0VAA;F=E
@@ -3419,7 +3419,7 @@ EOF
 }
 
 perldoc_vim() {
-	(cat <<'EOF') | uudecode > perldoc.vim
+	(cat <<'EOF') | do_uudecode > perldoc.vim
 begin 644 perldoc.vim
 M(B!.86UE.B`@("`@("!P97)L9&]C+G9I;0HB($UA:6YT86EN97(Z('1R87!D
 M,#!R"B(@3&]C871I;VXZ("`@:'1T<#HO+W1R87!D,#!R+G-E+V-O;F9I9W,O
