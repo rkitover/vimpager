@@ -660,6 +660,7 @@ do_uudecode() {
 	# try perl, python, ruby then awk, see prototypes dir
 	if command -v perl >/dev/null; then
 		perl -e '
+binmode STDOUT; # for win32 perls
 <>;
 
 while (<>) {
