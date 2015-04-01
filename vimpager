@@ -46,6 +46,7 @@ case $(uname -s) in
         Darwin) osx=1; bsd=1 ;;
 	CYGWIN*) cygwin=1 ;;
 	MINGW*) msys=1 ;;
+	MSYS*) msys=1 ;;
 	OpenBSD) openbsd=1; bsd=1 ;;
 	FreeBSD) freebsd=1; bsd=1 ;;
 	NetBSD) netbsd=1; bsd=1 ;;
