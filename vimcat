@@ -46,6 +46,7 @@
 
   case $(uname -s) in
     MINGW*)  
+    MSYS*)
       if [ -n "${temp}" ]; then
         # MSYS2 is a little tricky, we're gonna stick to the user's private temp
         # since its mkdir doesn't like the --mode option
