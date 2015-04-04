@@ -45,11 +45,10 @@
   mkdir_options="-m 700"
 
   case $(uname -s) in
-    MINGW*)  
-    MSYS*)
+    MINGW*|MSYS*)
       if [ -n "${temp}" ]; then
         # MSYS2 is a little tricky, we're gonna stick to the user's private temp
-        # since its mkdir doesn't like the --mode option
+        # the -m mode switch to mkdir doesn't work
         tmp_dir=$(cygpath --unix "${temp}")
         mkdir_options=""
       fi
