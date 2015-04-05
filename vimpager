@@ -652,9 +652,17 @@ filter() {
 }
 
 do_uudecode() {
-	# first see if uudecode is available
 	if command -v uudecode >/dev/null; then
-		command uudecode -o /dev/stdout
+		_uudecode=uudecode
+	elif command -v guudecode >/dev/null; then
+		_uudecode=guudecode
+	else
+		_uudecode=""
+	fi
+
+	# first see if uudecode is available
+	if [ -n "${_uudecode}" ]; then
+		"${_uudecode}" -o /dev/stdout
 		return $?
 	fi
 
