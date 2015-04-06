@@ -71,14 +71,16 @@ let\ vimpager_use_gvim\ =\ 1
 \f[]
 .fi
 .PP
-To pass through text that is smaller than the terminal height (without
-highlighting, at present) use this:
+To turn off the feature of passing through text that is smaller than the
+terminal height use this:
 .IP
 .nf
 \f[C]
-let\ vimpager_passthrough\ =\ 1
+let\ vimpager_passthrough\ =\ 0
 \f[]
 .fi
+.PP
+See "PASSTHROUGH MODE" further down.
 .PP
 To start vim with -X (no x11 connection, a bit faster startup) put the
 following into your .vimrc/vimpagerrc:
@@ -169,10 +171,29 @@ let\ vimpager_disable_ansiesc\ =\ 1
 .fi
 .PP
 in your .vimrc.
-.SH CYGWIN NOTES
+.SH PASSTHROUGH MODE
 .PP
-The Cygwin gvim is very buggy, vimpager works correctly with the native
-Windows gvim, just put it in your PATH.
+If the text sent to the pager is smaller than the terminal window, then
+it will be displayed without vim as text.
+If it has ansi codes, they will be preserved, depending on your
+"vimpager_disable_ansiesc" setting, otherwise the text will be
+highlighted with vimcat.
+.PP
+You can turn this off by putting
+.IP
+.nf
+\f[C]
+let\ vimpager_enable_passthrough\ =\ 0
+\f[]
+.fi
+.PP
+Passthrough mode requires a POSIX shell with arithmetic expansion, if
+there is one on your system and it is not detected please submit an
+issue with the path and your OS version.
+.SH CYGWIN/MSYS/MSYS2 NOTES
+.PP
+vimpager works correctly with the native Windows gvim, just put it in
+your PATH and set the vimpager_use_gvim option as described above.
 .SH LICENSE AND COPYRIGHT
 .PP
 Copyright (c) 2014, Rafael Kitover <rkitover@gmail.com> and contributors

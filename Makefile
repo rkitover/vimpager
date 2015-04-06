@@ -10,7 +10,7 @@ COPYFILE?= ${INSTALL} -m 644
 
 all: vimpager vimpager.1 vimcat.1 README README.md
 
-vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu
+vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu
 	mv vimpager vimpager.work
 	awk '\
 	    /^begin [0-9]* ansiesc.tar/ { exit } \
@@ -41,6 +41,20 @@ vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu
 	rm -f vimpager.work less.vim.uu
 	mv vimpager vimpager.work
 	awk '\
+	    /^begin [0-9]* vimcat/ { exit } \
+	    { print } \
+	' vimpager.work > vimpager
+	cat vimcat.uu >> vimpager
+	echo EOF >> vimpager
+	awk '\
+	    BEGIN { skip = 1 } \
+	    /^# END OF vimcat/ { skip = 0 } \
+	    skip == 1 { next } \
+	    { print } \
+	' vimpager.work >> vimpager
+	rm -f vimpager.work vimcat.uu
+	mv vimpager vimpager.work
+	awk '\
 	    /^begin [0-9]* perldoc.vim/ { exit } \
 	    { print } \
 	' vimpager.work > vimpager
@@ -60,6 +74,9 @@ less.vim.uu: less.vim
 
 perldoc.vim.uu: perldoc.vim
 	uuencode perldoc.vim perldoc.vim > perldoc.vim.uu
+
+vimcat.uu: vimcat
+	uuencode vimcat vimcat > vimcat.uu
 
 ansiesc.tar.uu: ansiesc/autoload/AnsiEsc.vim ansiesc/doc/AnsiEsc.txt ansiesc/doc/tags ansiesc/plugin/AnsiEscPlugin.vim ansiesc/plugin/cecutil.vim
 	(cd ansiesc; tar cf ../ansiesc.tar .)
