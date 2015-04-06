@@ -218,8 +218,8 @@ fun! s:End()
   if exists('s:lz')
     let &lz = s:lz
   endif
-  unmap h
-  unmap H
+"  unmap h
+"  unmap H
   unmap <Space>
   unmap <C-V>
   unmap f
