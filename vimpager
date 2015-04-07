@@ -618,8 +618,6 @@ ansi_filter() {
 # Normally, filter outputs overstrike free content to STDERR.
 # When content is short, filter outputs content with ANSI escape codes and overstrikes to STDOUT.
 filter() {
-	_ansi_detected=0
-	_overstrike_detected=0
 	OLDIFS="${IFS}"
 	if [ -z "${no_pass_thru}" ]; then
 		content=
@@ -635,8 +633,9 @@ filter() {
 			read -r line
 
 			if [ $? != 0 -a -z "$line" ]; then
-				if [ "${_ansi_detected}" = "1" ] || [ "${_overstrike_detected}" = "1" ]; then
-					exec printf %s "${content}"
+				if	echo "${content}" | grep_q '\[[^m]*m' || \
+					echo "${content}" | grep_q '(.)\1'; then
+						exec printf %s "${content}"
 				fi
 
 				# use vimcat to highlight otherwise
@@ -649,12 +648,6 @@ filter() {
 
 			content="${content}${line}
 "
-			if [ "${_ansi_detected}" = "0" ] && echo "${content}" | grep_q '\[[^m]*m'; then
-				_ansi_detected=1
-			fi
-			if [ "${_overstrike_detected}" = "0" ] && echo "${content}" | grep_q '(.)\1'; then
-				_overstrike_detected=1
-			fi
 			nl=$((nl+1))
 
 			# w: line width
