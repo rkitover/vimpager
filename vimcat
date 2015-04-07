@@ -8,30 +8,43 @@
   if [ ! -t 1 ]; then
     exec cat "${@}"
   fi
-# try to find a better shell, especially on Solaris
+  # try to find a better shell, especially on Solaris
 
   PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
+
+  _MY_SHELL=/bin/sh
+  export _MY_SHELL
 
   if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
     IN_BASH=1
     export IN_BASH
+    _MY_SHELL=`command -v bash`
+    export _MY_SHELL
     exec bash "$0" "$@"
   elif [ -z "$IN_BASH" ] && [ -z "$IN_KSH" ]; then
     if command -v dtksh >/dev/null; then
       IN_KSH=1
       export IN_KSH
+      _MY_SHELL=`command -v dtksh`
+      export _MY_SHELL
       exec dtksh "$0" "$@"
     elif [ -x /usr/xpg4/bin/sh ]; then
       IN_KSH=1
       export IN_KSH
+      _MY_SHELL=/usr/xpg4/bin/sh
+      export _MY_SHELL
       exec /usr/xpg4/bin/sh "$0" "$@"
     elif command -v ksh93 >/dev/null; then
       IN_KSH=1
       export IN_KSH
+      _MY_SHELL=`command -v ksh93`
+      export _MY_SHELL
       exec ksh93 "$0" "$@"
     elif command -v ksh >/dev/null; then
       IN_KSH=1
       export IN_KSH
+      _MY_SHELL=`command -v ksh`
+      export _MY_SHELL
       exec ksh "$0" "$@"
     else
       echo "$0 requires either bash or ksh" >&2
@@ -39,8 +52,8 @@
     fi
   fi
 
-  # hopefully we're now POSIX
-   
+  # hopefully we're now POSIX, and shell is saved in ${_MY_SHELL}
+
   tmp_dir=/tmp
   mkdir_options="-m 700"
 
