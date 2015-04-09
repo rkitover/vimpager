@@ -126,6 +126,7 @@ fun! AnsiEsc#AnsiEsc(rebuild)
   syn region ansiWhite		start="\e\[;\=0\{0,2};\=37m" end="\e\["me=e-2 contains=ansiConceal
   " set default ansi to white
   syn region ansiWhite          start="\e\[;\=0\{0,2};\=39m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBold          start="\e\[;\=0\{0,1}1;\=39m" end="\e\["me=e-2 contains=ansiConceal
 
   syn region ansiBold     	start="\e\[;\=0\{0,2};\=1m" end="\e\["me=e-2 contains=ansiConceal
   syn region ansiBoldBlack	start="\e\[;\=0\{0,2};\=\%(1;30\|30;1\)m" end="\e\["me=e-2 contains=ansiConceal
