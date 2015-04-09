@@ -642,6 +642,9 @@ filter() {
 				cd "${tmp}"
 				vimcat_script
 				chmod +x ./vimcat
+				unset _MY_SHELL
+				unset IN_BASH
+				unset IN_KSH
 				printf %s "${content}" | ./vimcat
 				exit 0
 			fi
