@@ -1,0 +1,24 @@
+From ef6b2d14600e72fee2ba5861230804788892ab05 Mon Sep 17 00:00:00 2001
+From: Guillaume Brogi <gui-gui@netcourrier.com>
+Date: Wed, 8 Apr 2015 14:22:54 +0200
+Subject: [PATCH] Add support for '\x1b[1;39m' (bold)
+
+---
+ ansiesc/autoload/AnsiEsc.vim | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ansiesc/autoload/AnsiEsc.vim b/ansiesc/autoload/AnsiEsc.vim
+index d41bd4e..da2acd5 100644
+--- a/ansiesc/autoload/AnsiEsc.vim
++++ b/ansiesc/autoload/AnsiEsc.vim
+@@ -126,6 +126,7 @@ fun! AnsiEsc#AnsiEsc(rebuild)
+   syn region ansiWhite		start="\e\[;\=0\{0,2};\=37m" end="\e\["me=e-2 contains=ansiConceal
+   " set default ansi to white
+   syn region ansiWhite          start="\e\[;\=0\{0,2};\=39m" end="\e\["me=e-2 contains=ansiConceal
++  syn region ansiBold          start="\e\[;\=0\{0,1}1;\=39m" end="\e\["me=e-2 contains=ansiConceal
+ 
+   syn region ansiBold     	start="\e\[;\=0\{0,2};\=1m" end="\e\["me=e-2 contains=ansiConceal
+   syn region ansiBoldBlack	start="\e\[;\=0\{0,2};\=\%(1;30\|30;1\)m" end="\e\["me=e-2 contains=ansiConceal
+-- 
+2.3.0
+
