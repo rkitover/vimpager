@@ -309,7 +309,7 @@ function! AnsiHighlight(output_file)
   return writefile(retv, a:output_file)
 endfunction
 
-" See copyright in the vims cript above (for the vim script) and in
+" See copyright in the vim script above (for the vim script) and in
 " vimcat.md for the whole script.
 "
 " The list of contributors is at the bottom of the vimpager script in this
