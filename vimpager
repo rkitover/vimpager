@@ -489,7 +489,7 @@ vim_less() {
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5}" \
-				-c "set nomodeline fdl=9999 | silent! e ${filename}" \
+				-c "set nomodeline fdl=9999 | args ${filename} | silent! e ${filename}" \
 				"${@}"
 			rm -rf "${tmp}" gvim.exe.stackdump
 			;;
@@ -515,7 +515,7 @@ vim_less() {
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5} |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
-				-c "set nomodeline fdl=9999 | silent! e ${filename}" \
+				-c "set nomodeline fdl=9999 | args ${filename} | silent! e ${filename}" \
 				"${@}"
 			) &
 			;;
