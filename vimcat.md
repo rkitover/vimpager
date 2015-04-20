@@ -27,8 +27,9 @@ Run a vim command after opening the file.
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2015, Rafael Kitover <rkitover@gmail.com> and Contributors
-(see the bottom of the 'vimpager' file in the project source.) 
+Copyright (c) 2015, Matthew Wozniski <mjw@drexel.edu> and Rafael Kitover
+<rkitover@gmail.com> and Contributors (see the bottom of the 'vimpager'
+file in the project source.) 
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
