@@ -4,6 +4,3 @@
 " the user's ${VIMPAGER_RC}, ~/.vimpagerrc or ~/.vimrc.
 
 " This file will only be read if the user does not have a ~/.vimrc.
-
-" use light fonts on dark background
-"set background=dark

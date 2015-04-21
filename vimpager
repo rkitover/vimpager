@@ -529,6 +529,7 @@ vim_less() {
 			${vim_cmd} \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
+				--cmd 'set bg=dark' \
 				--cmd 'let vimpager=1 | runtime! macros/less.vim | set nocp' \
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5}" \
