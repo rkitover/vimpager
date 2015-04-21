@@ -23,7 +23,17 @@ To disable loading plugins, put "set noloadplugins" into a ~/.vimcatrc file.
 
 ## -c cmd
 
-Run a vim command after opening the file.
+Run a vim command after opening the file. Multiple -c arguments are
+supported.
+
+## --cmd cmd
+
+Run a vim command when entering vim before anything else. Multiple --cmd
+arguments are supported.
+
+## -u vimrc
+
+Use an alternate .vimrc or .vimcatrc.
 
 # LICENSE AND COPYRIGHT
 

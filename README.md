@@ -120,7 +120,17 @@ Start at the end of the file, just like less.
 
 ## -c cmd
 
-Run a vim command after opening the file.
+Run a vim command after opening the file. Multiple -c arguments are
+supported.
+
+## --cmd cmd
+
+Run a vim command when entering vim before anything else. Multiple --cmd
+arguments are supported.
+
+## -u vimrc
+
+Use alternate .vimrc or .vimpagerrc.
 
 # ANSI ESCAPE SEQUENCES AND OVERSTRIKES
 
@@ -161,8 +171,7 @@ in your .vimrc.
 
 If the text sent to the pager is smaller than the terminal window, then
 it will be displayed without vim as text. If it has ansi codes, they
-will be preserved, depending on your "vimpager_disable_ansiesc" setting,
-otherwise the text will be highlighted with vimcat.
+will be preserved, otherwise the text will be highlighted with vimcat.
 
 You can turn this off by putting
 
