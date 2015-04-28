@@ -2,6 +2,9 @@
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
 " Last Change:	2014 May 13
 
+" This file is derived from the Vim project and is licensed under the
+" same terms as Vim.
+
 " Avoid loading this file twice, allow the user to define his own script.
 if exists("loaded_less")
   finish

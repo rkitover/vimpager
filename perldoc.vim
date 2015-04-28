@@ -7,6 +7,8 @@
 " since whole blocks (sometimes the whole perldoc) got hilighted (it's etc..)
 " There's probably errors. :)
 
+" This file is derived from the Vim project and is licensed under the
+" same terms as Vim itself.
 
 " Remove any old syntax stuff that was loaded (5.x) or quit when a syntax file
 " was already loaded (6.x).
