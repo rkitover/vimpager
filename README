@@ -44,11 +44,9 @@ In your ~/.bashrc add the following:
 DESCRIPTION
 ===========
 
-A slightly more sophisticated replacement for less.sh that also supports
-being set as the PAGER environment variable. Displays man pages,
-perldocs and python documentation properly. Works on Linux, Solaris,
-FreeBSD, NetBSD, OpenBSD, OSX, Cygwin and msys. Should work on most
-other systems as well.
+A PAGER using less.vim with support for highlighting of man pages and
+many other features. Works on most UNIX-like systems as well as Cygwin
+and MSYS.
 
 On GitHub: http://github.com/rkitover/vimpager
 
