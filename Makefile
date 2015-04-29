@@ -10,7 +10,7 @@ COPYFILE?= ${INSTALL} -m 644
 
 all: vimpager vimpager.1 vimcat.1 README README.md
 
-vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu
+vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu ConcealRetab.vim.uu
 	mv vimpager vimpager.work
 	awk '\
 	    /^begin [0-9]* ansiesc.tar/ { exit } \
@@ -67,6 +67,20 @@ vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu
 	    { print } \
 	' vimpager.work >> vimpager
 	rm -f vimpager.work perldoc.vim.uu
+	mv vimpager vimpager.work
+	awk '\
+	    /^begin [0-9]* ConcealRetab.vim/ { exit } \
+	    { print } \
+	' vimpager.work > vimpager
+	cat ConcealRetab.vim.uu >> vimpager
+	echo EOF >> vimpager
+	awk '\
+	    BEGIN { skip = 1 } \
+	    /^# END OF ConcealRetab.vim/ { skip = 0 } \
+	    skip == 1 { next } \
+	    { print } \
+	' vimpager.work >> vimpager
+	rm -f vimpager.work ConcealRetab.vim.uu
 	chmod +x vimpager
 
 less.vim.uu: less.vim
@@ -77,6 +91,9 @@ perldoc.vim.uu: perldoc.vim
 
 vimcat.uu: vimcat
 	uuencode vimcat vimcat > vimcat.uu
+
+ConcealRetab.vim.uu: ConcealRetab.vim
+	uuencode ConcealRetab.vim ConcealRetab.vim > ConcealRetab.vim.uu
 
 ansiesc.tar.uu: ansiesc/autoload/AnsiEsc.vim ansiesc/doc/AnsiEsc.txt ansiesc/doc/tags ansiesc/plugin/AnsiEscPlugin.vim ansiesc/plugin/cecutil.vim
 	(cd ansiesc; tar cf ../ansiesc.tar .)

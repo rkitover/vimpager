@@ -484,6 +484,13 @@ extract_bundled_scripts() {
 
 		if [ -n "${use_ansiesc}" ]; then
 			ansiesc_tar
+
+			mkdir "${tmp}/extra_vim_home/plugin" 2>/dev/null
+			cd "${tmp}/extra_vim_home/plugin"
+
+			conceal_retab_vim
+
+			cd "${tmp}/extra_vim_home"
 		fi
 
 		if [ -f "${tmp}/use_vimcat" ]; then
@@ -499,7 +506,7 @@ vim_less() {
 	extract_bundled_scripts
 
 	if [ -n "${use_ansiesc}" ]; then
-		ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set buftype=nofile modifiable' | exe 'autocmd VimEnter * :silent! %s/\t/        /g' | endif"
+		ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set buftype=nofile modifiable noreadonly' | exe 'autocmd VimEnter * :ConcealRetab' | endif"
 	else
 		ansi_command='silent! echo'
 	fi
@@ -871,7 +878,7 @@ M````````````````````````````````````````````````````````````
 M````````+B]A=71O;&]A9"\`````````````````````````````````````
 M````````````````````````````````````````````````````````````
 M`````````````````````#`P,#<U-2``,#`P-S8U(``P,#`P,C0@`#`P,#`P
-M,#`P,#`P(#$R-3$Q-#8T-#$W(#`Q-#`T,``@-0``````````````````````
+M,#`P,#`P(#$R-3$W-S8U-S4V(#`Q-#`V,``@-0``````````````````````
 M````````````````````````````````````````````````````````````
 M``````````````````````````````````````````````````!U<W1A<@`P
 M,')K:71O=F5R````````````````````````````````<W1A9F8`````````
@@ -894,7 +901,7 @@ M`````````````````````````````````````````````````````"XO<&QU
 M9VEN+P``````````````````````````````````````````````````````
 M````````````````````````````````````````````````````````````
 M```````P,#`W-34@`#`P,#<V-2``,#`P,#(T(``P,#`P,#`P,#`P,"`Q,C4Q
-M-C0Q,C$Q,B`P,3,U,30`(#4`````````````````````````````````````
+M-S<V-38P,2`P,3,U,S,`(#4`````````````````````````````````````
 M````````````````````````````````````````````````````````````
 M````````````````````````````````````=7-T87(`,#!R:VET;W9E<@``
 M`````````````````````````````'-T869F````````````````````````
@@ -4302,6 +4309,36 @@ $<STX"@``
 end
 EOF
 # END OF perldoc.vim
+}
+
+conceal_retab_vim() {
+	(cat <<'EOF') | do_uudecode > ConcealRetab.vim
+begin 644 ConcealRetab.vim
+M8V]M;6%N9"$@+6YA<F=S/3`@+6)A;F<@+6)A<B!#;VYC96%L4F5T86(@.F-A
+M;&P@0V]N8V5A;%)E=&%B*"D*"F9U;F-T:6]N(2!#;VYC96%L4F5T86(H*0H@
+M("`@;&5T(&-U<G)E;G1?8W5R<V]R(#T@9V5T8W5R<&]S*"D*"B`@("!C86QL
+M(&-U<G-O<B@Q+#$I"@H@("`@;&5T(&QN=6T@/2!S96%R8V@H)UQT)RD*"B`@
+M("!W:&EL92!L;G5M("$](R`P"B`@("`@("`@;&5T(&YE=VQI;F4@/2`G)PH@
+M("`@("`@(&QE="!C;VQU;6X@(#T@,`H@("`@("`@(&QE="!L:6YE<&]S(#T@
+M,0H*("`@("`@("!F;W(@8R!I;B!S<&QI="AG971L:6YE*"<N)RDL("=<>G,G
+M*0H@("`@("`@("`@("!I9B!C(#T](R`B7'0B"B`@("`@("`@("`@("`@("!L
+M970@<W!A8V5S("`@/2`X("T@*&-O;'5M;B`E(#@I"B`@("`@("`@("`@("`@
+M("!L970@8V]L=6UN("`K/2!S<&%C97,*"B`@("`@("`@("`@("`@("!L970@
+M;F5W;&EN92`N/2!R97!E870H)R`G+"!S<&%C97,I"B`@("`@("`@("`@(&5L
+M<V4*("`@("`@("`@("`@("`@(&QE="!C;VYC96%L960@/2!S>6YC;VYC96%L
+M960H;&YU;2P@;&EN97!O<RD*"B`@("`@("`@("`@("`@("!I9B!C;VYC96%L
+M961;,%T@/3TC(#`@?'P@8V]N8V5A;&5D6S%=("$](R`G)PH@("`@("`@("`@
+M("`@("`@("`@(&QE="!C;VQU;6X@*ST@,0H@("`@("`@("`@("`@("`@96YD
+M:68*"B`@("`@("`@("`@("`@("!L970@;F5W;&EN92`N/2!C"B`@("`@("`@
+M("`@(&5N9&EF"@H@("`@("`@("`@("!L970@;&EN97!O<R`K/2`Q"B`@("`@
+M("`@96YD9F]R"@H@("`@("`@(&-A;&P@<V5T;&EN92AL;G5M+"!N97=L:6YE
+M*0H*("`@("`@("!L970@;&YU;2`]('-E87)C:"@G7'0G*0H@("`@96YD=VAI
+M;&4*"B`@("!C86QL('-E='!O<R@G+B<L(&-U<G)E;G1?8W5R<V]R*0IE;F1F
+#=6X*
+`
+end
+EOF
+# END OF ConcealRetab.vim
 }
 
 main "$@"
