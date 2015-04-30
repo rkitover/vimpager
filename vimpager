@@ -558,7 +558,6 @@ vim_less() {
 			fi
 
 			(
-			trap "rm -rf "${tmp}" gvim.exe.stackdump" 0
 			${vim_cmd} \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
@@ -567,12 +566,18 @@ vim_less() {
 				-c "set scrolloff=${scrolloff:-5} |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
 				-c "set nomodeline fdl=9999 | args ${filename} | silent! e ${filename}" \
+				-c 'autocmd VimEnter * :call cursor(1, 1)' \
+				-c 'autocmd VimLeave * :call writefile([], "'"${tmp}"'/gvim_done")' \
 				"${@}"
+			(
+				while ! [ -e "${tmp}/gvim_done" ]; do
+					sleep 1
+				done
+				rm -rf "${tmp}" gvim.exe.stackdump
+			) &
 			) &
 			;;
 	esac
-
-	rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 }
 
 awk_pstree_freebsd() {
