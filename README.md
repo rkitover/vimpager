@@ -175,7 +175,7 @@ will be preserved, otherwise the text will be highlighted with vimcat.
 You can turn this off by putting
 
 ```vim
-let vimpager_enable_passthrough = 0
+let vimpager_passthrough = 0
 ```
 
 Passthrough mode requires a POSIX shell with arithmetic expansion, if
