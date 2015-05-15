@@ -1,40 +1,40 @@
 command! -nargs=0 -bang -bar ConcealRetab :call ConcealRetab()
 
 function! ConcealRetab()
-    let current_cursor = getcurpos()
+    let l:current_cursor = getpos('.')
 
     call cursor(1,1)
 
-    let lnum = search('\t')
+    let l:lnum = search('\t')
 
-    while lnum !=# 0
-        let newline = ''
-        let column  = 0
-        let linepos = 1
+    while l:lnum !=# 0
+        let l:newline = ''
+        let l:column  = 0
+        let l:linepos = 1
 
-        for c in split(getline('.'), '\zs')
-            if c ==# "\t"
-                let spaces   = 8 - (column % 8)
-                let column  += spaces
+        for l:c in split(getline('.'), '\zs')
+            if l:c ==# "\t"
+                let l:spaces   = 8 - (l:column % 8)
+                let l:column  += l:spaces
 
-                let newline .= repeat(' ', spaces)
+                let l:newline .= repeat(' ', l:spaces)
             else
-                let concealed = synconcealed(lnum, linepos)
+                let l:concealed = synconcealed(l:lnum, l:linepos)
 
-                if concealed[0] ==# 0 || concealed[1] !=# ''
-                    let column += 1
+                if l:concealed[0] ==# 0 || l:concealed[1] !=# ''
+                    let l:column += 1
                 endif
 
-                let newline .= c
+                let l:newline .= c
             endif
 
-            let linepos += 1
+            let l:linepos += 1
         endfor
 
-        call setline(lnum, newline)
+        call setline(l:lnum, l:newline)
 
-        let lnum = search('\t')
+        let l:lnum = search('\t')
     endwhile
 
-    call setpos('.', current_cursor)
+    call setpos('.', l:current_cursor)
 endfun
