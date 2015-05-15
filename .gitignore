@@ -1,3 +1,8 @@
+# these files can be made by the makefile
+README
+vimpager.1
+vimcat.1
+
 # Compiled source #
 ###################
 *.com
