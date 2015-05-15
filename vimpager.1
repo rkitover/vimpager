@@ -1,7 +1,8 @@
-.TH VIMPAGER 1 "April 29, 2015" "vimpager user manual"
+.\"t
+.TH "VIMPAGER" "1" "April 29, 2015" "vimpager user manual" ""
 .SH NAME
 .PP
-vimpager - less.sh replacement
+vimpager \- less.sh replacement
 .SH SYNOPSIS
 .PP
 vimpager \[aq]some file\[aq]
@@ -9,7 +10,7 @@ vimpager \[aq]some file\[aq]
 # or (this won\[aq]t always syntax highlight as well)
 .PP
 cat \[aq]some file\[aq] | vimpager
-.SH RUN-TIME DEPENDENCIES
+.SH RUN\-TIME DEPENDENCIES
 .IP \[bu] 2
 vim
 .IP \[bu] 2
@@ -29,6 +30,16 @@ sudo\ make\ install
 \f[]
 .fi
 .PP
+If you got vimpager from the vim.org scripts section, just put it
+somewhere in your PATH, e.g.:
+.IP
+.nf
+\f[C]
+cp\ vimpager\ ~/bin
+chmod\ +x\ ~/bin/vimpager
+\f[]
+.fi
+.PP
 In your ~/.bashrc add the following:
 .IP
 .nf
@@ -42,7 +53,7 @@ alias\ zless=$PAGER
 .PP
 A PAGER using less.vim with support for highlighting of man pages and
 many other features.
-Works on most UNIX-like systems as well as Cygwin and MSYS.
+Works on most UNIX\-like systems as well as Cygwin and MSYS.
 .PP
 On GitHub: <http://github.com/rkitover/vimpager>
 .PP
@@ -53,6 +64,103 @@ VIMPAGER_RC environment variable.
 You can also have a global config file for all users in /etc/vimpagerrc,
 users can override it by creating a ~/.vimpagerrc or a
 ~/.vim/vimpagerrc.
+.PP
+These are the keys for paging while in vimpager, they are the same as in
+less for the most part:
+.PP
+.TS
+tab(@);
+l l l l.
+T{
+\f[I]Key\f[]
+T}@T{
+\f[I]Action\f[]
+T}@T{
+\f[I]Key\f[]
+T}@T{
+\f[I]Action\f[]
+T}
+_
+T{
+T}@T{
+One page forward
+T}@T{
+b
+T}@T{
+One page backward
+T}
+T{
+d
+T}@T{
+Half a page forward
+T}@T{
+u
+T}@T{
+Half a page backward
+T}
+T{
+T}@T{
+One line forward
+T}@T{
+k
+T}@T{
+One line backward
+T}
+T{
+G
+T}@T{
+End of file
+T}@T{
+g
+T}@T{
+Start of file
+T}
+T{
+N%
+T}@T{
+percentage in file
+T}@T{
+,h
+T}@T{
+Display this help
+T}
+T{
+/pattern
+T}@T{
+Search for pattern
+T}@T{
+?pattern
+T}@T{
+Search backward for pattern
+T}
+T{
+n
+T}@T{
+next pattern match
+T}@T{
+N
+T}@T{
+Previous pattern match
+T}
+T{
+:n
+T}@T{
+Next file
+T}@T{
+:p
+T}@T{
+Previous file
+T}
+T{
+q
+T}@T{
+Quit
+T}@T{
+,v
+T}@T{
+Toggle Less Mode
+T}
+.TE
 .PP
 To disable loading plugins, put "set noloadplugins" into a vimpagerrc
 file.
@@ -80,7 +188,7 @@ let\ vimpager_passthrough\ =\ 0
 .PP
 See "PASSTHROUGH MODE" further down.
 .PP
-To start vim with -X (no x11 connection, a bit faster startup) put the
+To start vim with \-X (no x11 connection, a bit faster startup) put the
 following into your .vimrc/vimpagerrc:
 .IP
 .nf
@@ -104,7 +212,7 @@ variable, an example usage is as follows:
 .nf
 \f[C]
 if\ exists("vimpager")
-\ \ if\ exists("vimpager_ptree")\ &&\ vimpager_ptree[-2]\ ==\ \[aq]wman\[aq]
+\ \ if\ exists("vimpager_ptree")\ &&\ vimpager_ptree[\-2]\ ==\ \[aq]wman\[aq]
 \ \ \ \ set\ ft=man
 \ \ endif
 endif
@@ -126,15 +234,15 @@ details.
 .SS + | +G
 .PP
 Start at the end of the file, just like less.
-.SS -c cmd
+.SS \-c cmd
 .PP
 Run a vim command after opening the file.
-Multiple -c arguments are supported.
-.SS --cmd cmd
+Multiple \-c arguments are supported.
+.SS \-\-cmd cmd
 .PP
 Run a vim command when entering vim before anything else.
-Multiple --cmd arguments are supported.
-.SS -u vimrc
+Multiple \-\-cmd arguments are supported.
+.SS \-u vimrc
 .PP
 Use alternate .vimrc or .vimpagerrc.
 .SH ANSI ESCAPE SEQUENCES AND OVERSTRIKES

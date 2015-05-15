@@ -1,4 +1,4 @@
-" Vim script to work like "less"
+"" Vim script to work like "less"
 " Maintainer:	Bram Moolenaar <Bram@vim.org>
 " Last Change:	2014 May 13
 
@@ -6,10 +6,10 @@
 " same terms as Vim.
 
 " Avoid loading this file twice, allow the user to define his own script.
-if exists("loaded_less")
-  finish
-endif
-let loaded_less = 1
+"if exists("loaded_less")
+"  finish
+"endif
+"let loaded_less = 1
 
 " If not reading from stdin, skip files that can't be read.
 " Exit if there is no file at all.
@@ -69,24 +69,27 @@ endif
 au VimEnter * set nomod
 
 " Can't modify the text
-set noma
+"set noma
+
+" Don't complain on quit
+au! BufReadPost * set buftype=nofile
 
 " Give help
-"noremap h :call <SID>Help()<CR>
-"map H h
+noremap ,h :call <SID>Help()<CR>
+map ,H ,h
 fun! s:Help()
   echo "<Space>   One page forward          b         One page backward"
   echo "d         Half a page forward       u         Half a page backward"
   echo "<Enter>   One line forward          k         One line backward"
   echo "G         End of file               g         Start of file"
-  echo "N%        percentage in file"
+  echo "N%        percentage in file        ,h        Display this help"
   echo "\n"
   echo "/pattern  Search for pattern        ?pattern  Search backward for pattern"
   echo "n         next pattern match        N         Previous pattern match"
   echo "\n"
   echo ":n<Enter> Next file                 :p<Enter> Previous file"
   echo "\n"
-  echo "q         Quit                      v         Edit file"
+  echo "q         Quit                      ,v        Toggle Less Mode"
   let i = input("Hit Enter to continue")
 endfun
 
@@ -212,17 +215,33 @@ cunmap <CR>
 " Quitting
 noremap q :<C-u>q<CR>
 
-" Switch to editing (switch off less mode)
+" Switch to editing (switch off less mode) with v or ,v
+" Toggle back to less mode with ,v
 map v :silent call <SID>End()<CR>
+nmap ,v :silent call <SID>ToggleLess()<CR>
+let s:less_unloaded = 0
+
+if !exists('*s:ToggleLess')
+  fun! s:ToggleLess()
+    if s:less_unloaded ==# 1
+      let s:less_unloaded = 0
+      runtime macros/less.vim
+    else
+      silent call <SID>End()
+    endif
+  endfun
+endif
+
 fun! s:End()
   set scrolloff=0
-  set modeline
-  set ma
+  "set modeline
+  "set ma
   if exists('s:lz')
     let &lz = s:lz
   endif
-"  unmap h
-"  unmap H
+  let s:less_unloaded = 1
+  unmap ,h
+  unmap ,H
   unmap <Space>
   unmap <C-V>
   unmap f
