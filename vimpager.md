@@ -67,9 +67,9 @@ less for the most part:
 
 | _Key_   | _Action_            | _Key_   | _Action_                  |  
 |---------|---------------------|---------|---------------------------|  
-|<Space>  |One page forward     |b        |One page backward          |  
+|Space    |One page forward     |b        |One page backward          |  
 |d        |Half a page forward  |u        |Half a page backward       |  
-|<Enter>  |One line forward     |k        |One line backward          |  
+|Enter    |One line forward     |k        |One line backward          |  
 |G        |End of file          |g        |Start of file              |  
 |N%       |percentage in file   |,h       |Display this help          |  
 |/pattern |Search for pattern   |?pattern |Search backward for pattern|  
