@@ -128,7 +128,7 @@ README: vimpager.md
 	tr -d '\015' < README > README.tmp
 	mv README.tmp README
 
-clean:
-	rm *.1 README
+realclean distclean clean:
+	rm -f *.1 README
 
 .PHONY: all install uninstall man clean
