@@ -8,7 +8,7 @@ INSTALLMAN?= ${INSTALL} -m 444
 INSTALLCONF?= ${INSTALL} -m 644
 COPYFILE?= ${INSTALL} -m 644
 
-all: vimpager vimpager.1 vimcat.1 README README.md
+all: vimpager docs
 
 vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu ConcealRetab.vim.uu
 	mv vimpager vimpager.work
@@ -106,7 +106,7 @@ uninstall:
 	rm -f ${PREFIX}/share/man/man1/vimpager.1
 	rm -f ${PREFIX}/etc/vimpagerrc
 
-install:
+install: all
 	${MKPATH} ${DESTDIR}/${PREFIX}/bin
 	${INSTALLBIN} vimpager ${DESTDIR}/${PREFIX}/bin/vimpager
 	${INSTALLBIN} vimcat ${DESTDIR}/${PREFIX}/bin/vimcat
@@ -115,6 +115,8 @@ install:
 	${INSTALLMAN} vimcat.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimcat.1
 	${MKPATH} ${DESTDIR}/${SYSCONFDIR}
 	${INSTALLCONF} vimpagerrc ${DESTDIR}/${SYSCONFDIR}/vimpagerrc
+
+docs: man README
 
 man: vimpager.1 vimcat.1
 
@@ -131,4 +133,4 @@ README: vimpager.md
 realclean distclean clean:
 	rm -f *.1 README
 
-.PHONY: all install uninstall man realclean distclean clean
+.PHONY: all install uninstall docs man realclean distclean clean
