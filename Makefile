@@ -131,4 +131,4 @@ README: vimpager.md
 realclean distclean clean:
 	rm -f *.1 README
 
-.PHONY: all install uninstall man clean
+.PHONY: all install uninstall man realclean distclean clean
