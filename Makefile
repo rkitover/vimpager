@@ -110,27 +110,36 @@ install: all
 	${MKPATH} ${DESTDIR}/${PREFIX}/bin
 	${INSTALLBIN} vimpager ${DESTDIR}/${PREFIX}/bin/vimpager
 	${INSTALLBIN} vimcat ${DESTDIR}/${PREFIX}/bin/vimcat
-	${MKPATH} ${DESTDIR}/${PREFIX}/share/man/man1
-	${INSTALLMAN} vimpager.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimpager.1
-	${INSTALLMAN} vimcat.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimcat.1
+	[ -e vimpager.1 -o -e vimcat.1 ] && ${MKPATH} ${DESTDIR}/${PREFIX}/share/man/man1 || true
+	[ -e vimpager.1 ] && ${INSTALLMAN} vimpager.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimpager.1 || true
+	[ -e vimcat.1 ] && ${INSTALLMAN} vimcat.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimcat.1 || true
 	${MKPATH} ${DESTDIR}/${SYSCONFDIR}
 	${INSTALLCONF} vimpagerrc ${DESTDIR}/${SYSCONFDIR}/vimpagerrc
 
-docs: man README
-
-man: vimpager.1 vimcat.1
-
-%.1: %.md
-	pandoc -s -w man $< -o $@
-	tr -d '\015' < $@ > $@.tmp
-	mv $@.tmp $@
-
-README: vimpager.md
-	pandoc -s -w plain vimpager.md -o README
-	tr -d '\015' < README > README.tmp
-	mv README.tmp README
+docs:
+	@if command -v pandoc >/dev/null; then \
+		printf '%s' 'Generating vimpager.1...'; \
+		pandoc -s -w man vimpager.md -o vimpager.1; \
+		tr -d '\015' < vimpager.1 > vimpager.1.tmp; \
+		mv vimpager.1.tmp vimpager.1; \
+		echo 'done.'; \
+		printf '%s' 'Generating vimcat.1...'; \
+		pandoc -s -w man vimcat.md -o vimcat.1; \
+		tr -d '\015' < vimcat.1 > vimcat.1.tmp; \
+		mv vimcat.1.tmp vimcat.1; \
+		echo 'done.'; \
+		printf '%s' 'Generating README...'; \
+		pandoc -s -w plain vimpager.md -o README; \
+		tr -d '\015' < README > README.tmp; \
+		mv README.tmp README; \
+		echo 'done.'; \
+	else \
+		echo; \
+		echo "[1;31mWARNING[0m: pandoc is not available, man pages will not be generated. If you want to install the man pages, install pandoc and re-run make." >&2; \
+		echo; \
+	fi
 
 realclean distclean clean:
 	rm -f *.1 README
 
-.PHONY: all install uninstall docs man realclean distclean clean
+.PHONY: all install uninstall docs realclean distclean clean
