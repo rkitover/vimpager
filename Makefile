@@ -106,7 +106,7 @@ uninstall:
 	rm -f ${PREFIX}/share/man/man1/vimpager.1
 	rm -f ${PREFIX}/etc/vimpagerrc
 
-install: all
+install: docs
 	${MKPATH} ${DESTDIR}/${PREFIX}/bin
 	${INSTALLBIN} vimpager ${DESTDIR}/${PREFIX}/bin/vimpager
 	${INSTALLBIN} vimcat ${DESTDIR}/${PREFIX}/bin/vimcat
