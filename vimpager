@@ -451,13 +451,19 @@ tail_n() {
 			_tail_syntax=new
 		else
 			_tail_syntax=old
+
+			if ! tail -1 -- "$0" > /dev/null 2>&1; then
+				_tail_no_double_dash=1
+			fi
 		fi
 	fi
 
 	if [ "$_tail_syntax" = "new" ]; then
-		tail -n $_lines -- "$@"
+		tail -n "$_lines" -- "$@"
+	elif [ -z "$_tail_no_double_dash" ]; then
+		tail -"$_lines" -- "$@"
 	else
-		tail -$_lines -- "$@"
+		tail -"$_lines" "$@"
 	fi
 }
 
