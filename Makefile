@@ -95,7 +95,7 @@ vimcat.uu: vimcat
 ConcealRetab.vim.uu: ConcealRetab.vim
 	uuencode ConcealRetab.vim ConcealRetab.vim > ConcealRetab.vim.uu
 
-ansiesc.tar.uu: ansiesc/autoload/AnsiEsc.vim ansiesc/doc/AnsiEsc.txt ansiesc/doc/tags ansiesc/plugin/AnsiEscPlugin.vim ansiesc/plugin/cecutil.vim
+ansiesc.tar.uu: ansiesc/autoload/AnsiEsc.vim ansiesc/plugin/AnsiEscPlugin.vim ansiesc/plugin/cecutil.vim
 	(cd ansiesc; tar cf ../ansiesc.tar .)
 	uuencode ansiesc.tar ansiesc.tar > ansiesc.tar.uu
 	rm -f ansiesc.tar
