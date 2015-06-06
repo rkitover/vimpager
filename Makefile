@@ -133,6 +133,9 @@ docs:
 		tr -d '\015' < README > README.tmp; \
 		mv README.tmp README; \
 		echo 'done.'; \
+		printf '%s' 'Generating man.tar.gz...'; \
+		tar cf - vimpager.1 vimcat.1 | gzip -c > man.tar.gz; \
+		echo 'done.'; \
 	else \
 		echo; \
 		echo "[1;31mWARNING[0m: pandoc is not available, man pages will not be generated. If you want to install the man pages, install pandoc and re-run make." >&2; \
@@ -140,6 +143,6 @@ docs:
 	fi
 
 realclean distclean clean:
-	rm -f *.1 README
+	rm -f *.1 README man.tar.gz
 
 .PHONY: all install uninstall docs realclean distclean clean
