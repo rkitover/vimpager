@@ -163,7 +163,15 @@
         fi
         cat "${tmp_file}"
         # if file doesn't end in a newline, output a newline
-        last_char=$(tail -c 1 "${tmp_file}")
+        # regular Solaris tail does not work for this
+        tail_cmd=tail
+        if [ -x /usr/xpg4/bin/tail ]; then
+          tail_cmd=/usr/xpg4/bin/tail
+        fi
+        if command -v gtail >/dev/null; then
+          tail_cmd=gtail
+        fi
+        last_char=$($tail_cmd -c 1 "${tmp_file}")
         if [ "${last_char}" != "" ]; then
           echo
         fi
@@ -185,6 +193,8 @@
 : endwhile
 : endif
 : endfor
+: endif
+: endif
 : endif
 : endif
 : endif

@@ -50,7 +50,20 @@ lookup = defaultdict(list)
 for n, s, v in [("l", k, v) for k, v in left.iteritems()] + [("m", k, v) for k, v in middle.iteritems()] + [("r", k, v) for k, v in right.iteritems()]:
     lookup[v].append('%s["%s"]' % (n, escape(s)))
 
-for c, slots in lookup.iteritems():
-    stdout.write("=".join(slots + [str(ord(c)) + ";"]))
+pieces = []
 
-print ""
+for c, slots in lookup.iteritems():
+    pieces.append("=".join(slots + [str(ord(c)) + ";"]))
+
+# /bin/awk on Solaris has a max record length of 2559, so we write out the
+# table in pieces no greater than that.
+str = ''
+
+for p in pieces:
+    if len(str + p) > 2559:
+        print str
+        str = p
+    else:
+        str += p
+
+print str
