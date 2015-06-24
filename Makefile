@@ -103,6 +103,7 @@ uninstall:
 	rm -f ${PREFIX}/bin/vimpager
 	rm -f ${PREFIX}/bin/vimcat
 	rm -f ${PREFIX}/share/man/man1/vimpager.1
+	rm -f ${PREFIX}/share/man/man1/vimcat.1
 	rm -f ${PREFIX}/etc/vimpagerrc
 
 install: docs
