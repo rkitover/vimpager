@@ -47,8 +47,7 @@
       export _MY_SHELL
       exec ksh "$0" "$@"
     else
-      echo "$0 requires either bash or ksh" >&2
-      exit
+      _MY_SHELL="${SHELL:-/bin/sh}"
     fi
   fi
 
