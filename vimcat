@@ -120,37 +120,35 @@
     esac
   done
 
-  files=("${@}")
-
-  if [ "${#}" -eq 0 ]; then
-    files[1]="-"
+  if [ -z "${vimcatrc}" ]; then
+    if [ -f ~/.vimcatrc ]; then
+        vimcatrc="~/.vimcatrc"
+    else
+        vimcatrc=""
+    fi
   fi
 
-  for file in "${files[@]}"
-  do
-    if [ "${#files[@]}" -ge 2 ]; then
-      echo "==> ${file} <=="
-    fi
+  if [ -z "${extra_cmd}" ]; then
+    extra_cmd='silent! echo'
+  fi
 
-    if [ -z "${vimcatrc}" ]; then
-      if [ -f ~/.vimcatrc ]; then
-          vimcatrc="~/.vimcatrc"
-      else
-          vimcatrc=""
-      fi
+  if [ -z "${extra_c}" ]; then
+    extra_c='silent! echo'
+  fi
+
+  if [ "${#}" -eq 0 ]; then
+    set -- -
+  fi
+
+  for file in "$@"
+  do
+    if [ "${#}" -ge 2 ]; then
+      echo "==> ${file} <=="
     fi
 
     if [ "${file}" = "-" ]; then
       cat - >${tmp_file}
       file=${tmp_file}
-    fi
-
-    if [ -z "${extra_cmd}" ]; then
-      extra_cmd='silent! echo'
-    fi
-
-    if [ -z "${extra_c}" ]; then
-      extra_c='silent! echo'
     fi
 
     # Check that the file exists
