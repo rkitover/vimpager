@@ -534,6 +534,9 @@ vim_less() {
 		return
 	fi
 
+	# escape any :h expand vim special chars in filename
+	escaped_filename=$(printf '%s\n' ${filename} | sed -e 's/\([#%<>]\)/\\\1/g')
+
 	case ${vim_cmd} in
 		vim*)
 			if [ -n "${disable_x11}" ]; then
@@ -548,7 +551,8 @@ vim_less() {
 				--cmd 'let vimpager=1 | runtime macros/less.vim | set nocp' \
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5}" \
-				-c "set nomodeline fdl=9999 | args ${filename} | silent! e ${filename}" \
+				-c "set nomodeline fdl=9999 | args ${escaped_filename}" \
+				-c "silent! e ${escaped_filename}" \
 				"${@}"
 			cd "${tmp}/.."
 			rm -rf "${tmp}" gvim.exe.stackdump
@@ -575,7 +579,8 @@ vim_less() {
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5} |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
-				-c "set nomodeline fdl=9999 | args ${filename} | silent! e ${filename}" \
+				-c "set nomodeline fdl=9999 | args ${escaped_filename}" \
+				-c "silent! e ${escaped_filename}" \
 				-c 'autocmd VimEnter * :call cursor(1, 1)' \
 				-c 'autocmd VimLeave * :call writefile([], "'"${tmp}"'/gvim_done")' \
 				"${@}"
