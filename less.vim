@@ -43,7 +43,6 @@ syntax on
 set so=0
 set hlsearch
 set incsearch
-nohlsearch
 " Don't remember file names and positions
 set viminfo=
 set nows
@@ -184,8 +183,9 @@ else
   noremap <script> ? Hg0:call <SID>Backward()<CR>?
 endif
 
-" esc-u to turn off search highlighting like in less
-nnoremap <ESC>u :nohlsearch<CR>
+" esc-u to toggle search highlighting like in less
+let less_hlsearch = 1
+nnoremap <ESC>u :if less_hlsearch ==# 1 \| nohlsearch \| let less_hlsearch = 0 \| else \| set hlsearch \| let less_hlsearch = 1 \| endif<CR><CR>
 
 fun! s:Forward()
   " Searching forward
