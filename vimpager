@@ -545,10 +545,12 @@ vim_less() {
 
 			${vim_cmd} \
 				-u "${vimrc}" \
+				--cmd 'let __save_hidden = &hidden | set nohidden' \
 				--cmd 'set buftype=nofile modifiable noreadonly' \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd 'set bg=dark' \
 				--cmd 'let vimpager=1 | runtime macros/less.vim | set nocp' \
+				-c 'let &hidden = __save_hidden' \
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5}" \
 				-c "set nomodeline fdl=9999 | args ${escaped_filename}" \
@@ -573,9 +575,11 @@ vim_less() {
 			(
 			${vim_cmd} \
 				-u "${vimrc}" \
+				--cmd 'let __save_hidden = &hidden | set nohidden' \
 				--cmd 'set buftype=nofile modifiable noreadonly' \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd 'let vimpager=1 | runtime macros/less.vim | set nocp' \
+				-c 'let &hidden = __save_hidden' \
 				-c "${ansi_command}" \
 				-c "set scrolloff=${scrolloff:-5} |
 				    ${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
