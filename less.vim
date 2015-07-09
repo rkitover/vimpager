@@ -52,8 +52,12 @@ set lz
 set foldlevel=9999
 set nonu
 silent! set nornu
-set nomodeline
-set scrolloff=5
+
+if exists('vimpager_scrolloff')
+    let &scrolloff = vimpager_scrolloff
+else
+    set scrolloff=5
+endif
 
 " Used after each command: put cursor at end and display position
 if &wrap

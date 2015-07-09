@@ -83,6 +83,13 @@ file.
 You can also switch on the "vimpager" variable in your vimrc to set alternate
 settings for vimpager.
 
+If you want to disable less compatibility mode, and use regular vim
+motion commands, put this into your .vimrc/vimpagerrc:
+
+```vim
+let vimpager_less_mode = 0
+```
+
 Put the following into your .vimrc/vimpagerrc if you want to use gvim/MacVim
 for your pager window:
 
@@ -112,6 +119,9 @@ following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 ```vim
 let vimpager_scrolloff = 5
 ```
+
+The default is 5 only in less mode, with less mode disabled the default
+is the user's scrolloff setting.
 
 The process tree of vimpager is available in the "vimpager_ptree" variable, an
 example usage is as follows:
