@@ -3,6 +3,9 @@
 README
 vimpager.1
 vimcat.1
+man.tar.gz
+*.work
+*.uu
 
 # Compiled source #
 ###################
