@@ -85,6 +85,7 @@ fun! s:Help()
   echo "\n"
   echo "/pattern  Search for pattern        ?pattern  Search backward for pattern"
   echo "n         next pattern match        N         Previous pattern match"
+  echo "<ESC>u    toggle search highlight"
   echo "\n"
   echo ":n<Enter> Next file                 :p<Enter> Previous file"
   echo "\n"
