@@ -17,12 +17,11 @@ cat 'some file' | vimpager
 # RUN-TIME DEPENDENCIES
 
 * vim
-* sharutils or some uudecode (optional)
 
 # BUILD DEPENDENCIES
 
 * sharutils or some uuencode
-* pandoc
+* pandoc (for man pages)
 
 # INSTALL
 
@@ -75,7 +74,7 @@ less for the most part:
 |/pattern |Search for pattern       |?pattern |Search backward for pattern|  
 |n        |next pattern match       |N        |Previous pattern match     |  
 |ESC-u    |toggle search highlight  |         |                           |  
-|:n<Enter>|Next file                |:p<Enter>|Previous file              |  
+|:n-Enter |Next file                |:p-Enter |Previous file              |  
 |q        |Quit                     |,v       |Toggle Less Mode           |  
 
 To disable loading plugins, put "set noloadplugins" into a vimpagerrc
