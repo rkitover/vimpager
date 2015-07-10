@@ -53,8 +53,8 @@ set foldlevel=9999
 set nonu
 silent! set nornu
 
-if exists('vimpager_scrolloff')
-    let &scrolloff = vimpager_scrolloff
+if exists('g:vimpager_scrolloff')
+    let &scrolloff = g:vimpager_scrolloff
 else
     set scrolloff=5
 endif
@@ -226,6 +226,8 @@ map v :silent call <SID>End()<CR>
 nmap ,v :silent call <SID>ToggleLess()<CR>
 let s:less_unloaded = 0
 
+let g:vimpager_less_mode = 1
+
 if !exists('*s:ToggleLess')
   fun! s:ToggleLess()
     if s:less_unloaded ==# 1
@@ -233,12 +235,15 @@ if !exists('*s:ToggleLess')
       runtime macros/less.vim
     else
       silent call <SID>End()
+      let g:vimpager_less_mode = 0
     endif
   endfun
 endif
 
 fun! s:End()
-  set scrolloff=0
+  if !exists('g:vimpager_scrolloff')
+    set scrolloff=0
+  endif
   "set modeline
   "set ma
   if exists('s:lz')

@@ -90,6 +90,11 @@ motion commands, put this into your .vimrc/vimpagerrc:
 let vimpager_less_mode = 0
 ```
 
+You can still enable less mode with this setting by pressing ",v".
+
+At runtime whenever less mode is toggled with ,v , this variable will
+reflect the current state, regardless of the initial value.
+
 Put the following into your .vimrc/vimpagerrc if you want to use gvim/MacVim
 for your pager window:
 
