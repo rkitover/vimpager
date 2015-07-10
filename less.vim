@@ -222,8 +222,8 @@ noremap q :<C-u>q<CR>
 
 " Switch to editing (switch off less mode) with v or ,v
 " Toggle back to less mode with ,v
-map v :silent call <SID>End()<CR>
-nmap ,v :silent call <SID>ToggleLess()<CR>
+map v :call <SID>End()<CR>
+nmap ,v :call <SID>ToggleLess()<CR>
 let s:less_unloaded = 0
 
 let g:vimpager_less_mode = 1
@@ -233,9 +233,11 @@ if !exists('*s:ToggleLess')
     if s:less_unloaded ==# 1
       let s:less_unloaded = 0
       runtime macros/less.vim
+      echo 'Less Mode Enabled'
     else
       silent call <SID>End()
       let g:vimpager_less_mode = 0
+      echo 'Less Mode Disabled'
     endif
   endfun
 endif
