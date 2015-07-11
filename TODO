@@ -1,3 +1,4 @@
 add usage screen
 either add multi file support or throw error and update docs
 better error message for unreadable files
+tabs do not look correct in vimcat on Solaris

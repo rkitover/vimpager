@@ -90,7 +90,7 @@ vimpager: ${UUS}
 	(cd src; uuencode `basename $<` `basename $<` > ../$@)
 
 vimcat.uu: vimcat
-	uuencode $< $< > $@
+	uuencode vimcat vimcat > $@
 
 ansiesc.tar.uu: ${ANSIESC}
 	(cd src/ansiesc; tar cf ../../ansiesc.tar .)
