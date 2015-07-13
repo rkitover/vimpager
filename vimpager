@@ -155,7 +155,7 @@ main() {
 	fi
 
 	# read settings
-	vim -u "${vimrc}" -E --cmd 'set nocp' -c '
+	vim -u "${vimrc}" -E --cmd 'set nocp' --cmd 'let vimpager = 1' -c '
 		if !exists("vimpager_use_gvim")
 			let vimpager_use_gvim = 0
 		endif
