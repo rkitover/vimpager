@@ -233,11 +233,13 @@ if !exists('*s:ToggleLess')
     if s:less_unloaded ==# 1
       let s:less_unloaded = 0
       runtime macros/less.vim
-      echo 'Less Mode Enabled'
+      redraw
+      echomsg 'Less Mode Enabled'
     else
       silent call <SID>End()
       let g:vimpager_less_mode = 0
-      echo 'Less Mode Disabled'
+      redraw
+      echomsg 'Less Mode Disabled'
     endif
   endfun
 endif
