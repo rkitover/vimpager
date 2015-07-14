@@ -498,8 +498,8 @@ extract_bundled_scripts() {
 		if [ -n "${use_ansiesc}" ]; then
 			ansiesc_tar
 
-			mkdir "${tmp}/extra_vim_home/plugin" 2>/dev/null
-			cd "${tmp}/extra_vim_home/plugin"
+			mkdir "${tmp}/extra_vim_home/autoload" 2>/dev/null
+			cd "${tmp}/extra_vim_home/autoload"
 
 			conceal_retab_vim
 
@@ -519,7 +519,7 @@ vim_less() {
 	extract_bundled_scripts
 
 	if [ -n "${use_ansiesc}" ]; then
-		ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set buftype=nofile modifiable noreadonly' | exe 'autocmd VimEnter * :ConcealRetab' | endif"
+		ansi_command="if exists(':AnsiEsc') | exe 'autocmd VimEnter * :AnsiEsc' | exe 'autocmd VimEnter * :set buftype=nofile modifiable noreadonly' | exe 'autocmd VimEnter * :call ConcealRetab#ConcealRetab()' | endif"
 	else
 		ansi_command='silent! echo'
 	fi
@@ -4315,27 +4315,27 @@ conceal_retab_vim() {
 	(cat <<'EOF') | do_uudecode > ConcealRetab.vim
 begin 644 ConcealRetab.vim
 M8V]M;6%N9"$@+6YA<F=S/3`@+6)A;F<@+6)A<B!#;VYC96%L4F5T86(@.F-A
-M;&P@0V]N8V5A;%)E=&%B*"D*"F9U;F-T:6]N(2!#;VYC96%L4F5T86(H*0H@
-M("`@;&5T(&PZ8W5R<F5N=%]C=7)S;W(@/2!G971P;W,H)RXG*0H*("`@(&-A
-M;&P@8W5R<V]R*#$L,2D*"B`@("!L970@;#IL;G5M(#T@<V5A<F-H*"=<="<I
-M"@H@("`@=VAI;&4@;#IL;G5M("$](R`P"B`@("`@("`@;&5T(&PZ;F5W;&EN
-M92`]("<G"B`@("`@("`@;&5T(&PZ8V]L=6UN("`](#`*("`@("`@("!L970@
-M;#IL:6YE<&]S(#T@,0H*("`@("`@("!F;W(@;#IC(&EN('-P;&ET*&=E=&QI
-M;F4H)RXG*2P@)UQZ<R<I"B`@("`@("`@("`@(&EF(&PZ8R`]/2,@(EQT(@H@
-M("`@("`@("`@("`@("`@;&5T(&PZ<W!A8V5S("`@/2`X("T@*&PZ8V]L=6UN
-M("4@."D*("`@("`@("`@("`@("`@(&QE="!L.F-O;'5M;B`@*ST@;#IS<&%C
-M97,*"B`@("`@("`@("`@("`@("!L970@;#IN97=L:6YE("X](')E<&5A="@G
-M("<L(&PZ<W!A8V5S*0H@("`@("`@("`@("!E;'-E"B`@("`@("`@("`@("`@
-M("!L970@;#IC;VYC96%L960@/2!S>6YC;VYC96%L960H;#IL;G5M+"!L.FQI
-M;F5P;W,I"@H@("`@("`@("`@("`@("`@:68@;#IC;VYC96%L961;,%T@/3TC
-M(#`@?'P@;#IC;VYC96%L961;,5T@(3TC("<G"B`@("`@("`@("`@("`@("`@
-M("`@;&5T(&PZ8V]L=6UN("L](#$*("`@("`@("`@("`@("`@(&5N9&EF"@H@
-M("`@("`@("`@("`@("`@;&5T(&PZ;F5W;&EN92`N/2!C"B`@("`@("`@("`@
-M(&5N9&EF"@H@("`@("`@("`@("!L970@;#IL:6YE<&]S("L](#$*("`@("`@
-M("!E;F1F;W(*"B`@("`@("`@8V%L;"!S971L:6YE*&PZ;&YU;2P@;#IN97=L
-M:6YE*0H*("`@("`@("!L970@;#IL;G5M(#T@<V5A<F-H*"=<="<I"B`@("!E
-M;F1W:&EL90H*("`@(&-A;&P@<V5T<&]S*"<N)RP@;#IC=7)R96YT7V-U<G-O
-*<BD*96YD9G5N"@``
+M;&P@0V]N8V5A;%)E=&%B(T-O;F-E86Q2971A8B@I"@IF=6YC=&EO;B$@0V]N
+M8V5A;%)E=&%B(T-O;F-E86Q2971A8B@I"B`@("!L970@;#IC=7)R96YT7V-U
+M<G-O<B`](&=E='!O<R@G+B<I"@H@("`@8V%L;"!C=7)S;W(H,2PQ*0H*("`@
+M(&QE="!L.FQN=6T@/2!S96%R8V@H)UQT)RD*"B`@("!W:&EL92!L.FQN=6T@
+M(3TC(#`*("`@("`@("!L970@;#IN97=L:6YE(#T@)R<*("`@("`@("!L970@
+M;#IC;VQU;6X@(#T@,`H@("`@("`@(&QE="!L.FQI;F5P;W,@/2`Q"@H@("`@
+M("`@(&9O<B!L.F,@:6X@<W!L:70H9V5T;&EN92@G+B<I+"`G7'IS)RD*("`@
+M("`@("`@("`@:68@;#IC(#T](R`B7'0B"B`@("`@("`@("`@("`@("!L970@
+M;#IS<&%C97,@("`](#@@+2`H;#IC;VQU;6X@)2`X*0H@("`@("`@("`@("`@
+M("`@;&5T(&PZ8V]L=6UN("`K/2!L.G-P86-E<PH*("`@("`@("`@("`@("`@
+M(&QE="!L.FYE=VQI;F4@+CT@<F5P96%T*"<@)RP@;#IS<&%C97,I"B`@("`@
+M("`@("`@(&5L<V4*("`@("`@("`@("`@("`@(&QE="!L.F-O;F-E86QE9"`]
+M('-Y;F-O;F-E86QE9"AL.FQN=6TL(&PZ;&EN97!O<RD*"B`@("`@("`@("`@
+M("`@("!I9B!L.F-O;F-E86QE9%LP72`]/2,@,"!\?"!L.F-O;F-E86QE9%LQ
+M72`A/2,@)R<*("`@("`@("`@("`@("`@("`@("!L970@;#IC;VQU;6X@*ST@
+M,0H@("`@("`@("`@("`@("`@96YD:68*"B`@("`@("`@("`@("`@("!L970@
+M;#IN97=L:6YE("X](&,*("`@("`@("`@("`@96YD:68*"B`@("`@("`@("`@
+M(&QE="!L.FQI;F5P;W,@*ST@,0H@("`@("`@(&5N9&9O<@H*("`@("`@("!C
+M86QL('-E=&QI;F4H;#IL;G5M+"!L.FYE=VQI;F4I"@H@("`@("`@(&QE="!L
+M.FQN=6T@/2!S96%R8V@H)UQT)RD*("`@(&5N9'=H:6QE"@H@("`@8V%L;"!S
+D971P;W,H)RXG+"!L.F-U<G)E;G1?8W5R<V]R*0IE;F1F=6X*
 `
 end
 EOF

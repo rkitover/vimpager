@@ -7,9 +7,13 @@ INSTALLMAN=${INSTALL} -m 444
 INSTALLCONF=${INSTALL} -m 644
 AWK=awk
 
+UUS=ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu ConcealRetab.vim.uu
+ANSIESC=src/ansiesc/autoload/AnsiEsc.vim src/ansiesc/plugin/AnsiEscPlugin.vim src/ansiesc/plugin/cecutil.vim
+
+
 all: vimpager docs
 
-vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu ConcealRetab.vim.uu
+vimpager: ${UUS}
 	mv vimpager vimpager.work
 	${AWK} '\
 	    /^begin [0-9]* ansiesc.tar/ { exit } \
@@ -82,20 +86,14 @@ vimpager: ansiesc.tar.uu less.vim.uu perldoc.vim.uu vimcat.uu ConcealRetab.vim.u
 	rm -f vimpager.work ConcealRetab.vim.uu
 	chmod +x vimpager
 
-less.vim.uu: less.vim
-	uuencode less.vim less.vim > less.vim.uu
-
-perldoc.vim.uu: perldoc.vim
-	uuencode perldoc.vim perldoc.vim > perldoc.vim.uu
+%.vim.uu: src/%.vim
+	(cd src; uuencode `basename $<` `basename $<` > ../$@)
 
 vimcat.uu: vimcat
-	uuencode vimcat vimcat > vimcat.uu
+	uuencode $< $< > $@
 
-ConcealRetab.vim.uu: ConcealRetab.vim
-	uuencode ConcealRetab.vim ConcealRetab.vim > ConcealRetab.vim.uu
-
-ansiesc.tar.uu: ansiesc/autoload/AnsiEsc.vim ansiesc/plugin/AnsiEscPlugin.vim ansiesc/plugin/cecutil.vim
-	(cd ansiesc; tar cf ../ansiesc.tar .)
+ansiesc.tar.uu: ${ANSIESC}
+	(cd src/ansiesc; tar cf ../../ansiesc.tar .)
 	uuencode ansiesc.tar ansiesc.tar > ansiesc.tar.uu
 	rm -f ansiesc.tar
 
@@ -135,17 +133,17 @@ install: docs
 docs:
 	@if command -v pandoc >/dev/null; then \
 		printf '%s' 'Generating vimpager.1...'; \
-		pandoc -s -w man vimpager.md -o vimpager.1; \
+		pandoc -s -w man doc/vimpager.md -o vimpager.1; \
 		tr -d '\015' < vimpager.1 > vimpager.1.tmp; \
 		mv vimpager.1.tmp vimpager.1; \
 		echo 'done.'; \
 		printf '%s' 'Generating vimcat.1...'; \
-		pandoc -s -w man vimcat.md -o vimcat.1; \
+		pandoc -s -w man doc/vimcat.md -o vimcat.1; \
 		tr -d '\015' < vimcat.1 > vimcat.1.tmp; \
 		mv vimcat.1.tmp vimcat.1; \
 		echo 'done.'; \
 		printf '%s' 'Generating README...'; \
-		pandoc -s -w plain vimpager.md -o README; \
+		pandoc -s -w plain doc/vimpager.md -o README; \
 		tr -d '\015' < README > README.tmp; \
 		mv README.tmp README; \
 		echo 'done.'; \

@@ -1,1 +1,1 @@
-vimpager.md
+doc/vimpager.md

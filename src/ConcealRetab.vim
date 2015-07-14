@@ -1,6 +1,6 @@
-command! -nargs=0 -bang -bar ConcealRetab :call ConcealRetab()
+command! -nargs=0 -bang -bar ConcealRetab :call ConcealRetab#ConcealRetab()
 
-function! ConcealRetab()
+function! ConcealRetab#ConcealRetab()
     let l:current_cursor = getpos('.')
 
     call cursor(1,1)
