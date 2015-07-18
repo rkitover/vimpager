@@ -2,3 +2,8 @@ add usage screen
 either add multi file support or throw error and update docs
 better error message for unreadable files
 tabs do not look correct in vimcat on Solaris
+colors seem different on solaris and other OSes
+allow clicking on man links in man and perldoc mode
+set cursor wrt scrolloff when toggling less mode
+merge ansiesc changes upstream
+merge less.vim changes upstream

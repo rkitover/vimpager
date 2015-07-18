@@ -20,7 +20,7 @@ cat 'some file' | vimpager
 
 # BUILD DEPENDENCIES
 
-* sharutils or some uuencode
+* sharutils or some uuencode (only if you change the .vim sources)
 * pandoc (for man pages)
 
 # INSTALL

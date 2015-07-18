@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if command -v gawk >/dev/null; then
+    _awk=gawk
+elif command -v nawk >/dev/null; then
+    _awk=nawk
+elif command -v mawk >/dev/null; then
+    _awk=mawk
+elif [ -x /usr/xpg4/bin/awk ]; then
+    _awk=/usr/xpg4/bin/awk
+elif command -v awk >/dev/null; then
+    _awk=awk
+else
+    echo "ERROR: No awk found!" >&2
+    exit 1
+fi
+
+${_awk} "$@"
