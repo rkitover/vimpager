@@ -83,6 +83,7 @@ docs: vimpager.1 vimcat.1
 	fi
 
 realclean distclean clean:
-	rm -f *.1 README man.tar.gz *.work *-stamp *.uu src/*.uu src/ansiesc/autoload/*.uu src/ansiesc/plugin/*.uu
+	rm -f *.1 *.work *-stamp
+	rm -f `find . -name '*.uu'`
 
 .PHONY: all install uninstall docs realclean distclean clean
