@@ -6,10 +6,10 @@
 " same terms as Vim.
 
 " Avoid loading this file twice, allow the user to define his own script.
-"if exists("loaded_less")
-"  finish
-"endif
-"let loaded_less = 1
+if exists("g:loaded_less") && g:loaded_less ==# 1
+  finish
+endif
+let g:loaded_less = 1
 
 " If not reading from stdin, skip files that can't be read.
 " Exit if there is no file at all.
@@ -224,19 +224,32 @@ noremap q :<C-u>q<CR>
 " Toggle back to less mode with ,v
 map v :call <SID>End()<CR>
 nmap ,v :call <SID>ToggleLess()<CR>
-let s:less_unloaded = 0
 
 let g:vimpager_less_mode = 1
 
 if !exists('*s:ToggleLess')
-  fun! s:ToggleLess()
-    if s:less_unloaded ==# 1
-      let s:less_unloaded = 0
+  function! s:ToggleLess()
+    if !exists('g:loaded_less') || g:loaded_less ==# 0
+      if exists('g:vimpager_scrolloff')
+          let jump = g:vimpager_scrolloff
+      else
+          let jump = 5
+      endif
+
+      let curpos = getpos('.')
+
+      if winline() <= jump
+          call setpos('.', [curpos[0], curpos[1] + (jump - winline()) + 1, curpos[2], curpos[3]])
+      elseif (winheight(0) - winline()) <= jump
+          call setpos('.', [curpos[0], curpos[1] - (jump - (winheight(0) - winline())) - 1 , curpos[2], curpos[3]])
+      endif
+
+      unlet! g:loaded_less
       runtime macros/less.vim
       redraw
       echomsg 'Less Mode Enabled'
     else
-      silent call <SID>End()
+      call s:End()
       let g:vimpager_less_mode = 0
       redraw
       echomsg 'Less Mode Disabled'
@@ -248,12 +261,11 @@ fun! s:End()
   if !exists('g:vimpager_scrolloff')
     set scrolloff=0
   endif
-  "set modeline
   "set ma
   if exists('s:lz')
     let &lz = s:lz
   endif
-  let s:less_unloaded = 1
+  unlet! g:loaded_less
   unmap ,h
   unmap ,H
   unmap <Space>

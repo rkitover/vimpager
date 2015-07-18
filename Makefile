@@ -8,7 +8,7 @@ INSTALLMAN=${INSTALL} -m 444
 INSTALLCONF=${INSTALL} -m 644
 
 ANSIESC=src/ansiesc/autoload/AnsiEsc.vim src/ansiesc/plugin/AnsiEscPlugin.vim src/ansiesc/plugin/cecutil.vim
-SRC=${ANSIESC} src/less.vim src/perldoc.vim src/ConcealRetab.vim vimcat
+SRC=src/vimpager.vim src/less.vim src/perldoc.vim src/ConcealRetab.vim vimcat ${ANSIESC}
 
 all: vimpager docs
 	@chmod +x vimcat
