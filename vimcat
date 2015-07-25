@@ -154,9 +154,9 @@
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
         if [ -n "${vimcatrc}" ]; then
-          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          vim -N -E -X -R -i NONE                  --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
         cat "${tmp_file}"
         # if file doesn't end in a newline, output a newline
@@ -190,20 +190,6 @@
 : endwhile
 : endif
 : endfor
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
 
 " AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
 " the syntax changes colors, for easy, faithful reproduction.
