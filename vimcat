@@ -154,9 +154,9 @@
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
         if [ -n "${vimcatrc}" ]; then
-          vim -E -X -R -i NONE -u "${vimcatrc}" --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          vim -E -X -R -i NONE                  --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE                  --cmd "${extra_cmd}" -c "source ${script} | ${extra_c} | visual | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
         cat "${tmp_file}"
         # if file doesn't end in a newline, output a newline
