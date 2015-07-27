@@ -6,7 +6,7 @@
 : if 0
   # try to find a better shell, especially on Solaris
 
-  PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
+  PATH="$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin"
 
   _MY_SHELL=/bin/sh
   export _MY_SHELL
@@ -52,12 +52,12 @@
   tmp_dir=/tmp
   mkdir_options="-m 700"
 
-  case $(uname -s) in
+  case "$(uname -s)" in
     MINGW*|MSYS*)
       if [ -n "${temp}" ]; then
         # MSYS2 is a little tricky, we're gonna stick to the user's private temp
         # the -m mode switch to mkdir doesn't work
-        tmp_dir=$(cygpath --unix "${temp}")
+        tmp_dir="$(cygpath --unix "${temp}")"
         mkdir_options=""
       fi
     ;;
@@ -65,18 +65,18 @@
 
   tmp_dir="${tmp_dir}/vimcat_${$}"
 
-  if ! mkdir ${mkdir_options} ${tmp_dir}; then
-    echo Could not create temporary directory ${tmp_dir} >&2
+  if ! mkdir ${mkdir_options} "${tmp_dir}"; then
+    echo Could not create temporary directory "${tmp_dir}" >&2
     exit 1
   fi 
 
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
-  tmp_file=${tmp_dir}/vimcat
+  tmp_file="${tmp_dir}/vimcat"
 
-  script=$(command -v ${0})
+  script="$(command -v ${0})"
 
   # check for arguments to pass to vim
-  while [ $# -gt 0 ] ; do
+  while [ "${#}" -gt 0 ] ; do
     case "${1}" in
       "-c")
         shift
@@ -154,8 +154,8 @@
     fi
 
     if [ "${file}" = "-" ]; then
-      cat - >${tmp_file}
-      file=${tmp_file}
+      cat - >"${tmp_file}"
+      file="${tmp_file}"
     fi
 
     # Check that the file exists
@@ -187,7 +187,7 @@
           if command -v gtail >/dev/null; then
             tail_cmd=gtail
           fi
-          last_char=$($tail_cmd -c 1 "${tmp_file}")
+          last_char="$($tail_cmd -c 1 "${tmp_file}")"
           if [ "${last_char}" != "" ]; then
             echo
           fi
