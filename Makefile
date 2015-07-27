@@ -46,25 +46,25 @@ uninstall:
 
 install: docs
 	@chmod +x ./install-sh 2>/dev/null || true; \
-	${MKPATH} ${DESTDIR}/${PREFIX}/bin; \
-	echo ${INSTALLBIN} vimpager ${DESTDIR}/${PREFIX}/bin/vimpager; \
-	${INSTALLBIN} vimpager ${DESTDIR}/${PREFIX}/bin/vimpager; \
-	echo ${INSTALLBIN} vimcat ${DESTDIR}/${PREFIX}/bin/vimcat; \
-	${INSTALLBIN} vimcat ${DESTDIR}/${PREFIX}/bin/vimcat; \
+	${MKPATH} ${DESTDIR}${PREFIX}/bin; \
+	echo ${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/vimpager; \
+	${INSTALLBIN} vimpager ${DESTDIR}${PREFIX}/bin/vimpager; \
+	echo ${INSTALLBIN} vimcat ${DESTDIR}${PREFIX}/bin/vimcat; \
+	${INSTALLBIN} vimcat ${DESTDIR}${PREFIX}/bin/vimcat; \
 	if [ -r vimpager.1 -o -r vimcat.1 ]; then \
-		${MKPATH} ${DESTDIR}/${PREFIX}/share/man/man1; \
+		${MKPATH} ${DESTDIR}${PREFIX}/share/man/man1; \
 	fi; \
 	if [ -r vimpager.1 ]; then \
-		echo ${INSTALLMAN} vimpager.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimpager.1; \
-		${INSTALLMAN} vimpager.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimpager.1; \
+		echo ${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/share/man/man1/vimpager.1; \
+		${INSTALLMAN} vimpager.1 ${DESTDIR}${PREFIX}/share/man/man1/vimpager.1; \
 	fi; \
 	if [ -r vimcat.1 ]; then \
-		echo ${INSTALLMAN} vimcat.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimcat.1; \
-		${INSTALLMAN} vimcat.1 ${DESTDIR}/${PREFIX}/share/man/man1/vimcat.1; \
+		echo ${INSTALLMAN} vimcat.1 ${DESTDIR}${PREFIX}/share/man/man1/vimcat.1; \
+		${INSTALLMAN} vimcat.1 ${DESTDIR}${PREFIX}/share/man/man1/vimcat.1; \
 	fi; \
-	${MKPATH} ${DESTDIR}/${SYSCONFDIR}; \
-	echo ${INSTALLCONF} vimpagerrc ${DESTDIR}/${SYSCONFDIR}/vimpagerrc; \
-	${INSTALLCONF} vimpagerrc ${DESTDIR}/${SYSCONFDIR}/vimpagerrc
+	${MKPATH} ${DESTDIR}${SYSCONFDIR}; \
+	echo ${INSTALLCONF} vimpagerrc ${DESTDIR}${SYSCONFDIR}/vimpagerrc; \
+	${INSTALLCONF} vimpagerrc ${DESTDIR}${SYSCONFDIR}/vimpagerrc
 
 docs: vimpager.1 vimcat.1
 	@rm -f docs-warn-stamp
