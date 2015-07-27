@@ -4,10 +4,6 @@
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
-  # Just pass through if not on a tty
-  if [ ! -t 1 ]; then
-    exec cat "${@}"
-  fi
   # try to find a better shell, especially on Solaris
 
   PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
@@ -105,6 +101,11 @@
         vimcatrc="${1}"
         shift
         ;;
+      "-o")
+        shift
+        output_file="${1}"
+        shift
+        ;;
       "--")
         shift
         break
@@ -118,6 +119,13 @@
         ;;
     esac
   done
+
+  # Just pass through if not on a tty, unless -o was given
+  if [ -z "${output_file}" ]; then
+    if [ ! -t 1 ]; then
+      exec cat "${@}"
+    fi
+  fi
 
   if [ -z "${vimcatrc}" ]; then
     if [ -f ~/.vimcatrc ]; then
@@ -153,24 +161,36 @@
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
-        if [ -n "${vimcatrc}" ]; then
-          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+        if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
+          dest_file="${tmp_file}"
         else
-          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${tmp_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          dest_file="${output_file}"
         fi
-        cat "${tmp_file}"
-        # if file doesn't end in a newline, output a newline
-        # regular Solaris tail does not work for this
-        tail_cmd=tail
-        if [ -x /usr/xpg4/bin/tail ]; then
-          tail_cmd=/usr/xpg4/bin/tail
+
+        if [ -n "${vimcatrc}" ]; then
+          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+        else
+          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
-        if command -v gtail >/dev/null; then
-          tail_cmd=gtail
+
+        if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
+          cat "${tmp_file}"
         fi
-        last_char=$($tail_cmd -c 1 "${tmp_file}")
-        if [ "${last_char}" != "" ]; then
-          echo
+
+        if [ -z "${output_file}" ]; then
+          # if file doesn't end in a newline, output a newline
+          # regular Solaris tail does not work for this
+          tail_cmd=tail
+          if [ -x /usr/xpg4/bin/tail ]; then
+            tail_cmd=/usr/xpg4/bin/tail
+          fi
+          if command -v gtail >/dev/null; then
+            tail_cmd=gtail
+          fi
+          last_char=$($tail_cmd -c 1 "${tmp_file}")
+          if [ "${last_char}" != "" ]; then
+            echo
+          fi
         fi
       fi
     else

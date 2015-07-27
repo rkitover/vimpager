@@ -8,7 +8,7 @@ vimcat - vim based syntax highlighter
 
 # SYNOPSIS
 
-vimcat *some_file*
+vimcat [options] file1 [file2 ...]
 
 # DESCRIPTION
 cat's a file to stdout, syntax-highlighting it using vim as a backend.
@@ -18,6 +18,9 @@ On GitHub: <http://github.com/rkitover/vimpager>
 To use a different vimrc with vimcat, put your settings into a ~/.vimcatrc.
 
 To disable loading plugins, put "set noloadplugins" into a ~/.vimcatrc file.
+
+If output is not a terminal, it will simply run cat, so using vimcat in
+pipe commands is safe. If you actually need the ANSI codes, use -o .
 
 # COMMAND LINE OPTIONS
 
@@ -34,3 +37,10 @@ arguments are supported.
 ## -u vimrc
 
 Use an alternate .vimrc or .vimcatrc.
+
+## -o output_file
+
+Write output to output_file instead of the terminal. This works when
+vimcat is not run on a terminal as well.
+
+If output_file is "-" then output is written to STDOUT.
