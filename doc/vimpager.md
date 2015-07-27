@@ -4,15 +4,17 @@
 
 # NAME
 
-vimpager - less.sh replacement
+vimpager - pager using vim and less.vim
 
 # SYNOPSIS
 
-vimpager 'some file'
+vimpager [options] 'some file'
 
 &#35; or (this won't always syntax highlight as well)
 
-cat 'some file' | vimpager
+cat 'some file' | vimpager [options]
+
+For vimcat see [here](doc/vimcat.md) or 'man vimcat'.
 
 # RUN-TIME DEPENDENCIES
 
@@ -21,7 +23,7 @@ cat 'some file' | vimpager
 # BUILD DEPENDENCIES
 
 * sharutils or some uuencode (only if you change the .vim sources)
-* pandoc (for man pages)
+* pandoc (for man pages, optional)
 
 # INSTALL
 
@@ -71,10 +73,9 @@ less for the most part:
 |Enter    |One line forward         |k        |One line backward          |  
 |G        |End of file              |g        |Start of file              |  
 |N%       |percentage in file       |,h       |Display this help          |  
-|/pattern |Search for pattern       |?pattern |Search backward for pattern|  
-|n        |next pattern match       |N        |Previous pattern match     |  
+|/pattern |Search forward           |?pattern |Search backward            |  
+|n        |next match               |N        |Previous match             |  
 |ESC-u    |toggle search highlight  |         |                           |  
-|:n-Enter |Next file                |:p-Enter |Previous file              |  
 |q        |Quit                     |,v       |Toggle Less Mode           |  
 
 To disable loading plugins, put "set noloadplugins" into a vimpagerrc
