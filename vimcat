@@ -357,19 +357,19 @@ function! AnsiHighlight(output_file)
     let line = getline(lnum)
 
     for cnum in range(1, col('.'))
-      if synIDtrans(synID(lnum, cnum, 1)) != last
+      let concealed = synconcealed(lnum, cnum)
+
+      if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
         let last = synIDtrans(synID(lnum, cnum, 1))
         let output .= s:GroupToAnsi(last)
       endif
-
-      let concealed = synconcealed(lnum, cnum)
 
       if concealed[0] ==# 1 && &conceallevel !=# 0
         if &conceallevel ==# 1 || &conceallevel ==# 2
           let output .= concealed[1]
         endif
       else
-        let output .= strpart(line, cnum, 1)
+        let output .= matchstr(line, '\%(\zs.\)\{'.cnum.'}')
       endif
       "let line = substitute(line, '.', '', '')
             "let line = matchstr(line, '^\@<!.*')
