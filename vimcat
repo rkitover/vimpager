@@ -362,7 +362,15 @@ function! AnsiHighlight(output_file)
         let output .= s:GroupToAnsi(last)
       endif
 
-      let output .= matchstr(line, '\%(\zs.\)\{'.cnum.'}')
+      let concealed = synconcealed(lnum, cnum)
+
+      if concealed[0] ==# 1 && &conceallevel !=# 0
+        if &conceallevel ==# 1 || &conceallevel ==# 2
+          let output .= concealed[1]
+        endif
+      else
+        let output .= strpart(line, cnum, 1)
+      endif
       "let line = substitute(line, '.', '', '')
             "let line = matchstr(line, '^\@<!.*')
     endfor
