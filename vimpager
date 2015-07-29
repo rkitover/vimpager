@@ -707,7 +707,7 @@ find_rc() {
 }
 
 ansi_filter() {
-	sed -e 's/\[;*\?*\([0-9.]*\(;[0-9]*\)*\)*[A-Za-z]//g'
+	sed -e 's/\[;*[?]*\([0-9.]*\(;[0-9]*\)*\)*[A-Za-z]//g'
 }
 
 # Normally, filter outputs overstrike free content to STDERR.
