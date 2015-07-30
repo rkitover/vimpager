@@ -355,8 +355,19 @@ function! AnsiHighlight(output_file)
     exe "norm! " . lnum . "G$"
 
     let line = getline(lnum)
+    let cnum = 1
 
-    for cnum in range(1, col('.'))
+    while cnum <=# col('.')
+      " skip ansi codes in the file
+      if matchstr(line, '\%(\zs.\)\{'.cnum.'}') ==# "\e" && matchstr(line, '\%(\zs.\)\{'.(cnum + 1).'}') ==# '['
+        let cnum += 2
+        while match(matchstr(line, '\%(\zs.\)\{'.cnum.'}'), '[A-Za-z]') ==# -1
+          let cnum += 1
+        endwhile
+
+        continue
+      endif
+
       let concealed = synconcealed(lnum, cnum)
 
       if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
@@ -373,7 +384,9 @@ function! AnsiHighlight(output_file)
       endif
       "let line = substitute(line, '.', '', '')
             "let line = matchstr(line, '^\@<!.*')
-    endfor
+
+      let cnum += 1
+    endwhile
     let retv += [output]
   endfor
   " Reset the colors to default after displaying the file
