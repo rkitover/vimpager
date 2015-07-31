@@ -354,34 +354,44 @@ function! AnsiHighlight(output_file)
         " Hopefully fix highlighting sync issues
     exe "norm! " . lnum . "G$"
 
-    let line = getline(lnum)
-    let cnum = 1
+    let line  = getline(lnum)
+    let chars = split(line, '\zs')
+    let cnum  = 1
 
-    while cnum <=# col('.')
+    while cnum <# col('.')
       " skip ansi codes in the file
-      if matchstr(line, '\%(\zs.\)\{'.cnum.'}') ==# "\e" && matchstr(line, '\%(\zs.\)\{'.(cnum + 1).'}') ==# '['
+      if cnum <# col('.') - 1 && chars[cnum-1] ==# "\e" && chars[cnum] ==# '['
         let cnum += 2
-        while match(matchstr(line, '\%(\zs.\)\{'.cnum.'}'), '[A-Za-z]') ==# -1
+        while match(chars[cnum-1], '[A-Za-z]') ==# -1
           let cnum += 1
         endwhile
 
+        let cnum += 1
         continue
       endif
 
-      let concealed = synconcealed(lnum, cnum)
+"      let concealed = synconcealed(lnum, cnum)
+"
+"      if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
+"        let last = synIDtrans(synID(lnum, cnum, 1))
+"        let output .= s:GroupToAnsi(last)
+"      endif
+"
+"      if concealed[0] ==# 1 && &conceallevel !=# 0
+"        if &conceallevel ==# 1 || &conceallevel ==# 2
+"          let output .= concealed[1]
+"        endif
+"      else
+"        let output .= chars[cnum-1]
+"      endif
 
-      if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
+      if synIDtrans(synID(lnum, cnum, 1)) != last
         let last = synIDtrans(synID(lnum, cnum, 1))
         let output .= s:GroupToAnsi(last)
       endif
 
-      if concealed[0] ==# 1 && &conceallevel !=# 0
-        if &conceallevel ==# 1 || &conceallevel ==# 2
-          let output .= concealed[1]
-        endif
-      else
-        let output .= matchstr(line, '\%(\zs.\)\{'.cnum.'}')
-      endif
+      let output .= chars[cnum-1]
+
       "let line = substitute(line, '.', '', '')
             "let line = matchstr(line, '^\@<!.*')
 
