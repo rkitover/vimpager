@@ -350,7 +350,7 @@ main() {
 	esac
 
 	# check for ANSI codes and strip if not using ansiesc
-	if grep_q '(\[;*\??([0-9]+(;[0-9]+)*)?[A-Za-z]))*' "${filename}"; then
+	if grep_q '(\[;*\??([0-9]+(;[0-9]+)*)?[A-Za-z])*' "${filename}"; then
 		if [ -z "${ansiesc_available}" -o -n "${force_strip_ansi}" ]; then
 			mv -- "${filename}" "${filename}.work"
 			cat -- "${filename}.work" | ansi_filter > "${filename}"
