@@ -355,14 +355,13 @@ function! AnsiHighlight(output_file)
     exe "norm! " . lnum . "G$"
 
     let line  = getline(lnum)
-    let chars = split(line, '\zs')
     let cnum  = 1
 
-    while cnum <# col('.')
+    while cnum <=# col('.')
       " skip ansi codes in the file
-      if cnum <# col('.') - 1 && chars[cnum-1] ==# "\e" && chars[cnum] ==# '['
+      if cnum <=# col('.') - 1 && line[cnum-1] ==# "\e" && line[cnum] ==# '['
         let cnum += 2
-        while match(chars[cnum-1], '[A-Za-z]') ==# -1
+        while match(line[cnum-1], '[A-Za-z]') ==# -1
           let cnum += 1
         endwhile
 
@@ -370,31 +369,22 @@ function! AnsiHighlight(output_file)
         continue
       endif
 
-"      let concealed = synconcealed(lnum, cnum)
-"
-"      if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
-"        let last = synIDtrans(synID(lnum, cnum, 1))
-"        let output .= s:GroupToAnsi(last)
-"      endif
-"
-"      if concealed[0] ==# 1 && &conceallevel !=# 0
-"        if &conceallevel ==# 1 || &conceallevel ==# 2
-"          let output .= concealed[1]
-"        endif
-"      else
-"        let output .= chars[cnum-1]
-"      endif
+      let concealed = synconcealed(lnum, cnum)
 
-      if synIDtrans(synID(lnum, cnum, 1)) != last
+      if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
         let last = synIDtrans(synID(lnum, cnum, 1))
         let output .= s:GroupToAnsi(last)
       endif
 
-      let output .= chars[cnum-1]
-
+      if concealed[0] ==# 1 && &conceallevel !=# 0
+        if &conceallevel ==# 1 || &conceallevel ==# 2
+          let output .= concealed[1]
+        endif
+      else
+        let output .= line[cnum-1]
+      endif
       "let line = substitute(line, '.', '', '')
             "let line = matchstr(line, '^\@<!.*')
-
       let cnum += 1
     endwhile
     let retv += [output]
