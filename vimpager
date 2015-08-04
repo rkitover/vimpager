@@ -530,8 +530,8 @@ vim_less() {
 		unset IN_KSH
 		./vimcat \
 			-u "${vimrc}" \
-			--cmd "set rtp^=${tmp}/extra_vim_home | let vimpager=1 | set nocp" \
-			-c "set nomodeline fdl=9999 bg=dark" \
+			--cmd "set rtp^=${tmp}/extra_vim_home | let vimpager=1" \
+			-c "set fdl=9999" \
 			"${@}" "${filename}"
 		cd "${tmp}/.."
 		rm -rf "${tmp}" gvim.exe.stackdump
