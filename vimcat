@@ -168,9 +168,9 @@
         fi
 
         if [ -n "${vimcatrc}" ]; then
-          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
 
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
