@@ -1,13 +1,25 @@
-The vimpager project and vimcat is licensed under these terms:
+The vimpager project and all files in it is licensed under the below
+terms unless otherwise noted.
+
+The entirety of the project can be considered under a dual license, the
+2-clause BSD license (below) and the Vim license (see uganda.txt.)
 
 Copyright (c) 2015, Rafael Kitover <rkitover@gmail.com> and contributors
 (see the list of CONTRIBUTORS at the bottom of the 'vimpager' file.)
 
 vimcat is Copyright (c) 2015 Matthew Wozniski <mjw@drexel.edu> and other
-contributors to this project and is licensed under the following terms.
+contributors to this project and is licensed under the same terms as
+vimpager.
 
-Other bundled components are copyright their respective owners and are
-distributable under their original terms.
+The following files are licensed under the Vim license and are copyright
+their respective owners (see uganda.txt for the Vim license, and the
+files themselves for the copyright owners):
+
+src/less.vim
+src/perldoc.vim
+src/ansiesc/autoload/AnsiEsc.vim
+src/ansiesc/plugin/AnsiEscPlugin.vim
+src/ansiesc/plugin/cecutil.vim
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

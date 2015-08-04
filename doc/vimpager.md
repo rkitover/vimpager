@@ -1,6 +1,6 @@
 % VIMPAGER(1) vimpager user manual
 % Rafael Kitover <rkitover@gmail.com>
-% April 29, 2015
+% August 4, 2015
 
 # NAME
 

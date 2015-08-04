@@ -1,6 +1,6 @@
 % VIMCAT(1) vimcat user manual
 % Abdó Roig-Maranges <abdo.roig@gmail.com>
-% April 29, 2015
+% August 4, 2015
 
 # NAME
 
@@ -21,6 +21,13 @@ To disable loading plugins, put "set noloadplugins" into a ~/.vimcatrc file.
 
 If output is not a terminal, it will simply run cat, so using vimcat in
 pipe commands is safe. If you actually need the ANSI codes, use -o .
+
+vimcat defaults to syntax on and set bg=dark. If you need bg=light do
+something like this:
+
+```bash
+alias vimcat="vimcat -c 'set bg=light'"
+```
 
 # COMMAND LINE OPTIONS
 
@@ -43,4 +50,6 @@ Use an alternate .vimrc or .vimcatrc.
 Write output to output_file instead of the terminal. This works when
 vimcat is not run on a terminal as well.
 
-If output_file is "-" then output is written to STDOUT.
+If output_file is "-" then output is written to STDOUT. An extra newline
+will not be output if there isn't one at the end of the file with this
+option, but will be in normal operation with a terminal.
