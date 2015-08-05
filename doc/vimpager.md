@@ -22,8 +22,8 @@ For vimcat see [here](doc/vimcat.md) or 'man vimcat'.
 
 # BUILD DEPENDENCIES
 
-* sharutils or some uuencode (only if you change the .vim sources)
-* pandoc (for man pages, optional)
+* sharutils or some uuencode (only if you change the src/*.vim sources)
+* pandoc (for man pages and html, optional)
 
 # INSTALL
 
@@ -88,7 +88,7 @@ If you want to disable less compatibility mode, and use regular vim
 motion commands, put this into your .vimrc/vimpagerrc:
 
 ```vim
-let vimpager_less_mode = 0
+let g:vimpager_less_mode = 0
 ```
 
 You can still enable less mode with this setting by pressing ",v".
@@ -100,14 +100,14 @@ Put the following into your .vimrc/vimpagerrc if you want to use gvim/MacVim
 for your pager window:
 
 ```vim
-let vimpager_use_gvim = 1
+let g:vimpager_use_gvim = 1
 ```
 
 To turn off the feature of passing through text that is smaller than the
 terminal height use this:
 
 ```vim
-let vimpager_passthrough = 0
+let g:vimpager_passthrough = 0
 ```
 
 See "PASSTHROUGH MODE" further down.
@@ -116,14 +116,14 @@ To start vim with -X (no x11 connection, a bit faster startup) put the following
 into your .vimrc/vimpagerrc:
 
 ```vim
-let vimpager_disable_x11 = 1
+let g:vimpager_disable_x11 = 1
 ```
 
 The scroll offset (:help scrolloff), may be specified by placing the 
 following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
 ```vim
-let vimpager_scrolloff = 5
+let g:vimpager_scrolloff = 5
 ```
 
 The default is 5 only in less mode, with less mode disabled the default
@@ -144,7 +144,7 @@ To disable the use of AnsiEsc.vim to display ANSI colors in the source,
 set:
 
 ```vim
-let vimpager_disable_ansiesc = 1
+let g:vimpager_disable_ansiesc = 1
 ```
 
 see the section "ANSI ESCAPE SEQUENCES AND OVERSTRIKES" for more
@@ -200,10 +200,25 @@ vim from Homebrew.
 To disable the use of AnsiEsc.vim, set:
 
 ```vim
-let vimpager_disable_ansiesc = 1
+let g:vimpager_disable_ansiesc = 1
 ```
 
 in your .vimrc.
+
+If the file has a modeline that sets ft or syntax, the setting will override
+the use of AnsiEsc.
+
+To turn off AnsiEsc while viewing a file, simply run
+
+```vim
+:AnsiEsc
+```
+
+To turn off AnsiEsc on the commandline, use an invocation such as the following:
+
+```sh
+vimpager -c 'au VimEnter * exe "setlocal syntax=".&syntax' somefile
+```
 
 # PASSTHROUGH MODE
 
@@ -214,7 +229,7 @@ will be preserved, otherwise the text will be highlighted with vimcat.
 You can turn this off by putting
 
 ```vim
-let vimpager_passthrough = 0
+let g:vimpager_passthrough = 0
 ```
 
 Passthrough mode requires a POSIX shell with arithmetic expansion, if

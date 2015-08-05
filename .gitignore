@@ -6,6 +6,7 @@ vimcat.1
 man.tar.gz
 *.work
 *.uu
+doc/html
 
 # Compiled source #
 ###################
