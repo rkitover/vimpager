@@ -74,6 +74,8 @@ install: docs
 	${INSTALLDOC} doc/vimpager.md ${DESTDIR}${PREFIX}/share/doc/vimpager/vimpager.md; \
 	echo ${INSTALLDOC} doc/vimcat.md ${DESTDIR}${PREFIX}/share/doc/vimpager/vimcat.md; \
 	${INSTALLDOC} doc/vimcat.md ${DESTDIR}${PREFIX}/share/doc/vimpager/vimcat.md; \
+	echo ${INSTALLDOC} TODO ${DESTDIR}${PREFIX}/share/doc/vimpager/TODO; \
+	${INSTALLDOC} TODO ${DESTDIR}${PREFIX}/share/doc/vimpager/TODO; \
 	${MKPATH} ${DESTDIR}${PREFIX}/share/doc/vimpager/html; \
 	echo ${INSTALLDOC} doc/html/vimpager.html ${DESTDIR}${PREFIX}/share/doc/vimpager/html/vimpager.html; \
 	${INSTALLDOC} doc/html/vimpager.html ${DESTDIR}${PREFIX}/share/doc/vimpager/html/vimpager.html; \
@@ -86,6 +88,25 @@ install: docs
 	${MKPATH} $${SYSCONFDIR} 2>/dev/null || true; \
 	echo ${INSTALLCONF} vimpagerrc $${SYSCONFDIR}/vimpagerrc; \
 	${INSTALLCONF} vimpagerrc $${SYSCONFDIR}/vimpagerrc
+
+install-deb:
+	@if [ "`id | cut -d'=' -f2 | cut -d'(' -f1`" -ne "0" ]; then \
+	    echo '[1;31mERROR[0m: You must be root, try sudo.' >&2; \
+	    echo >&2; \
+	    exit 1; \
+	fi
+	@apt-get update
+	@apt-get -y install debhelper devscripts equivs fakeroot gdebi-core
+	@mk-build-deps
+	@yes | gdebi vimpager-build-deps*.deb
+	@dpkg-buildpackage -b -uc -rfakeroot
+	@yes | gdebi `ls -1t ../vimpager*deb | head -1`
+	@dpkg --purge vimpager-build-deps
+	@apt-get -y autoremove
+	@rm -f vimpager-build-deps*.deb \
+	    `ls -1t ../vimpager*.deb | head -1` \
+	    `ls -1t ../vimpager*.changes | head -1`
+	@debian/rules clean
 
 docs: vimpager.1 vimcat.1 doc/html/vimpager.html doc/html/vimcat.html
 	@rm -f docs-warn-stamp
@@ -124,7 +145,7 @@ doc/html/%.html: %.md.work
 	fi
 
 realclean distclean clean:
-	rm -f *.1 *.work *-stamp
+	rm -f *.1 *.work *-stamp *.deb
 	rm -rf doc/html
 	rm -f `find . -name '*.uu'`
 

@@ -27,6 +27,16 @@ For vimcat see [here](doc/vimcat.md) or 'man vimcat'.
 
 # INSTALL
 
+On Ubuntu or Debian, use the following to install a package:
+
+```bash
+git clone git://github.com/rkitover/vimpager
+cd vimpager
+sudo make install-deb
+```
+
+Otherwise use 'make install' instead:
+
 ```bash
 git clone git://github.com/rkitover/vimpager
 cd vimpager

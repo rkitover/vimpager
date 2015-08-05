@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#DH_VERBOSE = 1
+
+# main packaging script based on dh7 syntax
+%:
+	dh $@ 
+
+override_dh_auto_install:
+	dh_auto_install -- PREFIX=/usr
+
+override_dh_compress:
+	dh_compress -X.md

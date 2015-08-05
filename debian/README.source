@@ -1,0 +1,14 @@
+vimpager for Debian
+-------------------
+
+I prefer that Debian packaging code is part of the upstream, which I
+maintain at:
+
+http://github.com/rkitover/vimpager
+
+if you want to make changes to it, send me a pull request or send me an
+email requesting to be added as a committer if you maintain a package
+for a distribution.
+
+ -- Rafael Kitover <rkitover@gmail.com>  Tue, 04 Aug 2015 05:05:01 -0400
+

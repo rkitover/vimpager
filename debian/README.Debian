@@ -1,0 +1,18 @@
+vimpager for Debian
+-------------------
+
+To use this pager, add the following to your ~/.bashrc, ~/.zshrc or
+whatever shell configuration file you use:
+
+PAGER=/usr/bin/vimpager
+export PAGER
+
+If you only want to use it as a pager for man pages, use the following
+instead:
+
+MANPAGER=/usr/bin/vimpager
+export MANPAGER
+
+See `man vimpager' for information on how to configure it.
+
+ -- Rafael Kitover <rkitover@gmail.com>  Tue, 04 Aug 2015 05:05:01 -0400
