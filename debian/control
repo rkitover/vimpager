@@ -3,15 +3,15 @@ Section: text
 Priority: optional
 Maintainer: Rafael Kitover <rkitover@gmail.com>
 Build-Depends: debhelper (>= 9), pandoc, sharutils
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 Homepage: http://github.com/rkitover/vimpager
 Vcs-Git: https://github.com/rkitover/vimpager.git
 Vcs-Browser: https://github.com/rkitover/vimpager
 
 Package: vimpager
 Architecture: all
-Depends: gvim | vim
+Depends: gvim | vim, ${misc:Depends}
 Recommends: sharutils, gawk
-Description: A PAGER using Vim and less.vim
- A PAGER that uses Vim and less.vim for less compatible keystrokes, with
- support for highlighting man pages and many other features.
+Description: PAGER using Vim and less.vim
+ PAGER that uses Vim and less.vim for less compatible keystrokes, with support
+ for highlighting man pages and many other features.

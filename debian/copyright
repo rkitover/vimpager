@@ -3,9 +3,13 @@ Upstream-Name: vimpager
 Upstream-Contact: Rafael Kitover <rkitover@gmail.com>
 Source: http://github.com/rkitover/vimpager
 
-Files: vimpager vimpagerrc TODO Makefile LICENSE doc/vimpager.md doc/vimcat.md src/vimpager.vim src/prototypes/*
+Files: vimpager vimpagerrc TODO Makefile LICENSE doc/vimpager.md doc/vimcat.md src/vimpager.vim src/prototypes/* scripts/awk-sh
 Copyright: 2015 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
+
+Files: scripts/install-sh
+Copyright: 1994 X Consortium <xorg@freedesktop.org>
+License: MIT-4-Clause
 
 Files: vimcat
 Copyright: 2015 Matthew Wozniski <mjw@drexel.edu>
@@ -35,14 +39,14 @@ License: BSD-2-Clause
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are
  met:
- 
+ .
  Redistributions of source code must retain the above copyright notice,
  this list of conditions and the following disclaimer.
- 
+ .
  Redistributions in binary form must reproduce the above copyright
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
- 
+ .
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER ``AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -62,7 +66,7 @@ License: Vim
      include this license text.  You are also allowed to include executables
      that you made from the unmodified Vim sources, plus your own usage
      examples and Vim scripts.
- 
+ .
  II) It is allowed to distribute a modified (or extended) version of Vim,
      including executables and/or source code, when the following four
      conditions are met:
@@ -119,7 +123,7 @@ License: Vim
      4) The contact information as required under 2)a) and 2)d) must not be
         removed or changed, except that the person himself can make
         corrections.
- 
+ .
  III) If you distribute a modified version of Vim, you are encouraged to use
       the Vim license for your changes and make them available to the
       maintainer, including the source code.  The preferred way to do this is
@@ -127,8 +131,31 @@ License: Vim
       If the number of changes is small (e.g., a modified Makefile) e-mailing a
       context diff will do.  The e-mail address to be used is
       <maintainer@vim.org>
- 
+ .
  IV)  It is not allowed to remove this license from the distribution of the Vim
       sources, parts of it or from a modified version.  You may use this
       license for previous Vim releases instead of the license that they came
       with, at your option.
+
+License: MIT-4-Clause
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to
+ deal in the Software without restriction, including without limitation the
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNEC-
+ TION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ .
+ Except as contained in this notice, the name of the X Consortium shall not
+ be used in advertising or otherwise to promote the sale, use or other deal-
+ ings in this Software without prior written authorization from the X Consor-
+ tium.
