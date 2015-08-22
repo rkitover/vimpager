@@ -99,13 +99,11 @@ install-deb:
 	@apt-get -y install debhelper devscripts equivs fakeroot gdebi-core
 	@mk-build-deps
 	@yes | gdebi vimpager-build-deps*.deb
-	@dpkg-buildpackage -b -uc -rfakeroot
+	@dpkg-buildpackage -uc -rfakeroot
 	@yes | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
 	@apt-get -y autoremove
-	@rm -f vimpager-build-deps*.deb \
-	    `ls -1t ../vimpager*.deb | head -1` \
-	    `ls -1t ../vimpager*.changes | head -1`
+	@rm -f vimpager-build-deps*.deb
 	@debian/rules clean
 
 docs: vimpager.1 vimcat.1 doc/html/vimpager.html doc/html/vimcat.html
