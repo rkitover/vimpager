@@ -317,6 +317,10 @@ main() {
 				vimrc="${1}"
 				shift
 				;;
+			"-s") # Ubuntu man passes this option to /usr/bin/pager
+				shift
+				squeeze_blank_lines=1
+				;;
 			"--") shift; break ;;
 			-*) echo "${0}: bad option '${1}'" ; exit 1 ;;
 			*) break ;;
@@ -358,6 +362,16 @@ main() {
 		else
 			use_ansiesc=1
 		fi
+	fi
+
+	# squeeze blank lines if option was specified, Ubuntu man with /usr/bin/pager does this
+	if [ "${squeeze_blank_lines}" = "1" ]; then
+			mv -- "${filename}" "${filename}.work"
+			sed -e '/^[ 	]*$/{
+				N
+				/^[ 	]*\n$/D
+			}' -- "${filename}.work" > "${filename}"
+			rm -f -- "${filename}.work"
 	fi
 
 	# dumb man detection when the pstree heuristic fails
