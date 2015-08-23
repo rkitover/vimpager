@@ -369,7 +369,7 @@ main() {
 			mv -- "${filename}" "${filename}.work"
 			sed -e '/^[ 	]*$/{
 				N
-				/^[ 	]*\n$/D
+				/^[ 	]*\n[ 	]*$/D
 			}' -- "${filename}.work" > "${filename}"
 			rm -f -- "${filename}.work"
 	fi
