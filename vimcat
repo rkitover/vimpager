@@ -71,7 +71,8 @@
   fi 
 
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
-  tmp_file="${tmp_dir}/vimcat"
+  tmp_file_in="${tmp_dir}/vimcat_in.txt"
+  tmp_file_out="${tmp_dir}/vimcat_out.txt"
 
   script="$(command -v ${0})"
 
@@ -105,6 +106,10 @@
         shift
         output_file="${1}"
         shift
+        ;;
+      "-s")
+        shift
+        squeeze_blank_lines=1
         ;;
       "--")
         shift
@@ -154,15 +159,25 @@
     fi
 
     if [ "${file}" = "-" ]; then
-      cat - >"${tmp_file}"
-      file="${tmp_file}"
+      cat - >"${tmp_file_in}"
+      file="${tmp_file_in}"
+    fi
+
+    if [ "${squeeze_blank_lines}" = "1" ]; then
+      cat -- "${file}" > "${tmp_file_in}.work"
+      sed -e '/^[ 	]*$/{
+				N
+				/^[ 	]*\n[ 	]*$/D
+      }' -- "${tmp_file_in}.work" > "${tmp_file_in}"
+      rm -f -- "${tmp_file_in}.work"
+      file="${tmp_file_in}"
     fi
 
     # Check that the file exists
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          dest_file="${tmp_file}"
+          dest_file="${tmp_file_out}"
         else
           dest_file="${output_file}"
         fi
@@ -174,7 +189,7 @@
         fi
 
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          cat "${tmp_file}"
+          cat "${tmp_file_out}"
         fi
 
         if [ -z "${output_file}" ]; then
@@ -187,7 +202,7 @@
           if command -v gtail >/dev/null; then
             tail_cmd=gtail
           fi
-          last_char="$($tail_cmd -c 1 "${tmp_file}")"
+          last_char="$($tail_cmd -c 1 "${tmp_file_out}")"
           if [ "${last_char}" != "" ]; then
             echo
           fi

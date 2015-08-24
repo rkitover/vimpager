@@ -53,3 +53,7 @@ vimcat is not run on a terminal as well.
 If output_file is "-" then output is written to STDOUT. An extra newline
 will not be output if there isn't one at the end of the file with this
 option, but will be in normal operation with a terminal.
+
+## -s
+
+Squeeze multiple blank lines into one.
