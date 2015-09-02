@@ -95,7 +95,7 @@ install-deb:
 	    echo >&2; \
 	    exit 1; \
 	fi
-	@apt-get update
+	@apt-get update || true
 	@apt-get -y install debhelper devscripts equivs fakeroot gdebi-core
 	@mk-build-deps
 	@yes | gdebi vimpager-build-deps*.deb
