@@ -240,8 +240,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
 
    syn cluster AnsiDefaultBgGroup contains=ansiBgBoldDefault,ansiBgUnderlineDefault,ansiBgDefaultDefault,ansiBgBlackDefault,ansiBgRedDefault,ansiBgGreenDefault,ansiBgYellowDefault,ansiBgBlueDefault,ansiBgMagentaDefault,ansiBgCyanDefault,ansiBgWhiteDefault
    syn region ansiDefaultBg	concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(0\{0,2};\)\=49\%(0\{0,2};\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiDefaultBgGroup,ansiConceal
-   syn region ansiBgBoldDefault     contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiBgUnderlineDefault contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiBgBoldDefault     contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiBgUnderlineDefault contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiBgDefaultDefault	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBgBlackDefault	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBgRedDefault	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -264,9 +264,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteDefault	ansiWhiteDefault
 
    syn cluster AnsiBlackBgGroup contains=ansiBgBoldBlack,ansiBgUnderlineBlack,ansiBgDefaultBlack,ansiBgBlackBlack,ansiBgRedBlack,ansiBgGreenBlack,ansiBgYellowBlack,ansiBgBlueBlack,ansiBgMagentaBlack,ansiBgCyanBlack,ansiBgWhiteBlack
-   syn region ansiBlackBg	concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=40\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiBlackBgGroup,ansiConceal
-   syn region ansiBgBoldBlack	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiBgUnderlineBlack	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiBlackBg	concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=40\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiBlackBgGroup,ansiConceal
+   syn region ansiBgBoldBlack	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiBgUnderlineBlack	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiBgDefaultBlack	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBgBlackBlack	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBgRedBlack	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -289,9 +289,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteBlack	ansiWhiteBlack
 
    syn cluster AnsiRedBgGroup contains=ansiBgBoldRed,ansiBgUnderlineRed,ansiBgDefaultRed,ansiBgBlackRed,ansiBgRedRed,ansiBgGreenRed,ansiBgYellowRed,ansiBgBlueRed,ansiBgMagentaRed,ansiBgCyanRed,ansiBgWhiteRed
-   syn region ansiRedBg		concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=41\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiRedBgGroup,ansiConceal
-   syn region ansiBgBoldRed	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiBgUnderlineRed	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiRedBg		concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=41\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiRedBgGroup,ansiConceal
+   syn region ansiBgBoldRed	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiBgUnderlineRed	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiBgDefaultRed	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBgBlackRed	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedRed	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -314,9 +314,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteRed	ansiWhiteRed
 
    syn cluster AnsiGreenBgGroup contains=ansiBgBoldGreen,ansiBgUnderlineGreen,ansiBgDefaultGreen,ansiBgBlackGreen,ansiBgRedGreen,ansiBgGreenGreen,ansiBgYellowGreen,ansiBgBlueGreen,ansiBgMagentaGreen,ansiBgCyanGreen,ansiBgWhiteGreen
-   syn region ansiGreenBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=42\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiGreenBgGroup,ansiConceal
-   syn region ansiBgBoldGreen	contained	start="\e\[1m"  skip='\e\[K'  end="\e\[[03m]"me=e-3 contains=ansiConceal
-   syn region ansiBgUnderlineGreen	contained	start="\e\[4m"  skip='\e\[K'  end="\e\[[03m]"me=e-3 contains=ansiConceal
+   syn region ansiGreenBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=42\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiGreenBgGroup,ansiConceal
+   syn region ansiBgBoldGreen	contained	start="\e\[1m"  skip='\e\[K'  end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiBgUnderlineGreen	contained	start="\e\[4m"  skip='\e\[K'  end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiBgDefaultGreen	contained	start="\e\[39m" skip='\e\[K'  end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgBlackGreen	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedGreen	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -339,9 +339,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteGreen	ansiWhiteGreen
 
    syn cluster AnsiYellowBgGroup contains=ansiBgBoldYellow,ansiBgUnderlineYellow,ansiBgDefaultYellow,ansiBgBlackYellow,ansiBgRedYellow,ansiBgGreenYellow,ansiBgYellowYellow,ansiBgBlueYellow,ansiBgMagentaYellow,ansiBgCyanYellow,ansiBgWhiteYellow
-   syn region ansiYellowBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=43\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiYellowBgGroup,ansiConceal
-   syn region ansiBgBoldYellow	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
-   syn region ansiBgUnderlineYellow	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
+   syn region ansiYellowBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=43\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiYellowBgGroup,ansiConceal
+   syn region ansiBgBoldYellow	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiBgUnderlineYellow	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiBgDefaultYellow	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgBlackYellow	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedYellow	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -364,9 +364,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteYellow	ansiWhiteYellow
 
    syn cluster AnsiBlueBgGroup contains=ansiBgBoldBlue,ansiBgUnderlineBlue,ansiBgDefaultBlue,ansiBgBlackBlue,ansiBgRedBlue,ansiBgGreenBlue,ansiBgYellowBlue,ansiBgBlueBlue,ansiBgMagentaBlue,ansiBgCyanBlue,ansiBgWhiteBlue
-   syn region ansiBlueBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=44\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiBlueBgGroup,ansiConceal
-   syn region ansiBgBoldBlue	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
-   syn region ansiBgUnderlineBlue	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
+   syn region ansiBlueBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=44\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiBlueBgGroup,ansiConceal
+   syn region ansiBgBoldBlue	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiBgUnderlineBlue	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiBgDefaultBlue	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgBlackBlue	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedBlue	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -389,9 +389,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteBlue	ansiWhiteBlue
 
    syn cluster AnsiMagentaBgGroup contains=ansiBgBoldMagenta,ansiBgUnderlineMagenta,ansiBgDefaultMagenta,ansiBgBlackMagenta,ansiBgRedMagenta,ansiBgGreenMagenta,ansiBgYellowMagenta,ansiBgBlueMagenta,ansiBgMagentaMagenta,ansiBgCyanMagenta,ansiBgWhiteMagenta
-   syn region ansiMagentaBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=45\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiMagentaBgGroup,ansiConceal
-   syn region ansiBgBoldMagenta      contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
-   syn region ansiBgUnderlineMagenta contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
+   syn region ansiMagentaBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=45\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiMagentaBgGroup,ansiConceal
+   syn region ansiBgBoldMagenta      contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiBgUnderlineMagenta contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiBgDefaultMagenta	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgBlackMagenta	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedMagenta	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -414,9 +414,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteMagenta	ansiWhiteMagenta
 
    syn cluster AnsiCyanBgGroup contains=ansiBgBoldCyan,ansiBgUnderlineCyan,ansiBgDefaultCyan,ansiBgBlackCyan,ansiBgRedCyan,ansiBgGreenCyan,ansiBgYellowCyan,ansiBgBlueCyan,ansiBgMagentaCyan,ansiBgCyanCyan,ansiBgWhiteCyan
-   syn region ansiCyanBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=46\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiCyanBgGroup,ansiConceal
-   syn region ansiBgBoldCyan        contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
-   syn region ansiBgUnderlineCyan   contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
+   syn region ansiCyanBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=46\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiCyanBgGroup,ansiConceal
+   syn region ansiBgBoldCyan        contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiBgUnderlineCyan   contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiBgDefaultCyan	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgBlackCyan	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedCyan	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -439,9 +439,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiBgWhiteCyan	ansiWhiteCyan
 
    syn cluster AnsiWhiteBgGroup contains=ansiBgBoldWhite,ansiBgUnderlineWhite,ansiBgDefaultWhite,ansiBgBlackWhite,ansiBgRedWhite,ansiBgGreenWhite,ansiBgYellowWhite,ansiBgBlueWhite,ansiBgMagentaWhite,ansiBgCyanWhite,ansiBgWhiteWhite
-   syn region ansiWhiteBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=47\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiWhiteBgGroup,ansiConceal
-   syn region ansiBgBoldWhite       contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
-   syn region ansiBgUnderlineWhite  contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
+   syn region ansiWhiteBg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=47\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiWhiteBgGroup,ansiConceal
+   syn region ansiBgBoldWhite       contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiBgUnderlineWhite  contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiBgDefaultWhite	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgBlackWhite	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
    syn region ansiBgRedWhite	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3 contains=ansiConceal
@@ -470,7 +470,7 @@ fun! AnsiEsc#AnsiEsc(rebuild)
 
    syn cluster AnsiDefaultFgGroup contains=ansiFgDefaultBold,ansiFgDefaultUnderline,ansiFgDefaultDefault,ansiFgDefaultBlack,ansiFgDefaultRed,ansiFgDefaultGreen,ansiFgDefaultYellow,ansiFgDefaultBlue,ansiFgDefaultMagenta,ansiFgDefaultCyan,ansiFgDefaultWhite
    syn region ansiDefaultFg		concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=39\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiDefaultFgGroup,ansiConceal
-   syn region ansiFgDefaultBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiFgDefaultBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
    syn region ansiFgDefaultUnerline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgDefaultDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgDefaultBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -494,8 +494,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgDefaultWhite	ansiDefaultWhite
 
    syn cluster AnsiBlackFgGroup contains=ansiFgBlackBold,ansiFgBlackUnderline,ansiFgBlackDefault,ansiFgBlackBlack,ansiFgBlackRed,ansiFgBlackGreen,ansiFgBlackYellow,ansiFgBlackBlue,ansiFgBlackMagenta,ansiFgBlackCyan,ansiFgBlackWhite
-   syn region ansiBlackFg	concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=30\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiBlackFgGroup,ansiConceal
-   syn region ansiFgBlackBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
+   syn region ansiBlackFg	concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=30\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiBlackFgGroup,ansiConceal
+   syn region ansiFgBlackBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
    syn region ansiFgBlackUnerline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
    syn region ansiFgBlackDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
    syn region ansiFgBlackBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
@@ -519,9 +519,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgBlackWhite	ansiBlackWhite
 
    syn cluster AnsiRedFgGroup contains=ansiFgRedBold,ansiFgRedUnderline,ansiFgRedDefault,ansiFgRedBlack,ansiFgRedRed,ansiFgRedGreen,ansiFgRedYellow,ansiFgRedBlue,ansiFgRedMagenta,ansiFgRedCyan,ansiFgRedWhite
-   syn region ansiRedFg		concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=31\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiRedFgGroup,ansiConceal
-   syn region ansiFgRedBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgRedUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiRedFg		concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=31\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiRedFgGroup,ansiConceal
+   syn region ansiFgRedBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgRedUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgRedDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgRedBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgRedRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -544,9 +544,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgRedWhite	ansiRedWhite
 
    syn cluster AnsiGreenFgGroup contains=ansiFgGreenBold,ansiFgGreenUnderline,ansiFgGreenDefault,ansiFgGreenBlack,ansiFgGreenRed,ansiFgGreenGreen,ansiFgGreenYellow,ansiFgGreenBlue,ansiFgGreenMagenta,ansiFgGreenCyan,ansiFgGreenWhite
-   syn region ansiGreenFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=32\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiGreenFgGroup,ansiConceal
-   syn region ansiFgGreenBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgGreenUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiGreenFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=32\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiGreenFgGroup,ansiConceal
+   syn region ansiFgGreenBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgGreenUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgGreenDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgGreenBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgGreenRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -569,9 +569,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgGreenWhite	ansiGreenWhite
 
    syn cluster AnsiYellowFgGroup contains=ansiFgYellowBold,ansiFgYellowUnderline,ansiFgYellowDefault,ansiFgYellowBlack,ansiFgYellowRed,ansiFgYellowGreen,ansiFgYellowYellow,ansiFgYellowBlue,ansiFgYellowMagenta,ansiFgYellowCyan,ansiFgYellowWhite
-   syn region ansiYellowFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=33\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiYellowFgGroup,ansiConceal
-   syn region ansiFgYellowBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgYellowUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiYellowFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=33\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiYellowFgGroup,ansiConceal
+   syn region ansiFgYellowBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgYellowUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgYellowDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgYellowBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgYellowRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -594,9 +594,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgYellowWhite	ansiYellowWhite
 
    syn cluster AnsiBlueFgGroup contains=ansiFgBlueBold,ansiFgBlueUnderline,ansiFgBlueDefault,ansiFgBlueBlack,ansiFgBlueRed,ansiFgBlueGreen,ansiFgBlueYellow,ansiFgBlueBlue,ansiFgBlueMagenta,ansiFgBlueCyan,ansiFgBlueWhite
-   syn region ansiBlueFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=34\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiBlueFgGroup,ansiConceal
-   syn region ansiFgBlueBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgBlueUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiBlueFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=34\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiBlueFgGroup,ansiConceal
+   syn region ansiFgBlueBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgBlueUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgBlueDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgBlueBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgBlueRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -619,9 +619,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgBlueWhite	ansiBlueWhite
 
    syn cluster AnsiMagentaFgGroup contains=ansiFgMagentaBold,ansiFgMagentaUnderline,ansiFgMagentaDefault,ansiFgMagentaBlack,ansiFgMagentaRed,ansiFgMagentaGreen,ansiFgMagentaYellow,ansiFgMagentaBlue,ansiFgMagentaMagenta,ansiFgMagentaCyan,ansiFgMagentaWhite
-   syn region ansiMagentaFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=35\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiMagentaFgGroup,ansiConceal
-   syn region ansiFgMagentaBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgMagentaUnderline contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiMagentaFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=35\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiMagentaFgGroup,ansiConceal
+   syn region ansiFgMagentaBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgMagentaUnderline contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgMagentaDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgMagentaBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgMagentaRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -644,9 +644,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgMagentaWhite	ansiMagentaWhite
 
    syn cluster AnsiCyanFgGroup contains=ansiFgCyanBold,ansiFgCyanUnderline,ansiFgCyanDefault,ansiFgCyanBlack,ansiFgCyanRed,ansiFgCyanGreen,ansiFgCyanYellow,ansiFgCyanBlue,ansiFgCyanMagenta,ansiFgCyanCyan,ansiFgCyanWhite
-   syn region ansiCyanFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=36\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiCyanFgGroup,ansiConceal
-   syn region ansiFgCyanBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgCyanUnderline contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiCyanFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=36\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiCyanFgGroup,ansiConceal
+   syn region ansiFgCyanBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgCyanUnderline contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgCyanDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgCyanBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgCyanRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -669,9 +669,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgCyanWhite	ansiCyanWhite
 
    syn cluster AnsiWhiteFgGroup contains=ansiFgWhiteBold,ansiFgWhiteUnderline,ansiFgWhiteDefault,ansiFgWhiteBlack,ansiFgWhiteRed,ansiFgWhiteGreen,ansiFgWhiteYellow,ansiFgWhiteBlue,ansiFgWhiteMagenta,ansiFgWhiteCyan,ansiFgWhiteWhite
-   syn region ansiWhiteFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=37\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiWhiteFgGroup,ansiConceal
-   syn region ansiFgWhiteBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiFgWhiteUnderline contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiWhiteFg	concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=37\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiWhiteFgGroup,ansiConceal
+   syn region ansiFgWhiteBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiFgWhiteUnderline contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiFgWhiteDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgWhiteBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiFgWhiteRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -694,8 +694,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiFgWhiteWhite	ansiWhiteWhite
 
    syn cluster AnsiBoldGroup contains=ansiUnderlineBoldRegion,ansiDefaultBoldRegion,ansiBlackBoldRegion,ansiWhiteBoldRegion,ansiRedBoldRegion,ansiGreenBoldRegion,ansiYellowBoldRegion,ansiBlueBoldRegion,ansiMagentaBoldRegion,ansiCyanBoldRegion
-   syn region ansiBoldRegion        concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=1;\=m" skip='\e\[K' end="\ze\e\[\%(0\|22\)m" contains=@AnsiBoldGroup,ansiConceal
-   syn region ansiUnderlineBoldRegion contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiBoldRegion        concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=1;\=m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(0*\|22\)\=m" contains=@AnsiBoldGroup,ansiConceal
+   syn region ansiUnderlineBoldRegion contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiDefaultBoldRegion	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBlackBoldRegion	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiRedBoldRegion	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -718,8 +718,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiWhiteBoldRegion	ansiBoldWhite
 
    syn cluster AnsiUnderlineGroup contains=ansiBoldUnderlineRegion,ansiDefaultUnderlineRegion,ansiBlackUnderlineRegion,ansiWhiteUnderlineRegion,ansiRedUnderlineRegion,ansiGreenUnderlineRegion,ansiYellowUnderlineRegion,ansiBlueUnderlineRegion,ansiMagentaUnderlineRegion,ansiCyanUnderlineRegion
-   syn region ansiUnderlineRegion       concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=4;\=m" skip='\e\[K' end="\ze\e\[\%(0\|24\)m" contains=@AnsiUnderlineGroup,ansiConceal
-   syn region ansiBoldUnderlineRegion	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiUnderlineRegion       concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=4;\=m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(0*\|24\)\=m" contains=@AnsiUnderlineGroup,ansiConceal
+   syn region ansiBoldUnderlineRegion	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
    syn region ansiDefaultUnderlineRegion	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBlackUnderlineRegion	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiRedUnderlineRegion	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -747,9 +747,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
 "   call Decho("installing implicit reverse background highlighting")
 
    syn cluster AnsiReverseGroup contains=ansiUnderlineReverse,ansiBoldReverse,ansiDefaultReverse,ansiBlackReverse,ansiWhiteReverse,ansiRedReverse,ansiGreenReverse,ansiYellowReverse,ansiBlueReverse,ansiMagentaReverse,ansiCyanReverse,ansiDefaultReverseBg,ansiBlackReverseBg,ansiRedReverseBg,ansiGreenReverseBg,ansiYellowReverseBg,ansiBlueReverseBg,ansiMagentaReverseBg,ansiCyanReverseBg,ansiWhiteReverseBg,ansiDefaultReverseFg,ansiBlackReverseFg,ansiWhiteReverseFg,ansiRedReverseFg,ansiGreenReverseFg,ansiYellowReverseFg,ansiBlueReverseFg,ansiMagentaReverseFg,ansiCyanReverseFg,ansiReverseBoldRegion,ansiReverseUnderlineRegion
-   syn region ansiReverseRegion        concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=7;\=m" skip='\e\[K' end="\ze\e\[\%(0\|27\)m" contains=@AnsiReverseGroup,ansiConceal
-   syn region ansiUnderlineReverse	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiBgBoldReverse	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiReverseRegion        concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=7;\=m" skip='\e\[K' end="\ze\e\[\%(0\|27\)\=m" contains=@AnsiReverseGroup,ansiConceal
+   syn region ansiUnderlineReverse	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
+   syn region ansiBgBoldReverse	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
    syn region ansiDefaultReverse	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBlackReverse	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiRedReverse	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -774,8 +774,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
 
    syn cluster AnsiDefaultReverseBgGroup contains=ansiReverseBgBoldDefault,ansiReverseBgUnderlineDefault,ansiReverseBgDefaultDefault,ansiReverseBgBlackDefault,ansiReverseBgRedDefault,ansiReverseBgGreenDefault,ansiReverseBgYellowDefault,ansiReverseBgBlueDefault,ansiReverseBgMagentaDefault,ansiReverseBgCyanDefault,ansiReverseBgWhiteDefault
    syn region ansiDefaultReverseBg      contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(0\{0,2};\)\=49\%(0\{0,2};\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiDefaultBgGroup,ansiConceal
-   syn region ansiReverseBgBoldDefault          contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineDefault     contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiReverseBgBoldDefault          contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineDefault     contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultDefault	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackDefault	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedDefault	contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -798,9 +798,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteDefault	ansiDefaultWhite
 
    syn cluster AnsiBlackReverseBgGroup contains=ansiReverseBgBoldBlack,ansiReverseBgUnderlineBlack,ansiReverseBgDefaultBlack,ansiReverseBgBlackBlack,ansiReverseBgRedBlack,ansiReverseBgGreenBlack,ansiReverseBgYellowBlack,ansiReverseBgBlueBlack,ansiReverseBgMagentaBlack,ansiReverseBgCyanBlack,ansiReverseBgWhiteBlack
-   syn region ansiBlackReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=40\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiBlackReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldBlack	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineBlack	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiBlackReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=40\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiBlackReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldBlack	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineBlack	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultBlack	contained	start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackBlack	contained	start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedBlack	            contained	start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -823,9 +823,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteBlack	    ansiBlackWhite
 
    syn cluster AnsiRedReverseBgGroup contains=ansiReverseBgBoldRed,ansiReverseBgUnderlineRed,ansiReverseBgDefaultRed,ansiReverseBgBlackRed,ansiReverseBgRedRed,ansiReverseBgGreenRed,ansiReverseBgYellowRed,ansiReverseBgBlueRed,ansiReverseBgMagentaRed,ansiReverseBgCyanRed,ansiReverseBgWhiteRed
-   syn region ansiRedReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=41\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiRedReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldRed	    contained start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineRed contained start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiRedReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=41\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiRedReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldRed	    contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineRed contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultRed   contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackRed	    contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedRed	    contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -848,9 +848,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteRed	ansiRedWhite
 
    syn cluster AnsiGreenReverseBgGroup contains=ansiReverseBgBoldGreen,ansiReverseBgUnderlineGreen,ansiReverseBgDefaultGreen,ansiReverseBgBlackGreen,ansiReverseBgRedGreen,ansiReverseBgGreenGreen,ansiReverseBgYellowGreen,ansiReverseBgBlueGreen,ansiReverseBgMagentaGreen,ansiReverseBgCyanGreen,ansiReverseBgWhiteGreen
-   syn region ansiGreenReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=42\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiGreenReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldGreen        contained start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineGreen   contained start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiGreenReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=42\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiGreenReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldGreen        contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineGreen   contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultGreen     contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackGreen       contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedGreen	        contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -873,9 +873,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteGreen	ansiGreenWhite
 
    syn cluster AnsiYellowReverseBgGroup contains=ansiReverseFgBoldYellow,ansiReverseFgUnderlineYellow,ansiReverseFgDefaultYellow,ansiReverseFgBlackYellow,ansiReverseFgRedYellow,ansiReverseFgGreenYellow,ansiReverseFgYellowYellow,ansiReverseFgBlueYellow,ansiReverseFgMagentaYellow,ansiReverseFgCyanYellow,ansiReverseFgWhiteYellow
-   syn region ansiYellowReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=43\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=@AnsiYellowReverseBgGroup,ansiConceal
-   syn region ansiReverseFgBoldYellow	contained start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseFgUnderlineYellow	contained start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiYellowReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=43\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]" contains=@AnsiYellowReverseBgGroup,ansiConceal
+   syn region ansiReverseFgBoldYellow	contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseFgUnderlineYellow	contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseFgDefaultYellow	contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseFgBlackYellow	contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseFgRedYellow	contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -898,9 +898,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgWhiteYellow	    ansiYellowWhite
 
    syn cluster AnsiBlueReverseBgGroup contains=ansiReverseBgBoldBlue,ansiReverseBgUnderlineBlue,ansiReverseBgDefaultBlue,ansiReverseBgBlackBlue,ansiReverseBgRedBlue,ansiReverseBgGreenBlue,ansiReverseBgYellowBlue,ansiReverseBgBlueBlue,ansiReverseBgMagentaBlue,ansiReverseBgCyanBlue,ansiReverseBgWhiteBlue
-   syn region ansiBlueReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=44\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiBlueReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldBlue	        contained start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineBlue    contained start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiBlueReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=44\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiBlueReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldBlue	        contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineBlue    contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultBlue      contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackBlue        contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedBlue          contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -923,9 +923,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteBlue	ansiBlueWhite
 
    syn cluster AnsiMagentaReverseBgGroup contains=ansiReverseBgBoldMagenta,ansiReverseBgUnderlineMagenta,ansiReverseBgDefaultMagenta,ansiReverseBgBlackMagenta,ansiReverseBgRedMagenta,ansiReverseBgGreenMagenta,ansiReverseBgYellowMagenta,ansiReverseBgBlueMagenta,ansiReverseBgMagentaMagenta,ansiReverseBgCyanMagenta,ansiReverseBgWhiteMagenta
-   syn region ansiMagentaReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=45\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiMagentaReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldMagenta          contained start="\e\[1m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineMagenta     contained start="\e\[4m"  skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiMagentaReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=45\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiMagentaReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldMagenta          contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineMagenta     contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultMagenta	contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackMagenta	contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedMagenta	contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -948,9 +948,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteMagenta        ansiMagentaWhite
 
    syn cluster AnsiCyanReverseBgGroup contains=ansiReverseBgBoldCyan,ansiReverseBgUnderlineCyan,ansiReverseBgDefaultCyan,ansiReverseBgBlackCyan,ansiReverseBgRedCyan,ansiReverseBgGreenCyan,ansiReverseBgYellowCyan,ansiReverseBgBlueCyan,ansiReverseBgMagentaCyan,ansiReverseBgCyanCyan,ansiReverseBgWhiteCyan
-   syn region ansiCyanReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=46\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiCyanReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldCyan         contained start="\e\[1m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineCyan    contained start="\e\[4m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiCyanReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=46\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiCyanReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldCyan         contained start="\e\[1m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineCyan    contained start="\e\[4m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultCyan      contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackCyan        contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedCyan          contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -973,9 +973,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseBgWhiteCyan	ansiCyanWhite
 
    syn cluster AnsiWhiteReverseBgGroup contains=ansiReverseBgBoldWhite,ansiReverseBgUnderlineWhite,ansiReverseBgDefaultWhite,ansiReverseBgBlackWhite,ansiReverseBgRedWhite,ansiReverseBgGreenWhite,ansiReverseBgYellowWhite,ansiReverseBgBlueWhite,ansiReverseBgMagentaWhite,ansiReverseBgCyanWhite,ansiReverseBgWhiteWhite
-   syn region ansiWhiteReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=47\%(;1\)\=m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=@AnsiWhiteReverseBgGroup,ansiConceal
-   syn region ansiReverseBgBoldWhite        contained start="\e\[1m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
-   syn region ansiReverseBgUnderlineWhite   contained start="\e\[4m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiWhiteReverseBg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=47\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=49m\|\ze\e\[[04m]"  contains=@AnsiWhiteReverseBgGroup,ansiConceal
+   syn region ansiReverseBgBoldWhite        contained start="\e\[1m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
+   syn region ansiReverseBgUnderlineWhite   contained start="\e\[4m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseBgDefaultWhite     contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgBlackWhite       contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiReverseBgRedWhite         contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -1004,7 +1004,7 @@ fun! AnsiEsc#AnsiEsc(rebuild)
 
    syn cluster AnsiDefaultReverseFgGroup contains=ansiReverseFgDefaultBold,ansiReverseFgDefaultUnderline,ansiReverseFgDefaultDefault,ansiReverseFgDefaultBlack,ansiReverseFgDefaultRed,ansiReverseFgDefaultGreen,ansiReverseFgDefaultYellow,ansiReverseFgDefaultBlue,ansiReverseFgDefaultMagenta,ansiReverseFgDefaultCyan,ansiReverseFgDefaultWhite
    syn region ansiDefaultReverseFg		contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=39\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiDefaultReverseFgGroup,ansiConceal
-   syn region ansiReverseFgDefaultBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiReverseFgDefaultBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgDefaultUnerline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgDefaultDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgDefaultBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1028,8 +1028,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgDefaultWhite     	 ansiWhiteDefault
 
    syn cluster AnsiBlackReverseFgGroup contains=ansiReverseFgBlackBold,ansiReverseFgBlackUnderline,ansiReverseFgBlackDefault,ansiReverseFgBlackBlack,ansiReverseFgBlackRed,ansiReverseFgBlackGreen,ansiReverseFgBlackYellow,ansiReverseFgBlackBlue,ansiReverseFgBlackMagenta,ansiReverseFgBlackCyan,ansiReverseFgBlackWhite
-   syn region ansiBlackReverseFg	contained concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=30\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiBlackReverseFgGroup,ansiConceal
-   syn region ansiReverseFgBlackBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
+   syn region ansiBlackReverseFg	contained concealends	matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=30\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiBlackReverseFgGroup,ansiConceal
+   syn region ansiReverseFgBlackBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
    syn region ansiReverseFgBlackUnerline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
    syn region ansiReverseFgBlackDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
    syn region ansiReverseFgBlackBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3  contains=ansiConceal
@@ -1053,9 +1053,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgBlackWhite     	 ansiWhiteBlack
 
    syn cluster AnsiRedReverseFgGroup contains=ansiReverseFgRedBold,ansiReverseFgRedUnderline,ansiReverseFgRedDefault,ansiReverseFgRedBlack,ansiReverseFgRedRed,ansiReverseFgRedGreen,ansiReverseFgRedYellow,ansiReverseFgRedBlue,ansiReverseFgRedMagenta,ansiReverseFgRedCyan,ansiReverseFgRedWhite
-   syn region ansiRedReverseFg		contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=31\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiRedReverseFgGroup,ansiConceal
-   syn region ansiReverseFgRedBold      contained start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgRedUnderline contained start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiRedReverseFg		contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=31\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiRedReverseFgGroup,ansiConceal
+   syn region ansiReverseFgRedBold      contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgRedUnderline contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgRedDefault   contained start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgRedBlack     contained start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgRedRed       contained start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1078,9 +1078,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgRedWhite     	 ansiWhiteRed
 
    syn cluster AnsiGreenReverseFgGroup contains=ansiReverseFgGreenBold,ansiReverseFgGreenUnderline,ansiReverseFgGreenDefault,ansiReverseFgGreenBlack,ansiReverseFgGreenRed,ansiReverseFgGreenGreen,ansiReverseFgGreenYellow,ansiReverseFgGreenBlue,ansiReverseFgGreenMagenta,ansiReverseFgGreenCyan,ansiReverseFgGreenWhite
-   syn region ansiGreenReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=32\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiGreenReverseFgGroup,ansiConceal
-   syn region ansiReverseFgGreenBold      contained start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgGreenUnderline contained start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiGreenReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=32\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiGreenReverseFgGroup,ansiConceal
+   syn region ansiReverseFgGreenBold      contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgGreenUnderline contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgGreenDefault   contained start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgGreenBlack     contained start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgGreenRed       contained start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1103,9 +1103,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgGreenWhite     	 ansiWhiteGreen
 
    syn cluster AnsiYellowReverseFgGroup contains=ansiReverseFgYellowBold,ansiReverseFgYellowUnderline,ansiReverseFgYellowDefault,ansiReverseFgYellowBlack,ansiReverseFgYellowRed,ansiReverseFgYellowGreen,ansiReverseFgYellowYellow,ansiReverseFgYellowBlue,ansiReverseFgYellowMagenta,ansiReverseFgYellowCyan,ansiReverseFgYellowWhite
-   syn region ansiYellowReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=33\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiYellowReverseFgGroup,ansiConceal
-   syn region ansiReverseFgYellowBold	contained	start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgYellowUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiYellowReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=33\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiYellowReverseFgGroup,ansiConceal
+   syn region ansiReverseFgYellowBold	contained	start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgYellowUnderline	contained	start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgYellowDefault	contained	start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgYellowBlack	contained	start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgYellowRed	contained	start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1128,9 +1128,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgYellowWhite     	 ansiWhiteYellow
 
    syn cluster AnsiBlueReverseFgGroup contains=ansiReverseFgBlueBold,ansiReverseFgBlueUnderline,ansiReverseFgBlueDefault,ansiReverseFgBlueBlack,ansiReverseFgBlueRed,ansiReverseFgBlueGreen,ansiReverseFgBlueYellow,ansiReverseFgBlueBlue,ansiReverseFgBlueMagenta,ansiReverseFgBlueCyan,ansiReverseFgBlueWhite
-   syn region ansiBlueReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=34\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiBlueReverseFgGroup,ansiConceal
-   syn region ansiReverseFgBlueBold      contained start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgBlueUnderline contained start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiBlueReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=34\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiBlueReverseFgGroup,ansiConceal
+   syn region ansiReverseFgBlueBold      contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgBlueUnderline contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgBlueDefault   contained start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgBlueBlack     contained start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgBlueRed       contained start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1153,9 +1153,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgBlueWhite     	 ansiWhiteBlue
 
    syn cluster AnsiMagentaReverseFgGroup contains=ansiReverseFgMagentaBold,ansiReverseFgMagentaUnderline,ansiReverseFgMagentaDefault,ansiReverseFgMagentaBlack,ansiReverseFgMagentaRed,ansiReverseFgMagentaGreen,ansiReverseFgMagentaYellow,ansiReverseFgMagentaBlue,ansiReverseFgMagentaMagenta,ansiReverseFgMagentaCyan,ansiReverseFgMagentaWhite
-   syn region ansiMagentaReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=35\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiMagentaReverseFgGroup,ansiConceal
-   syn region ansiReverseFgMagentaBold      contained start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgMagentaUnderline contained start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiMagentaReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=35\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiMagentaReverseFgGroup,ansiConceal
+   syn region ansiReverseFgMagentaBold      contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgMagentaUnderline contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgMagentaDefault   contained start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgMagentaBlack     contained start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgMagentaRed       contained start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1178,9 +1178,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgMagentaWhite     	 ansiWhiteMagenta
 
    syn cluster AnsiCyanReverseFgGroup contains=ansiReverseFgCyanBold,ansiReverseFgCyanUnderline,ansiReverseFgCyanDefault,ansiReverseFgCyanBlack,ansiReverseFgCyanRed,ansiReverseFgCyanGreen,ansiReverseFgCyanYellow,ansiReverseFgCyanBlue,ansiReverseFgCyanMagenta,ansiReverseFgCyanCyan,ansiReverseFgCyanWhite
-   syn region ansiCyanReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=36\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiCyanReverseFgGroup,ansiConceal
-   syn region ansiReverseFgCyanBold      contained start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgCyanUnderline contained start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiCyanReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=36\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiCyanReverseFgGroup,ansiConceal
+   syn region ansiReverseFgCyanBold      contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgCyanUnderline contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgCyanDefault   contained start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgCyanBlack     contained start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgCyanRed       contained start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1203,9 +1203,9 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgCyanWhite     	 ansiWhiteCyan
 
    syn cluster AnsiWhiteReverseFgGroup contains=ansiReverseFgWhiteBold,ansiReverseFgWhiteUnderline,ansiReverseFgWhiteDefault,ansiReverseFgWhiteBlack,ansiReverseFgWhiteRed,ansiReverseFgWhiteGreen,ansiReverseFgWhiteYellow,ansiReverseFgWhiteBlue,ansiReverseFgWhiteMagenta,ansiReverseFgWhiteCyan,ansiReverseFgWhiteWhite
-   syn region ansiWhiteReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=37\%(;1\)\=m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=@AnsiWhiteReverseFgGroup,ansiConceal
-   syn region ansiReverseFgWhiteBold      contained start="\e\[1m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
-   syn region ansiReverseFgWhiteUnderline contained start="\e\[4m"  skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
+   syn region ansiWhiteReverseFg	contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=\%(1;\)\=37\%(;1\)\=m" skip='\e\[K' end="\e\[\%(0*;*\)\=39m\|\ze\e\[[03m]"  contains=@AnsiWhiteReverseFgGroup,ansiConceal
+   syn region ansiReverseFgWhiteBold      contained start="\e\[1m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m" contains=ansiConceal
+   syn region ansiReverseFgWhiteUnderline contained start="\e\[4m"  skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m" contains=ansiConceal
    syn region ansiReverseFgWhiteDefault   contained start="\e\[49m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgWhiteBlack     contained start="\e\[40m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
    syn region ansiReverseFgWhiteRed       contained start="\e\[41m" skip='\e\[K' end="\e\[[04m]"me=e-3 contains=ansiConceal
@@ -1228,8 +1228,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiReverseFgWhiteWhite     	 ansiWhiteWhite
 
    syn cluster AnsiReverseBoldGroup contains=ansiUnderlineReverseBoldRegion,ansiDefaultReverseBoldRegion,ansiBlackReverseBoldRegion,ansiWhiteReverseBoldRegion,ansiRedReverseBoldRegion,ansiGreenReverseBoldRegion,ansiYellowReverseBoldRegion,ansiBlueReverseBoldRegion,ansiMagentaReverseBoldRegion,ansiCyanReverseBoldRegion
-   syn region ansiReverseBoldRegion     contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=1;\=m" end="\ze\e\[\%(0\|22\)m" contains=@AnsiBoldGroup,ansiConceal
-   syn region ansiUnderlineReverseBoldRegion	contained start="\e\[4m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiReverseBoldRegion     contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=1;\=m" end="\ze\e\[\%(0*;*\)\=\%(0*\|22\)\=m" contains=@AnsiBoldGroup,ansiConceal
+   syn region ansiUnderlineReverseBoldRegion	contained start="\e\[4m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(24\|0*\)\=m"  contains=ansiConceal
    syn region ansiDefaultReverseBoldRegion	contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBlackReverseBoldRegion	contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiRedReverseBoldRegion	contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -1252,8 +1252,8 @@ fun! AnsiEsc#AnsiEsc(rebuild)
    hi link ansiWhiteReverseBoldRegion	ansiWhiteBold
 
    syn cluster AnsiReverseUnderlineGroup contains=ansiBoldReverseUnderlineRegion,ansiDefaultReverseUnderlineRegion,ansiBlackReverseUnderlineRegion,ansiWhiteReverseUnderlineRegion,ansiRedReverseUnderlineRegion,ansiGreenReverseUnderlineRegion,ansiYellowReverseUnderlineRegion,ansiBlueReverseUnderlineRegion,ansiMagentaReverseUnderlineRegion,ansiCyanReverseUnderlineRegion,ansiBgStop,ansiBoldStop
-   syn region ansiReverseUnderlineRegion contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=4;\=m" end="\ze\e\[\%(0\|24\)m" contains=@AnsiUnderlineGroup,ansiConceal
-   syn region ansiBoldReverseUnderlineRegion	contained start="\e\[1m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
+   syn region ansiReverseUnderlineRegion contained concealends matchgroup=ansiNone start="\e\[;\=0\{0,2};\=4;\=m" end="\ze\e\[\%(0*;*\)\=\%(0*\|24\)\=m" contains=@AnsiUnderlineGroup,ansiConceal
+   syn region ansiBoldReverseUnderlineRegion	contained start="\e\[1m" skip='\e\[K' end="\ze\e\[\%(0*;*\)\=\%(22\|0*\)\=m"  contains=ansiConceal
    syn region ansiDefaultReverseUnderlineRegion	contained start="\e\[39m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiBlackReverseUnderlineRegion	contained start="\e\[30m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
    syn region ansiRedReverseUnderlineRegion	contained start="\e\[31m" skip='\e\[K' end="\e\[[03m]"me=e-3  contains=ansiConceal
@@ -1291,86 +1291,86 @@ fun! AnsiEsc#AnsiEsc(rebuild)
   " ---------------------------------------------------------------------
   " Some Color Combinations: - can't do 'em all, the qty of highlighting groups is limited! {{{2
   " ---------------------------------------------------------------------
-  syn region ansiBlackDefault	start="\e\[0\{0,2};\=\(30;49\|49;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedDefault	start="\e\[0\{0,2};\=\(31;49\|49;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenDefault	start="\e\[0\{0,2};\=\(32;49\|49;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowDefault	start="\e\[0\{0,2};\=\(33;49\|49;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueDefault	start="\e\[0\{0,2};\=\(34;49\|49;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaDefault	start="\e\[0\{0,2};\=\(35;49\|49;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanDefault	start="\e\[0\{0,2};\=\(36;49\|49;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteDefault	start="\e\[0\{0,2};\=\(37;49\|49;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackDefault	start="\e\[0\{0,2};\=\(30;49\|49;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedDefault	start="\e\[0\{0,2};\=\(31;49\|49;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenDefault	start="\e\[0\{0,2};\=\(32;49\|49;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowDefault	start="\e\[0\{0,2};\=\(33;49\|49;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueDefault	start="\e\[0\{0,2};\=\(34;49\|49;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaDefault	start="\e\[0\{0,2};\=\(35;49\|49;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanDefault	start="\e\[0\{0,2};\=\(36;49\|49;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteDefault	start="\e\[0\{0,2};\=\(37;49\|49;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackBlack	start="\e\[0\{0,2};\=\(30;40\|40;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedBlack	start="\e\[0\{0,2};\=\(31;40\|40;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenBlack	start="\e\[0\{0,2};\=\(32;40\|40;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowBlack	start="\e\[0\{0,2};\=\(33;40\|40;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueBlack	start="\e\[0\{0,2};\=\(34;40\|40;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaBlack	start="\e\[0\{0,2};\=\(35;40\|40;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanBlack	start="\e\[0\{0,2};\=\(36;40\|40;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteBlack	start="\e\[0\{0,2};\=\(37;40\|40;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackBlack	start="\e\[0\{0,2};\=\(30;40\|40;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedBlack	start="\e\[0\{0,2};\=\(31;40\|40;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenBlack	start="\e\[0\{0,2};\=\(32;40\|40;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowBlack	start="\e\[0\{0,2};\=\(33;40\|40;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueBlack	start="\e\[0\{0,2};\=\(34;40\|40;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaBlack	start="\e\[0\{0,2};\=\(35;40\|40;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanBlack	start="\e\[0\{0,2};\=\(36;40\|40;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteBlack	start="\e\[0\{0,2};\=\(37;40\|40;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackRed	start="\e\[0\{0,2};\=\(30;41\|41;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedRed		start="\e\[0\{0,2};\=\(31;41\|41;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenRed	start="\e\[0\{0,2};\=\(32;41\|41;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowRed	start="\e\[0\{0,2};\=\(33;41\|41;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueRed	start="\e\[0\{0,2};\=\(34;41\|41;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaRed	start="\e\[0\{0,2};\=\(35;41\|41;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanRed	start="\e\[0\{0,2};\=\(36;41\|41;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteRed	start="\e\[0\{0,2};\=\(37;41\|41;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackRed	start="\e\[0\{0,2};\=\(30;41\|41;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedRed		start="\e\[0\{0,2};\=\(31;41\|41;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenRed	start="\e\[0\{0,2};\=\(32;41\|41;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowRed	start="\e\[0\{0,2};\=\(33;41\|41;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueRed	start="\e\[0\{0,2};\=\(34;41\|41;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaRed	start="\e\[0\{0,2};\=\(35;41\|41;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanRed	start="\e\[0\{0,2};\=\(36;41\|41;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteRed	start="\e\[0\{0,2};\=\(37;41\|41;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackGreen	start="\e\[0\{0,2};\=\(30;42\|42;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedGreen	start="\e\[0\{0,2};\=\(31;42\|42;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenGreen	start="\e\[0\{0,2};\=\(32;42\|42;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowGreen	start="\e\[0\{0,2};\=\(33;42\|42;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueGreen	start="\e\[0\{0,2};\=\(34;42\|42;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaGreen	start="\e\[0\{0,2};\=\(35;42\|42;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanGreen	start="\e\[0\{0,2};\=\(36;42\|42;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteGreen	start="\e\[0\{0,2};\=\(37;42\|42;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackGreen	start="\e\[0\{0,2};\=\(30;42\|42;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedGreen	start="\e\[0\{0,2};\=\(31;42\|42;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenGreen	start="\e\[0\{0,2};\=\(32;42\|42;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowGreen	start="\e\[0\{0,2};\=\(33;42\|42;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueGreen	start="\e\[0\{0,2};\=\(34;42\|42;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaGreen	start="\e\[0\{0,2};\=\(35;42\|42;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanGreen	start="\e\[0\{0,2};\=\(36;42\|42;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteGreen	start="\e\[0\{0,2};\=\(37;42\|42;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackYellow	start="\e\[0\{0,2};\=\(30;43\|43;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedYellow	start="\e\[0\{0,2};\=\(31;43\|43;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenYellow	start="\e\[0\{0,2};\=\(32;43\|43;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowYellow	start="\e\[0\{0,2};\=\(33;43\|43;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueYellow	start="\e\[0\{0,2};\=\(34;43\|43;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaYellow	start="\e\[0\{0,2};\=\(35;43\|43;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanYellow	start="\e\[0\{0,2};\=\(36;43\|43;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteYellow	start="\e\[0\{0,2};\=\(37;43\|43;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackYellow	start="\e\[0\{0,2};\=\(30;43\|43;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedYellow	start="\e\[0\{0,2};\=\(31;43\|43;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenYellow	start="\e\[0\{0,2};\=\(32;43\|43;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowYellow	start="\e\[0\{0,2};\=\(33;43\|43;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueYellow	start="\e\[0\{0,2};\=\(34;43\|43;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaYellow	start="\e\[0\{0,2};\=\(35;43\|43;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanYellow	start="\e\[0\{0,2};\=\(36;43\|43;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteYellow	start="\e\[0\{0,2};\=\(37;43\|43;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackBlue	start="\e\[0\{0,2};\=\(30;44\|44;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedBlue	start="\e\[0\{0,2};\=\(31;44\|44;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenBlue	start="\e\[0\{0,2};\=\(32;44\|44;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowBlue	start="\e\[0\{0,2};\=\(33;44\|44;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueBlue	start="\e\[0\{0,2};\=\(34;44\|44;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaBlue	start="\e\[0\{0,2};\=\(35;44\|44;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanBlue	start="\e\[0\{0,2};\=\(36;44\|44;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteBlue	start="\e\[0\{0,2};\=\(37;44\|44;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackBlue	start="\e\[0\{0,2};\=\(30;44\|44;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedBlue	start="\e\[0\{0,2};\=\(31;44\|44;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenBlue	start="\e\[0\{0,2};\=\(32;44\|44;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowBlue	start="\e\[0\{0,2};\=\(33;44\|44;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueBlue	start="\e\[0\{0,2};\=\(34;44\|44;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaBlue	start="\e\[0\{0,2};\=\(35;44\|44;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanBlue	start="\e\[0\{0,2};\=\(36;44\|44;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteBlue	start="\e\[0\{0,2};\=\(37;44\|44;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackMagenta	start="\e\[0\{0,2};\=\(30;45\|45;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedMagenta	start="\e\[0\{0,2};\=\(31;45\|45;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenMagenta	start="\e\[0\{0,2};\=\(32;45\|45;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowMagenta	start="\e\[0\{0,2};\=\(33;45\|45;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueMagenta	start="\e\[0\{0,2};\=\(34;45\|45;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaMagenta	start="\e\[0\{0,2};\=\(35;45\|45;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanMagenta	start="\e\[0\{0,2};\=\(36;45\|45;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteMagenta	start="\e\[0\{0,2};\=\(37;45\|45;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackMagenta	start="\e\[0\{0,2};\=\(30;45\|45;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedMagenta	start="\e\[0\{0,2};\=\(31;45\|45;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenMagenta	start="\e\[0\{0,2};\=\(32;45\|45;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowMagenta	start="\e\[0\{0,2};\=\(33;45\|45;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueMagenta	start="\e\[0\{0,2};\=\(34;45\|45;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaMagenta	start="\e\[0\{0,2};\=\(35;45\|45;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanMagenta	start="\e\[0\{0,2};\=\(36;45\|45;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteMagenta	start="\e\[0\{0,2};\=\(37;45\|45;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackCyan	start="\e\[0\{0,2};\=\(30;46\|46;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedCyan	start="\e\[0\{0,2};\=\(31;46\|46;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenCyan	start="\e\[0\{0,2};\=\(32;46\|46;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowCyan	start="\e\[0\{0,2};\=\(33;46\|46;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueCyan	start="\e\[0\{0,2};\=\(34;46\|46;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaCyan	start="\e\[0\{0,2};\=\(35;46\|46;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanCyan	start="\e\[0\{0,2};\=\(36;46\|46;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteCyan	start="\e\[0\{0,2};\=\(37;46\|46;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackCyan	start="\e\[0\{0,2};\=\(30;46\|46;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedCyan	start="\e\[0\{0,2};\=\(31;46\|46;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenCyan	start="\e\[0\{0,2};\=\(32;46\|46;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowCyan	start="\e\[0\{0,2};\=\(33;46\|46;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueCyan	start="\e\[0\{0,2};\=\(34;46\|46;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaCyan	start="\e\[0\{0,2};\=\(35;46\|46;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanCyan	start="\e\[0\{0,2};\=\(36;46\|46;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteCyan	start="\e\[0\{0,2};\=\(37;46\|46;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
-  syn region ansiBlackWhite	start="\e\[0\{0,2};\=\(30;47\|47;30\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiRedWhite	start="\e\[0\{0,2};\=\(31;47\|47;31\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiGreenWhite	start="\e\[0\{0,2};\=\(32;47\|47;32\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiYellowWhite	start="\e\[0\{0,2};\=\(33;47\|47;33\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiBlueWhite	start="\e\[0\{0,2};\=\(34;47\|47;34\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiMagentaWhite	start="\e\[0\{0,2};\=\(35;47\|47;35\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiCyanWhite	start="\e\[0\{0,2};\=\(36;47\|47;36\)m" end="\e\["me=e-2 contains=ansiConceal
-  syn region ansiWhiteWhite	start="\e\[0\{0,2};\=\(37;47\|47;37\)m" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlackWhite	start="\e\[0\{0,2};\=\(30;47\|47;30\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiRedWhite	start="\e\[0\{0,2};\=\(31;47\|47;31\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiGreenWhite	start="\e\[0\{0,2};\=\(32;47\|47;32\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiYellowWhite	start="\e\[0\{0,2};\=\(33;47\|47;33\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiBlueWhite	start="\e\[0\{0,2};\=\(34;47\|47;34\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiMagentaWhite	start="\e\[0\{0,2};\=\(35;47\|47;35\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiCyanWhite	start="\e\[0\{0,2};\=\(36;47\|47;36\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
+  syn region ansiWhiteWhite	start="\e\[0\{0,2};\=\(37;47\|47;37\)m" skip="\e\[K" end="\e\["me=e-2 contains=ansiConceal
 
   syn match ansiExtended	"\e\[;\=\(0;\)\=[34]8;\(\d*;\)*\d*m"   contains=ansiConceal
 
