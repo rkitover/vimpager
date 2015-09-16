@@ -307,7 +307,7 @@ function! s:GroupToAnsi(groupnum)
     unlet fg
   endif
 
-  if !exists('fg') && !groupnum == hlID('Normal')
+  if !exists('fg') && groupnum != hlID('Normal')
     let fg = synIDattr(hlID('Normal'), 'fg', s:type)
     if fg == "" || fg == -1
       unlet fg
