@@ -328,7 +328,7 @@ main() {
 	done
 
 	filename=${@:-stdin}
-	filename=$(echo "${filename}" | tr '/' '_')
+	filename=$(echo "${filename}" | tr '/[:space:]' '_')
 	filename="${tmp}/${filename}"
 
 	case $(echo "${@}" | tr 'A-Z' 'a-z') in
