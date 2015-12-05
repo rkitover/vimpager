@@ -3,6 +3,9 @@ function! vimpager#Init()
 
     nnoremap ,v :call <SID>LoadLess()<CR>
 
+    " disable surround plugin
+    let g:loaded_surround = 1
+
     let g:__save_hidden = &hidden
     set nohidden
     autocmd VimEnter * let &hidden = __save_hidden
