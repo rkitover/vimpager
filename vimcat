@@ -385,6 +385,10 @@ function! AnsiHighlight(output_file)
 
       let concealed = synconcealed(lnum, cnum)
 
+      if empty(concealed) " no conceal feature
+        let concealed = [0]
+      endif
+
       if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
         let last = synIDtrans(synID(lnum, cnum, 1))
         let output .= s:GroupToAnsi(last)
