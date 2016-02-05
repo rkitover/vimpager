@@ -111,6 +111,10 @@
         shift
         squeeze_blank_lines=1
         ;;
+      "-n")
+        shift
+        line_numbers=1
+        ;;
       "--")
         shift
         break
@@ -148,6 +152,10 @@
     extra_c='silent! echo'
   fi
 
+  if [ -z "${line_numbers}" ]; then
+    line_numbers=0
+  fi
+
   if [ "${#}" -eq 0 ]; then
     set -- -
   fi
@@ -183,9 +191,9 @@
         fi
 
         if [ -n "${vimcatrc}" ]; then
-          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark | syn on | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
 
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
@@ -358,8 +366,12 @@ function! s:GroupToAnsi(groupnum)
   return retv
 endfunction
 
-function! AnsiHighlight(output_file)
+function! AnsiHighlight(output_file, line_numbers)
   let retv = []
+
+  if a:line_numbers
+    let ln_field_len = len(line('$'))
+  endif
 
   for lnum in range(1, line('$'))
     let last = hlID('Normal')
@@ -405,6 +417,11 @@ function! AnsiHighlight(output_file)
             "let line = matchstr(line, '^\@<!.*')
       let cnum += 1
     endwhile
+
+    if a:line_numbers
+      let output = printf("\<Esc>[0m\<Esc>[37;1m%" . ln_field_len . "d ", lnum) . output
+    endif
+
     let retv += [output]
   endfor
   " Reset the colors to default after displaying the file

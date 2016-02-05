@@ -31,6 +31,10 @@ alias vimcat="vimcat -c 'set bg=light'"
 
 # COMMAND LINE OPTIONS
 
+## -n
+
+Display line numbers.
+
 ## -c cmd
 
 Run a vim command after opening the file. Multiple -c arguments are
