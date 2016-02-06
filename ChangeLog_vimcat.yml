@@ -1,0 +1,39 @@
+---
+# Revision history for vimcat from the vimpager project.
+# https://github.com/rkitover/vimpager
+
+2.06 2015-06-28:
+- Solaris compatibility fixes
+- remove array syntax for compatibility with more shells gh#118
+
+2.0 2015-04-29:
+- support multiple -c and --cmd options, as well as the -u option
+- support MSYS2
+
+1.8.9 2014-05-25:
+- security enhancements (snordhausen; Stefan Nordhausen) gh#78
+- exit on empty file instead of hanging (mapeiqi88) gh#80
+
+1.8.8 2014-04-07:
+- don't clobber user's PATH (mayersj1; Steve Mayer) gh#77
+
+1.8.3 2013-12-23:
+- manpage for vimcat available on github (aroig; Abdó Roig-Maranges)
+- add -c option for extra vim command (aroig; Abdó Roig-Maranges)
+- pass through if not on a tty (dfechner; Dustin Fechner)
+
+1.7.9 2013-02-10:
+- reset fg color if no fg color is set gh#56 (krijesta)
+- use '#!/usr/bin/env bash' as the shebang
+
+1.7.8 2012-12-31:
+- change shebang from /bin/sh to /bin/bash, as it's a bash script gh#53
+- use aixterm escapes for light non-bold colors (aroig; Abdó Roig-Maranges)
+- reads ~/.vimcatrc if it exist for config (aroig; Abdó Roig-Maranges)
+- disables writing to viminfo (aroig; Abdó Roig-Maranges)
+- allow vimcat to read from stdin (krijesta; Chris Chambers)
+
+1.7.7 2012-11-26:
+- Initial upload
+
+# vim: ft=yaml tw=0

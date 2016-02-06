@@ -1,0 +1,224 @@
+---
+# Revision history for vimpager from the vimpager project.
+# https://github.com/rkitover/vimpager
+
+2.06 2015-06-28:
+- more Solaris fixes
+- remove array syntax from vimcat gh#118
+
+2.05 2015-06-06:
+- minor AnsiEsc fixes
+
+2.04 2015-05-25:
+- fix Solaris regression
+
+2.03 2015-05-15:
+- use getpos('.') instead of getcurpos() in ansi retab script, some vims do not have getcurpos() gh#114
+- add ,v mapping to switch back and forth between less mode and editing mode gh#101
+- add ,h mapping for help gh#107
+
+2.02 2015-04-30:
+- fix gvim/mvim support broken in 2.0
+
+2.0 2015-04-29:
+- full support for ANSI highlighted text using bundled AnsiEsc
+- support MSYS2
+- experimental highlighting support for perl in perldocs by Magnus Woldrich
+- better detection of C man pages with highlighting
+- suppress errors about things that look like modelines
+- support for -- and safer opening of any file names
+- passthrough mode where text that is shorter than the terminal window is just printed is now the default and supports all highlighting
+- clean up mappings like 'h' that caused some people problems, we bundle our own less.vim now so this is easier
+- default to bg=dark when using terminal vim, this is helpful for people without vim configs since most people use a dark background but vim defaults to light
+- multiple -c and --cmd options are now supported, as well as the -u option
+
+1.8.9 2014-05-25:
+- security enhancements (snordhausen; Stefan Nordhausen) gh#78
+
+1.8.8 2014-04-07:
+- don't clobber user's PATH (mayersj1; Steve Mayer)  gh#77
+
+1.8.7 2014-03-10:
+- use more lines for fallback man page detection, misc. code cleanups (eworm-de; Christian Hesse)
+
+1.8.6 2014-02-22:
+- allow _vimrc on non-windows (mortonfox; Morton Fox)
+
+1.8.5 2014-02-12:
+- fix up arrow binding again, broken in 1.8.4
+
+1.8.4 2014-02-09:
+- disable help screen 'h' binding, cursor moves left instead gh#71
+
+1.8.3 2013-12-23:
+- reexec self under bash or ksh when available, especially on Solaris gh#63
+- add vim command -c option (aroig; Abdo Roig-Maranges)
+- allow ~/.vim/vimpagerrc as conf file (lucc; Lucas Hoffmann)
+
+1.8.2 2013-04-26:
+- better man page detection heuristics, when detection by process tree fails
+
+1.8.1 2013-04-15:
+- License under 2-clause BSD gh#59
+
+1.8.0 2013-03-20:
+- fix man detection on NetBSD (nonakap; NONAKA Kimihiro)
+
+1.7.8 2012-12-31:
+- set filetype for man pages correctly on FreeBSD (justinkb; Paul Mulders)
+
+1.7.7 2012-11-26:
+- fix screen flashing gh#46
+- fix q with visual selection gh#45
+- support for +G or + command line option to start at the end of the file (vincer; Vince Rosso)
+
+1.7.6 2012-11-13:
+- support /usr/local/etc/vimpagerrc and /etc/vimpagerrc, read after user's .vimrc
+- fix for .vimrc paths with spaces gh#49
+- support compressed file extensions case-insensitively
+
+1.7.5 2012-09-29:
+- set nocp with -u, fixes Pathogen compatibility gh#40
+- delete temp directory if file is zero length
+- remove .gz/.Z suffixes on temp files for compressed files
+- support global config file /etc/vimpagerrc (eworm-de; Christian Hesse)
+
+1.7.4 2012-09-19:
+- improve $VIM detection for Win32 (cygwin/msys)
+
+1.7.3 2012-09-15:
+- fix usage without a vimrc gh#38 broken in 1.7.2
+
+1.7.2 2012-09-13:
+- passthrough option for small text (Wei Dai)
+- major code refactor and cleanup
+
+1.7.1 2012-07-23:
+- fix arrow keys (Adam Lickel)
+
+1.7.0 2012-06-25:
+- make sure plugins don't override q gh#34
+- attempt fix for OpenBSD ps gh#33
+
+1.6.9 2012-06-19:
+- stop sourcing vimrc/gvimrc twice (Dave Goodell)
+
+1.6.8 2012-04-11:
+- fix scrolloff and custom scrolloff setting gh#30
+- safe mode for temp directory (Anselm Strauss)
+- turn off relative line numbers (Simon Olofsson and Anisse Astier)
+
+1.6.7 2012-01-29:
+- more intuitive arrow key behavior (patch by Iftekharul Haque)
+- add vimpager_ptree variable to hold the process tree (patch by Wei Dai)
+
+1.6.6 2012-01-10:
+- fix malformed utf8 warnings
+
+1.6.5 2012-01-10:
+- fix "col; illegal byte sequence" errors
+
+1.6.4 2011-12-31:
+- configurable scrolloff by Peter Fern
+
+1.6.3 2011-12-09:
+- fix zero length check on cygwin
+
+1.6.2 2011-11-28:
+- Pathogen compatibility
+- slightly faster startup
+
+1.6.1 2011-11-22:
+- only source .vimrc if it exists
+
+1.6.0 2011-11-18:
+- work around broken sed on OSX by using col -b if available
+
+1.5.9 2011-11-17:
+- remove -X by default gh#19
+
+1.5.8 2011-11-13:
+- re-source vimrc/gvimrc after less.vim to preserve user highlights and mappings
+
+1.5.7 2011-07-25:
+- remove mouse=h to allow mouse scrolling
+
+1.5.6 2011-07-17:
+- fix for filenames with spaces by Damien Pollet
+
+1.5.5 2011-06-30:
+- remove --noplugin
+- better gvimrc detection on cygwin
+
+1.5.4 2011-06-24:
+- support ~/.vimpagerrc and VIMPAGER_RC
+
+1.5.3 2011-06-23:
+- exit immediately for zero length files
+
+1.5.2 2011-06-05:
+- turn off terminal reset on OSX
+
+1.5.1 2011-05-22:
+- better msys support
+
+1.5.0 2011-05-07:
+- set scrolloff-5
+
+1.4.9 2011-05-01:
+- trap more signals for temp file removal
+- clear terminal on OSX only for terminal vim
+
+1.4.8 2011-04-22:
+- fix compatibility with Cygwin
+- fix compatibility with Windows gvim in Cygwin and msys
+- detect ssh session on OSX and Cygwin
+- remove "Input not from a terminal" warning entirely
+
+1.4.7 2011-04-15:
+- fix some "input not from terminal" warnings
+- fix for invocations on files not in current directory
+
+1.4.6 2011-04-11:
+- MacVim support
+- override GUI colors from .gvimrc
+- fix syntax highlighting for files opened directly
+- reset terminal on completion
+
+1.4.5 2011-04-08:
+- fixes for Mac OSX
+- -X option to speed up startup (jdevera)
+
+1.4.4 2011-03-21:
+- .vimrc option let vimpager_use_gvim = 1 to use gvim as the pager window
+
+1.4.3 2011-03-20:
+- Support for .Z and .gz files
+
+1.4.2 2011-03-20:
+- Extensive rewrite using awk for real Solaris compatibility by Wout Mertens.
+- Filter ANSI color codes and backspaces for all pager invocations gh#2
+
+1.4 2011-01-07:
+- fix for python2 docs on archlinux from Ivan S. Freitas
+
+1.3 2010-05-17:
+- added 'set nonu'
+
+1.2 2010-04-30:
+- fix for FreeBSD
+- add esc-u mapping to turn off hlsearch
+
+1.1 2009-05-22:
+- Fix bug where it wouldn't move on searches at launch without moving the cursor first
+
+1.0 2009-05-21:
+- Fix for perldoc on Cygwin
+
+0.9 2009-05-19:
+- Fix for filenames with spaces.
+
+0.8 2009-03-27:
+- Turn off folds (correctly this time.)
+
+# vim: ft=yaml tw=0
