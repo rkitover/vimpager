@@ -292,8 +292,15 @@ main() {
 	# Couldn't use getopt or getopts as neither supports options prepended with +
 	while [ $# -gt 0 ] ; do
 	        case "$1" in
-	                "+G"|"+") vim_cmd="${vim_cmd} +"; shift ;;
-			"-c")
+	                '+G'|'+')
+				vim_cmd="${vim_cmd} +";
+				shift
+				;;
+			'-N'|'--LINE-NUMBERS')
+				line_numbers=1
+				shift
+				;;
+			'-c')
 				shift
 				if [ -z "${extra_c}" ]; then
 					extra_c="${1}"
@@ -302,7 +309,7 @@ main() {
 				fi
 				shift
 				;;
-			"--cmd")
+			'--cmd')
 				shift
 				if [ -z "${extra_cmd}" ]; then
 					extra_cmd="${1}"
@@ -311,16 +318,16 @@ main() {
 				fi
 				shift
 				;;
-			"-u")
+			'-u')
 				shift
 				vimrc="${1}"
 				shift
 				;;
-			"-s") # Ubuntu man passes this option to /usr/bin/pager
+			'-s') # Ubuntu man passes this option to /usr/bin/pager
 				shift
 				squeeze_blank_lines=1
 				;;
-			"--") shift; break ;;
+			'--') shift; break ;;
 			-*) echo "${0}: bad option '${1}'" ; exit 1 ;;
 			*) break ;;
 	         esac
@@ -551,6 +558,12 @@ vim_less() {
 		return
 	fi
 
+	init_opts=''
+
+	if [ -n "${line_numbers}" ]; then
+		init_opts="${init_opts} 'line_numbers': ${line_numbers} "
+	fi
+
 	# escape any :h expand vim special chars in filename
 	escaped_filename=$(printf '%s\n' ${filename} | sed -e 's/\([#%<>]\)/\\\1/g')
 
@@ -563,7 +576,7 @@ vim_less() {
 			${vim_cmd} -N \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
-				--cmd 'call vimpager#Init()' \
+				--cmd "call vimpager#Init({ ${init_opts} })" \
 				-c "${ansi_command}" \
 				-c "args ${escaped_filename}" \
 				-c "silent! e ${escaped_filename}" \
@@ -588,7 +601,7 @@ vim_less() {
 			${vim_cmd} -N \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
-				--cmd 'call vimpager#Init()' \
+				--cmd "call vimpager#Init({ ${init_opts} })" \
 				-c "${ansi_command}" \
 				-c "${colors:-echo} | ${restore:-echo} | set lines=${lines} | set columns=${cols}" \
 				-c "args ${escaped_filename}" \
@@ -7050,75 +7063,78 @@ EOF
 vimpager_vim() {
 	(cat <<'EOF') | do_uudecode > vimpager.vim
 begin 644 src/vimpager.vim
-M9G5N8W1I;VXA('9I;7!A9V5R(TEN:70H*0H@("`@8V%L;"!S.E-E=$]P=&EO
-M;G,H*0H*("`@(&EF(&<Z;&5S<RYE;F%B;&5D"B`@("`@("`@875T;V-M9"!6
-M:6U%;G1E<B`J(')U;G1I;64@;6%C<F]S+VQE<W,N=FEM"B`@("!E;F1I9@H*
-M("`@(&YN;W)E;6%P("QV(#IC86QL(#Q3240^3&]A9$QE<W,H*3Q#4CX*"B`@
-M("!L970@9SI?7W-A=F5?:&ED9&5N(#T@)FAI9&1E;@H@("`@<V5T(&YO:&ED
-M9&5N"B`@("!A=71O8VUD(%9I;45N=&5R("H@;&5T("9H:61D96X@/2!?7W-A
-M=F5?:&ED9&5N"@H@("`@875T;V-M9"!"=69.97=&:6QE+$)U9E)E8610;W-T
-M("H@<V5T(&)U9G1Y<&4];F]F:6QE(&UO9&EF:6%B;&4@;F]R96%D;VYL>0H*
-M("`@(&%U=&]C;60@5FEM16YT97(@*B!C86QL(&-U<G-O<B@Q+"`Q*0H*("`@
-M('-E="!B9SUD87)K"B`@("!S>6YT87@@;VX*96YD9G5N8W1I;VX*"F9U;F-T
-M:6]N(2!S.E-E=$]P=&EO;G,H*0H@("`@:68@(65X:7-T<R@G9SIV:6UP86=E
-M<B<I"B`@("`@("`@;&5T(&<Z=FEM<&%G97(@/2![?0H@("`@96YD:68*"B`@
-M("!L970@9SIV:6UP86=E<BYE;F%B;&5D(#T@,0H*("`@(&EF("%E>&ES=',H
-M)V<Z;&5S<R<I"B`@("`@("`@;&5T(&<Z;&5S<R`]('M]"B`@("!E;F1I9@H*
-M("`@(&EF("%E>&ES=',H)V<Z;&5S<RYE;F%B;&5D)RD*("`@("`@("!I9B!E
-M>&ES=',H)V<Z=FEM<&%G97)?;&5S<U]M;V1E)RD*("`@("`@("`@("`@;&5T
-M(&<Z;&5S<RYE;F%B;&5D(#T@9SIV:6UP86=E<E]L97-S7VUO9&4*("`@("`@
-M("!E;'-E"B`@("`@("`@("`@(&QE="!G.FQE<W,N96YA8FQE9"`](#$*("`@
-M("`@("!E;F1I9@H@("`@96YD:68*"B`@("!I9B`A97AI<W1S*"=G.FQE<W,N
-M<V-R;VQL;V9F)RD*("`@("`@("!I9B!E>&ES=',H)V<Z=FEM<&%G97(N<V-R
-M;VQL;V9F)RD*("`@("`@("`@("`@9SIL97-S+G-C<F]L;&]F9B`](&<Z=FEM
-M<&%G97(N<V-R;VQL;V9F"B`@("`@("`@96QS96EF(&5X:7-T<R@G9SIV:6UP
-M86=E<E]S8W)O;&QO9F8G*0H@("`@("`@("`@("!G.FQE<W,N<V-R;VQL;V9F
-M(#T@9SIV:6UP86=E<E]S8W)O;&QO9F8*("`@("`@("!E;F1I9@H@("`@96YD
-M:68*"B`@("`B(&1I<V%B;&4@<W5R<F]U;F0@<&QU9VEN"B`@("!L970@9SIL
-M;V%D961?<W5R<F]U;F0@/2`Q"F5N9&9U;F-T:6]N"@IF=6YC=&EO;B$@<SI,
-M;V%D3&5S<R@I"B`@("!L970@:G5M<"`](#4*("`@(&EF(&5X:7-T<R@G9SIL
-M97-S+G-C<F]L;&]F9B<I"B`@("`@("`@;&5T(&IU;7`@/2!G.FQE<W,N<V-R
-M;VQL;V9F"B`@("!E;F1I9@H*("`@(&QE="!C=7)P;W,@/2!G971P;W,H)RXG
-M*0H*("`@(&EF('=I;FQI;F4H*2`\(&IU;7`*("`@("`@("!C86QL('-E='!O
-M<R@G+B<L(%MC=7)P;W-;,%TL(&-U<G!O<ULQ72`K("AJ=6UP("T@=VEN;&EN
-M92@I*2`K(#$L(&-U<G!O<ULR72P@8W5R<&]S6S-=72D*("`@(&5L<V5I9B`H
-M=VEN:&5I9VAT*#`I("T@=VEN;&EN92@I*2`\(&IU;7`*("`@("`@("!C86QL
-M('-E='!O<R@G+B<L(%MC=7)P;W-;,%TL(&-U<G!O<ULQ72`M("AJ=6UP("T@
-M*'=I;FAE:6=H="@P*2`M('=I;FQI;F4H*2DI("T@,2`L(&-U<G!O<ULR72P@
-M8W5R<&]S6S-=72D*("`@(&5N9&EF"@H@("`@<G5N=&EM92!M86-R;W,O;&5S
-M<RYV:6T*"B`@("!R961R87<*("`@(&5C:&]M<V<@)TQE<W,@36]D92!%;F%B
-M;&5D)PIE;F1F=6YC=&EO;@H*9G5N8W1I;VXA('9I;7!A9V5R(U-E='5P06YS
-M:45S8R@I"B`@("!A=71O8VUD(%9I;45N=&5R("H@8V%L;"!S.D1O06YS:45S
-M8R@I"F5N9&9U;F-T:6]N"@IF=6YC=&EO;B$@<SI$;T%N<VE%<V,H*0H@("`@
-M06YS:45S8PH@("`@8V%L;"!S.D-O;F-E86Q2971A8B@I"B`@("!C86QL(',Z
-M0VAE8VM-;V1E;&EN949I;&5T>7!E*"D*96YD9G5N8W1I;VX*"F9U;F-T:6]N
-M(2!S.D-O;F-E86Q2971A8B@I"B`@("!L970@8W5R<F5N=%]C=7)S;W(@/2!G
-M971P;W,H)RXG*0H*("`@(&-A;&P@8W5R<V]R*#$L,2D*"B`@("!L970@;&YU
-M;2`]('-E87)C:"@G7'0G*0H*("`@('=H:6QE(&QN=6T@(3TC(#`*("`@("`@
-M("!L970@;F5W;&EN92`]("<G"B`@("`@("`@;&5T(&-O;'5M;B`@/2`P"B`@
-M("`@("`@;&5T(&QI;F5P;W,@/2`Q"@EL970@;&EN92`@("`](&=E=&QI;F4H
-M)RXG*0H*("`@("`@("!W:&EL92!L:6YE<&]S(#P](R!L96XH;&EN92D*("`@
-M("`@("`@("`@:68@;&EN95ML:6YE<&]S+3%=(#T](R`B7'0B"B`@("`@("`@
-M("`@("`@("!L970@<W!A8V5S("`@/2`X("T@*&-O;'5M;B`E(#@I"B`@("`@
-M("`@("`@("`@("!L970@8V]L=6UN("`K/2!S<&%C97,*"B`@("`@("`@("`@
-M("`@("!L970@;F5W;&EN92`N/2!R97!E870H)R`G+"!S<&%C97,I"B`@("`@
-M("`@("`@(&5L<V4*("`@("`@("`@("`@("`@(&QE="!C;VYC96%L960@/2!S
-M>6YC;VYC96%L960H;&YU;2P@;&EN97!O<RD*"B`@("`@("`@("`@("`@("!I
-M9B!C;VYC96%L961;,%T@/3TC(#`@?'P@*&-O;F-E86QE9%LQ72`A/2,@)R<@
-M)B8@*"9C;VYC96%L;&5V96P@/3TC(#$@?'P@)F-O;F-E86QL979E;"`]/2,@
-M,BDI"B`@("`@("`@("`@("`@("`@("`@;&5T(&-O;'5M;B`K/2`Q"B`@("`@
-M("`@("`@("`@("!E;F1I9@H*("`@("`@("`@("`@("`@(&QE="!N97=L:6YE
-M("X](&QI;F5;;&EN97!O<RTQ70H@("`@("`@("`@("!E;F1I9@H*("`@("`@
-M("`@("`@;&5T(&QI;F5P;W,@*ST@,0H@("`@("`@(&5N9'=H:6QE"@H@("`@
-M("`@(&-A;&P@<V5T;&EN92AL;G5M+"!N97=L:6YE*0H*("`@("`@("!L970@
-M;&YU;2`]('-E87)C:"@G7'0G*0H@("`@96YD=VAI;&4*"B`@("!C86QL('-E
-M='!O<R@G+B<L(&-U<G)E;G1?8W5R<V]R*0IE;F1F=6YC=&EO;@H*9G5N8W1I
-M;VXA(',Z0VAE8VM-;V1E;&EN949I;&5T>7!E*"D*"7)E9&ER(#T^(&9T7W-E
-M=%]F<F]M"@D@("`@<VEL96YT(2!V97)B('-E="!F=`H)("`@('-I;&5N="$@
-M=F5R8B!S970@<WEN=&%X"@ER961I<B!%3D0*"@EI9B!F=%]S971?9G)O;2`]
-M?B,@)TQA<W0@<V5T(&9R;VT@;6]D96QI;F5</B<*"2`@("!E>&5C=71E("=S
-M971L;V-A;"!F=#TG("X@)F9T"@D@("`@97AE8W5T92`G<V5T;&]C86P@<WEN
-C=&%X/2<@+B`F<WEN=&%X"@EE;F1I9@IE;F1F=6YC=&EO;@H`
+M9G5N8W1I;VXA('9I;7!A9V5R(TEN:70H;W!T<RD*("`@(&-A;&P@<SI3971/
+M<'1I;VYS*&$Z;W!T<RD*"B`@("!I9B!G.FQE<W,N96YA8FQE9`H@("`@("`@
+M(&%U=&]C;60@5FEM16YT97(@*B!R=6YT:6UE(&UA8W)O<R]L97-S+G9I;0H@
+M("`@96YD:68*"B`@("!N;F]R96UA<"`L=B`Z8V%L;"`\4TE$/DQO861,97-S
+M*"D\0U(^"@H@("`@;&5T(&<Z7U]S879E7VAI9&1E;B`]("9H:61D96X*("`@
+M('-E="!N;VAI9&1E;@H@("`@875T;V-M9"!6:6U%;G1E<B`J(&QE="`F:&ED
+M9&5N(#T@7U]S879E7VAI9&1E;@H*("`@(&%U=&]C;60@0G5F3F5W1FEL92Q"
+M=69296%D4&]S="`J('-E="!B=69T>7!E/6YO9FEL92!M;V1I9FEA8FQE(&YO
+M<F5A9&]N;'D*"B`@("!A=71O8VUD(%9I;45N=&5R("H@8V%L;"!C=7)S;W(H
+M,2P@,2D*"B`@("!S970@8F<]9&%R:PH@("`@<WEN=&%X(&]N"F5N9&9U;F-T
+M:6]N"@IF=6YC=&EO;B$@<SI3971/<'1I;VYS*&]P=',I"B`@("!I9B`A97AI
+M<W1S*"=G.G9I;7!A9V5R)RD*("`@("`@("!L970@9SIV:6UP86=E<B`]('M]
+M"B`@("!E;F1I9@H*("`@(&QE="!G.G9I;7!A9V5R+F5N86)L960@/2`Q"@H@
+M("`@:68@(65X:7-T<R@G9SIL97-S)RD*("`@("`@("!L970@9SIL97-S(#T@
+M>WT*("`@(&5N9&EF"@H@("`@:68@(65X:7-T<R@G9SIL97-S+F5N86)L960G
+M*0H@("`@("`@(&EF(&5X:7-T<R@G9SIV:6UP86=E<E]L97-S7VUO9&4G*0H@
+M("`@("`@("`@("!L970@9SIL97-S+F5N86)L960@/2!G.G9I;7!A9V5R7VQE
+M<W-?;6]D90H@("`@("`@(&5L<V4*("`@("`@("`@("`@;&5T(&<Z;&5S<RYE
+M;F%B;&5D(#T@,0H@("`@("`@(&5N9&EF"B`@("!E;F1I9@H*("`@(&EF("%E
+M>&ES=',H)V<Z;&5S<RYS8W)O;&QO9F8G*0H@("`@("`@(&EF(&5X:7-T<R@G
+M9SIV:6UP86=E<BYS8W)O;&QO9F8G*0H@("`@("`@("`@("!G.FQE<W,N<V-R
+M;VQL;V9F(#T@9SIV:6UP86=E<BYS8W)O;&QO9F8*("`@("`@("!E;'-E:68@
+M97AI<W1S*"=G.G9I;7!A9V5R7W-C<F]L;&]F9B<I"B`@("`@("`@("`@(&<Z
+M;&5S<RYS8W)O;&QO9F8@/2!G.G9I;7!A9V5R7W-C<F]L;&]F9@H@("`@("`@
+M(&5N9&EF"B`@("!E;F1I9@H*("`@("(@<')O8V5S<R!O<'1I;VYS"B`@("!I
+M9B!E>&ES=',H)V$Z;W!T<RYL:6YE7VYU;6)E<G,G*0H@("`@("`@(&QE="!G
+M.FQE<W,N;G5M8F5R(#T@83IO<'1S+FQI;F5?;G5M8F5R<PH@("`@96YD:68*
+M"B`@("`B(&1I<V%B;&4@<W5R<F]U;F0@<&QU9VEN"B`@("!L970@9SIL;V%D
+M961?<W5R<F]U;F0@/2`Q"F5N9&9U;F-T:6]N"@IF=6YC=&EO;B$@<SI,;V%D
+M3&5S<R@I"B`@("!L970@:G5M<"`](#4*("`@(&EF(&5X:7-T<R@G9SIL97-S
+M+G-C<F]L;&]F9B<I"B`@("`@("`@;&5T(&IU;7`@/2!G.FQE<W,N<V-R;VQL
+M;V9F"B`@("!E;F1I9@H*("`@(&QE="!C=7)P;W,@/2!G971P;W,H)RXG*0H*
+M("`@(&EF('=I;FQI;F4H*2`\(&IU;7`*("`@("`@("!C86QL('-E='!O<R@G
+M+B<L(%MC=7)P;W-;,%TL(&-U<G!O<ULQ72`K("AJ=6UP("T@=VEN;&EN92@I
+M*2`K(#$L(&-U<G!O<ULR72P@8W5R<&]S6S-=72D*("`@(&5L<V5I9B`H=VEN
+M:&5I9VAT*#`I("T@=VEN;&EN92@I*2`\(&IU;7`*("`@("`@("!C86QL('-E
+M='!O<R@G+B<L(%MC=7)P;W-;,%TL(&-U<G!O<ULQ72`M("AJ=6UP("T@*'=I
+M;FAE:6=H="@P*2`M('=I;FQI;F4H*2DI("T@,2`L(&-U<G!O<ULR72P@8W5R
+M<&]S6S-=72D*("`@(&5N9&EF"@H@("`@<G5N=&EM92!M86-R;W,O;&5S<RYV
+M:6T*"B`@("!R961R87<*("`@(&5C:&]M<V<@)TQE<W,@36]D92!%;F%B;&5D
+M)PIE;F1F=6YC=&EO;@H*9G5N8W1I;VXA('9I;7!A9V5R(U-E='5P06YS:45S
+M8R@I"B`@("!A=71O8VUD(%9I;45N=&5R("H@8V%L;"!S.D1O06YS:45S8R@I
+M"F5N9&9U;F-T:6]N"@IF=6YC=&EO;B$@<SI$;T%N<VE%<V,H*0H@("`@06YS
+M:45S8PH@("`@8V%L;"!S.D-O;F-E86Q2971A8B@I"B`@("!C86QL(',Z0VAE
+M8VM-;V1E;&EN949I;&5T>7!E*"D*96YD9G5N8W1I;VX*"F9U;F-T:6]N(2!S
+M.D-O;F-E86Q2971A8B@I"B`@("!L970@8W5R<F5N=%]C=7)S;W(@/2!G971P
+M;W,H)RXG*0H*("`@(&-A;&P@8W5R<V]R*#$L,2D*"B`@("!L970@;&YU;2`]
+M('-E87)C:"@G7'0G*0H*("`@('=H:6QE(&QN=6T@(3TC(#`*("`@("`@("!L
+M970@;F5W;&EN92`]("<G"B`@("`@("`@;&5T(&-O;'5M;B`@/2`P"B`@("`@
+M("`@;&5T(&QI;F5P;W,@/2`Q"@EL970@;&EN92`@("`](&=E=&QI;F4H)RXG
+M*0H*("`@("`@("!W:&EL92!L:6YE<&]S(#P](R!L96XH;&EN92D*("`@("`@
+M("`@("`@:68@;&EN95ML:6YE<&]S+3%=(#T](R`B7'0B"B`@("`@("`@("`@
+M("`@("!L970@<W!A8V5S("`@/2`X("T@*&-O;'5M;B`E(#@I"B`@("`@("`@
+M("`@("`@("!L970@8V]L=6UN("`K/2!S<&%C97,*"B`@("`@("`@("`@("`@
+M("!L970@;F5W;&EN92`N/2!R97!E870H)R`G+"!S<&%C97,I"B`@("`@("`@
+M("`@(&5L<V4*("`@("`@("`@("`@("`@(&QE="!C;VYC96%L960@/2!S>6YC
+M;VYC96%L960H;&YU;2P@;&EN97!O<RD*"B`@("`@("`@("`@("`@("!I9B!C
+M;VYC96%L961;,%T@/3TC(#`@?'P@*&-O;F-E86QE9%LQ72`A/2,@)R<@)B8@
+M*"9C;VYC96%L;&5V96P@/3TC(#$@?'P@)F-O;F-E86QL979E;"`]/2,@,BDI
+M"B`@("`@("`@("`@("`@("`@("`@;&5T(&-O;'5M;B`K/2`Q"B`@("`@("`@
+M("`@("`@("!E;F1I9@H*("`@("`@("`@("`@("`@(&QE="!N97=L:6YE("X]
+M(&QI;F5;;&EN97!O<RTQ70H@("`@("`@("`@("!E;F1I9@H*("`@("`@("`@
+M("`@;&5T(&QI;F5P;W,@*ST@,0H@("`@("`@(&5N9'=H:6QE"@H@("`@("`@
+M(&-A;&P@<V5T;&EN92AL;G5M+"!N97=L:6YE*0H*("`@("`@("!L970@;&YU
+M;2`]('-E87)C:"@G7'0G*0H@("`@96YD=VAI;&4*"B`@("!C86QL('-E='!O
+M<R@G+B<L(&-U<G)E;G1?8W5R<V]R*0IE;F1F=6YC=&EO;@H*9G5N8W1I;VXA
+M(',Z0VAE8VM-;V1E;&EN949I;&5T>7!E*"D*"7)E9&ER(#T^(&9T7W-E=%]F
+M<F]M"@D@("`@<VEL96YT(2!V97)B('-E="!F=`H)("`@('-I;&5N="$@=F5R
+M8B!S970@<WEN=&%X"@ER961I<B!%3D0*"@EI9B!F=%]S971?9G)O;2`]?B,@
+M)TQA<W0@<V5T(&9R;VT@;6]D96QI;F5</B<*"2`@("!E>&5C=71E("=S971L
+M;V-A;"!F=#TG("X@)F9T"@D@("`@97AE8W5T92`G<V5T;&]C86P@<WEN=&%X
+@/2<@+B`F<WEN=&%X"@EE;F1I9@IE;F1F=6YC=&EO;@H`
 `
 end
 EOF

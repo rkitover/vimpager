@@ -1,5 +1,5 @@
-function! vimpager#Init()
-    call s:SetOptions()
+function! vimpager#Init(opts)
+    call s:SetOptions(a:opts)
 
     if g:less.enabled
         autocmd VimEnter * runtime macros/less.vim
@@ -19,7 +19,7 @@ function! vimpager#Init()
     syntax on
 endfunction
 
-function! s:SetOptions()
+function! s:SetOptions(opts)
     if !exists('g:vimpager')
         let g:vimpager = {}
     endif
@@ -44,6 +44,11 @@ function! s:SetOptions()
         elseif exists('g:vimpager_scrolloff')
             g:less.scrolloff = g:vimpager_scrolloff
         endif
+    endif
+
+    " process options
+    if exists('a:opts.line_numbers')
+        let g:less.number = a:opts.line_numbers
     endif
 
     " disable surround plugin

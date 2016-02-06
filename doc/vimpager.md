@@ -135,6 +135,15 @@ let g:vimpager.passthrough = 0
 
 See "PASSTHROUGH MODE" further down.
 
+To turn on line numbers set:
+
+```vim
+let g:less.number = 1
+```
+
+they are turned off by default. You can also invoke vimpager with the `-N`
+option to turn on line numbers.
+
 To start vim with -X (no x11 connection, a bit faster startup) put the following
 into your .vimrc/vimpagerrc:
 
@@ -180,6 +189,10 @@ details.
 ## + | +G
 
 Start at the end of the file, just like less.
+
+## -N | --LINE-NUMBERS
+
+Turn on line numbers, this can also be set with `let g:less.number = 1` .
 
 ## -c cmd
 

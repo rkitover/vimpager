@@ -2,7 +2,8 @@
 # Revision history for vimpager from the vimpager project.
 # https://github.com/rkitover/vimpager
 
-- refactor option naming and processing (fully backward compatible)
+- refactor option naming and processing (almost fully backward compatible)
+- add -N or --LINE-NUMBERS option for line numbers gh#136
 
 2.06 2015-06-28:
 - more Solaris fixes
