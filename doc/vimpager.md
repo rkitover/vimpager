@@ -1,6 +1,6 @@
 % VIMPAGER(1) vimpager user manual
 % Rafael Kitover <rkitover@gmail.com>
-% August 4, 2015
+% February 6, 2015
 
 # NAME
 
@@ -129,6 +129,8 @@ into your .vimrc/vimpagerrc:
 let g:vimpager_disable_x11 = 1
 ```
 
+**NOTE:** this may disable clipboard integration in X terminals.
+
 The scroll offset (:help scrolloff), may be specified by placing the 
 following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
@@ -234,6 +236,15 @@ To turn off AnsiEsc on the commandline, use an invocation such as the following:
 ```sh
 vimpager -c 'au VimEnter * exe "setlocal syntax=".&syntax' somefile
 ```
+
+**NOTE:** The `conceal` feature of vim is still very buggy, especially as
+concerns spacing, and the line wrapping in files highlighted with `AnsiEsc`
+will not be correct (they are wrapped too soon.) The tab stops will be correct
+however, this is fixed up with a vim script.
+
+**NOTE:** `AnsiEsc` is a work in progress, and will only display files with
+simple ANSI codes correctly, such as that output by git tools. More complex
+highlighting is likely not going to work right now. We are working on this.
 
 # PASSTHROUGH MODE
 

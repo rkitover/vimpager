@@ -1,6 +1,6 @@
 % VIMCAT(1) vimcat user manual
 % Abdó Roig-Maranges <abdo.roig@gmail.com>
-% August 4, 2015
+% February 6, 2016
 
 # NAME
 
