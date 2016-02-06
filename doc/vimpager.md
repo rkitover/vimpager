@@ -91,14 +91,27 @@ less for the most part:
 To disable loading plugins, put "set noloadplugins" into a vimpagerrc
 file.
 
-You can also switch on the "vimpager" variable in your vimrc to set alternate
-settings for vimpager.
+You can also switch on `exists('g:vimpager.enabled')` in your vimrc to set
+alternate settings for vimpager.
+
+**WARNING:** Option names have changed from the previous releases to use a
+dict, if you use the old option names and check on `exists('g:vimpager')`
+everything will work the same way, if you use the new option names you must
+check `exists('g:vimpager.enabled')` instead.
+
+**NOTE:** Before setting the vimpager and less.vim related options described
+below, make sure the `g:vimpager` and `g:less` dicts exist like so:
+
+```vim
+let g:vimpager = {}
+let g:less     = {}
+```
 
 If you want to disable less compatibility mode, and use regular vim
 motion commands, put this into your .vimrc/vimpagerrc:
 
 ```vim
-let g:vimpager_less_mode = 0
+let g:less.enabled = 0
 ```
 
 You can still enable less mode with this setting by pressing ",v".
@@ -110,14 +123,14 @@ Put the following into your .vimrc/vimpagerrc if you want to use gvim/MacVim
 for your pager window:
 
 ```vim
-let g:vimpager_use_gvim = 1
+let g:vimpager.gvim = 1
 ```
 
 To turn off the feature of passing through text that is smaller than the
 terminal height use this:
 
 ```vim
-let g:vimpager_passthrough = 0
+let g:vimpager.passthrough = 0
 ```
 
 See "PASSTHROUGH MODE" further down.
@@ -126,7 +139,7 @@ To start vim with -X (no x11 connection, a bit faster startup) put the following
 into your .vimrc/vimpagerrc:
 
 ```vim
-let g:vimpager_disable_x11 = 1
+let g:vimpager.X11 = 0
 ```
 
 **NOTE:** this may disable clipboard integration in X terminals.
@@ -135,18 +148,18 @@ The scroll offset (:help scrolloff), may be specified by placing the
 following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
 ```vim
-let g:vimpager_scrolloff = 5
+let g:less.scrolloff = 5
 ```
 
 The default is 5 only in less mode, with less mode disabled the default
 is the user's scrolloff setting.
 
-The process tree of vimpager is available in the "vimpager_ptree" variable, an
-example usage is as follows:
+The process tree of vimpager is available in `vimpager.ptree`, an example usage
+is as follows:
 
 ```vim
-if exists("vimpager")
-  if exists("vimpager_ptree") && vimpager_ptree[-2] == 'wman'
+if exists('g:vimpager.enabled')
+  if exists('g:vimpager.ptree') && g:vimpager.ptree[-2] == 'wman'
     set ft=man
   endif
 endif
@@ -156,7 +169,7 @@ To disable the use of AnsiEsc.vim to display ANSI colors in the source,
 set:
 
 ```vim
-let g:vimpager_disable_ansiesc = 1
+let g:vimpager.ansiesc = 0
 ```
 
 see the section "ANSI ESCAPE SEQUENCES AND OVERSTRIKES" for more
@@ -205,7 +218,7 @@ However, your vim must have been compiled with the 'conceal' feature
 enabled. To check, try
 
 ```vim
-:echo has("conceal")
+:echo has('conceal')
 ```
 
 if the result is '1' you have conceal, if it's '0' you do not, and the
@@ -217,10 +230,8 @@ vim from Homebrew.
 To disable the use of AnsiEsc.vim, set:
 
 ```vim
-let g:vimpager_disable_ansiesc = 1
+let g:vimpager.ansiesc = 0
 ```
-
-in your .vimrc.
 
 If the file has a modeline that sets ft or syntax, the setting will override
 the use of AnsiEsc.
@@ -252,10 +263,10 @@ If the text sent to the pager is smaller than the terminal window, then
 it will be displayed without vim as text. If it has ansi codes, they
 will be preserved, otherwise the text will be highlighted with vimcat.
 
-You can turn this off by putting
+You can turn this off by using:
 
 ```vim
-let g:vimpager_passthrough = 0
+let g:vimpager.passthrough = 0
 ```
 
 Passthrough mode requires a POSIX shell with arithmetic expansion, if

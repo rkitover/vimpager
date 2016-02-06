@@ -3,13 +3,18 @@
 " Last Change:	2014 May 13
 
 " This file is derived from the Vim project and is licensed under the
-" same terms as Vim.
+" same terms as Vim. See uganda.txt.
 
 " Avoid loading this file twice, allow the user to define his own script.
 if exists("g:loaded_less") && g:loaded_less ==# 1
   finish
 endif
-let g:loaded_less = 1
+
+let g:loaded_less       = 1
+
+if !exists('g:less')
+  let g:less = {}
+endif
 
 " If not reading from stdin, skip files that can't be read.
 " Exit if there is no file at all.
@@ -47,14 +52,20 @@ set nows
 let s:lz = &lz
 set lz
 set foldlevel=9999
-set nonu
+
+if exists('g:less.number')
+  set nu
+else
+  set nonu
+endif
+
 silent! set nornu
 
-if exists('g:vimpager_scrolloff')
-    let &scrolloff = g:vimpager_scrolloff
-else
-    set scrolloff=5
+if !exists('g:less.scrolloff')
+  let g:less.scrolloff = 5
 endif
+let g:less.original_scrolloff = &scrolloff
+let &scrolloff                = g:less.scrolloff
 
 " Used after each command: put cursor at end and display position
 if &wrap
@@ -222,16 +233,12 @@ noremap q :<C-u>q<CR>
 map v :call <SID>End()<CR>
 nmap ,v :call <SID>ToggleLess()<CR>
 
-let g:vimpager_less_mode = 1
+let g:less.enabled = 1
 
 if !exists('*s:ToggleLess')
   function! s:ToggleLess()
     if !exists('g:loaded_less') || g:loaded_less ==# 0
-      if exists('g:vimpager_scrolloff')
-          let jump = g:vimpager_scrolloff
-      else
-          let jump = 5
-      endif
+      let jump = g:less.scrolloff
 
       let curpos = getpos('.')
 
@@ -247,7 +254,7 @@ if !exists('*s:ToggleLess')
       echomsg 'Less Mode Enabled'
     else
       call s:End()
-      let g:vimpager_less_mode = 0
+      let g:less.enabled = 0
       redraw
       echomsg 'Less Mode Disabled'
     endif
@@ -255,9 +262,7 @@ if !exists('*s:ToggleLess')
 endif
 
 fun! s:End()
-  if !exists('g:vimpager_scrolloff')
-    set scrolloff=0
-  endif
+  let &scrolloff = g:less.original_scrolloff
   "set ma
   if exists('s:lz')
     let &lz = s:lz

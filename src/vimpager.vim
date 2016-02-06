@@ -1,10 +1,11 @@
 function! vimpager#Init()
-    let g:vimpager=1
+    call s:SetOptions()
+
+    if g:less.enabled
+        autocmd VimEnter * runtime macros/less.vim
+    endif
 
     nnoremap ,v :call <SID>LoadLess()<CR>
-
-    " disable surround plugin
-    let g:loaded_surround = 1
 
     let g:__save_hidden = &hidden
     set nohidden
@@ -18,10 +19,41 @@ function! vimpager#Init()
     syntax on
 endfunction
 
+function! s:SetOptions()
+    if !exists('g:vimpager')
+        let g:vimpager = {}
+    endif
+
+    let g:vimpager.enabled = 1
+
+    if !exists('g:less')
+        let g:less = {}
+    endif
+
+    if !exists('g:less.enabled')
+        if exists('g:vimpager_less_mode')
+            let g:less.enabled = g:vimpager_less_mode
+        else
+            let g:less.enabled = 1
+        endif
+    endif
+
+    if !exists('g:less.scrolloff')
+        if exists('g:vimpager.scrolloff')
+            g:less.scrolloff = g:vimpager.scrolloff
+        elseif exists('g:vimpager_scrolloff')
+            g:less.scrolloff = g:vimpager_scrolloff
+        endif
+    endif
+
+    " disable surround plugin
+    let g:loaded_surround = 1
+endfunction
+
 function! s:LoadLess()
     let jump = 5
-    if exists('g:vimpager_scrolloff')
-        let jump = g:vimpager_scrolloff
+    if exists('g:less.scrolloff')
+        let jump = g:less.scrolloff
     endif
 
     let curpos = getpos('.')
