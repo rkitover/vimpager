@@ -4,7 +4,7 @@ Upstream-Contact: Rafael Kitover <rkitover@gmail.com>
 Source: http://github.com/rkitover/vimpager
 
 Files: vimpager vimpagerrc TODO Makefile LICENSE doc/vimpager.md doc/vimcat.md src/vimpager.vim src/prototypes/* scripts/awk-sh
-Copyright: 2015 Rafael Kitover <rkitover@gmail.com>
+Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 
 Files: scripts/install-sh
@@ -16,7 +16,7 @@ Copyright: 2015 Matthew Wozniski <mjw@drexel.edu>
 License: BSD-2-Clause
 
 Files: debian/*
-Copyright: 2015 Rafael Kitover <rkitover@gmail.com>
+Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 
 Files: src/ansiesc/plugin/cecutil.vim src/ansiesc/autoload/AnsiEsc.vim src/ansiesc/plugin/AnsiEscPlugin.vim

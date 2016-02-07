@@ -7143,7 +7143,7 @@ EOF
 
 main "$@"
 
-# Copyright (c) 2015, Rafael Kitover <rkitover@gmail.com> and
+# Copyright (c) 2016, Rafael Kitover <rkitover@gmail.com> and
 # Contributors (below.)
 #
 # Redistribution and use in source and binary forms, with or without
