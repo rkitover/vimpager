@@ -1,0 +1,15 @@
+---
+2.07:
+- add usage screen
+- either add multi file support or throw error and update docs
+- better error message for unreadable files
+
+FUTURE:
+- tabs do not look correct in vimcat on Solaris
+- colors seem different on solaris and other OSes
+- allow clicking on man links in man and perldoc mode
+- merge less.vim changes upstream
+
+DONE:
+- merge AnsiEsc changes upstream
+- set cursor wrt scrolloff when toggling less mode
