@@ -2,6 +2,19 @@
 # Revision history for vimcat from the vimpager project.
 # https://github.com/rkitover/vimpager
 
+- allow using /bin/sh as the shell gh#118
+- invoke vim with -N to set nocp
+- make visual the first --cmd so that user --cmd and -c commands are in visual mode
+- fix closing endif statements for shell wrapper
+- add -o <output_file> option
+- support concealed syntax items based on conceallevel
+- skip ANSI codes in source files
+- fix multibyte support and improve speed greatly
+- default to bg=dark and syntax on
+- default to hi Normal ctermbg=NONE
+- add -s option to squeeze blank lines into one
+- add -n option for line numbers (right justified, in bright white)
+
 2.06 2015-06-28:
 - Solaris compatibility fixes
 - remove array syntax for compatibility with more shells gh#118

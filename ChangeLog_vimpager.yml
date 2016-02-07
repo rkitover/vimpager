@@ -2,6 +2,25 @@
 # Revision history for vimpager from the vimpager project.
 # https://github.com/rkitover/vimpager
 
+- escape special characters in file names so they can be opened, like # and % gh#120
+- turn hlsearch on by default, better toggle with <Esc>u gh#121
+- fix extra Scratch buffer by setting nohidden at load and restoring it gh#121
+- allow turning off less mode on start with less.enabled=0, ,v enables it gh#121
+- do not disable modelines by default gh#121
+- set vimpager.enabled=1 when reading the config gh#121
+- reorganize project tree
+- fix build on Solaris
+- rewrite Makefile and make it fully incremental
+- don't move the cursor when toggling less mode gh#105
+- fix 'cannot allocate color none' bug when gvim is used in AnsiEsc gh#45
+- fix double / in Makefile (an issue on Windows) gh#122
+- better stripping of ANSI codes
+- allow modelines to set ft or syntax to override AnsiEsc
+- fix AnsiEsc helper script for adjusting tabs to be unicode-aware
+- debian package support, 'make install-deb' will install a package on ubuntu/debian
+- add the -s option to squeeze blank lines into one, this is necessary for some versions of man
+- fix AnsiEsc being turned off on ,v
+- fix opening file names with whitespace (regression)
 - refactor option naming and processing (almost fully backward compatible)
 - add -N or --LINE-NUMBERS option for line numbers gh#136
 
