@@ -182,7 +182,7 @@ main() {
 
 		let g:use_ansiesc = 0
 
-		if has("conceal") && ((!exists("g:vimpager.ansiesc") || g:vimpager.ansiesc == 1) || (!exists("g:vimpager_disable_ansiesc") || g:vimpager_disable_ansiesc == 0))
+		if has("conceal") && (!exists("g:vimpager.ansiesc") || g:vimpager.ansiesc == 1) && (!exists("g:vimpager_disable_ansiesc") || g:vimpager_disable_ansiesc == 0)
 			let g:use_ansiesc = 1
 		endif
 
