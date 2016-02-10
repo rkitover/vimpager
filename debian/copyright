@@ -3,7 +3,7 @@ Upstream-Name: vimpager
 Upstream-Contact: Rafael Kitover <rkitover@gmail.com>
 Source: http://github.com/rkitover/vimpager
 
-Files: vimpager vimpagerrc TODO Makefile LICENSE doc/vimpager.md doc/vimcat.md src/vimpager.vim src/prototypes/* scripts/awk-sh
+Files: vimpager vimpagerrc *.yml Makefile LICENSE doc/vimpager.md doc/vimcat.md src/vimpager.vim src/prototypes/* scripts/awk-sh
 Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 

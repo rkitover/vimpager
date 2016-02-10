@@ -11,4 +11,4 @@ override_dh_auto_install:
 	dh_auto_install -- PREFIX=/usr
 
 override_dh_compress:
-	dh_compress -X.md
+	dh_compress -X.md -X.yml

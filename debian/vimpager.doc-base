@@ -6,7 +6,7 @@ Abstract: These manuals describes how to use the vimpager
 Section: Text
 
 Format: text
-Files: /usr/share/doc/vimpager/*.md /usr/share/doc/vimpager/TODO
+Files: /usr/share/doc/vimpager/*.md /usr/share/doc/vimpager/*.yml
 
 Format: HTML
 Index: /usr/share/doc/vimpager/html/vimpager.html
