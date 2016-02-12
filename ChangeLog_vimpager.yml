@@ -3,7 +3,7 @@
 # https://github.com/rkitover/vimpager
 
 - escape special characters in file names so they can be opened, like # and % gh#120
-- turn hlsearch on by default, better toggle with <Esc>u gh#121
+- turn hlsearch on by default, configurable via less.hlsearch, better toggle with <Esc>u gh#121
 - fix extra Scratch buffer by setting nohidden at load and restoring it gh#121
 - allow turning off less mode on start with less.enabled=0, ,v enables it gh#121
 - do not disable modelines by default gh#121
@@ -23,6 +23,7 @@
 - fix opening file names with whitespace (regression)
 - refactor option naming and processing (almost fully backward compatible)
 - add -N or --LINE-NUMBERS option for line numbers gh#136
+- refactor less.vim and its interaction with vimpager gh#137 gh#140
 
 2.06 2015-06-28:
 - more Solaris fixes

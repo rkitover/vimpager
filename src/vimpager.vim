@@ -1,30 +1,34 @@
 function! vimpager#Init(opts)
-    call s:SetOptions(a:opts)
+    let g:vimpager = { 'enabled': 1 }
 
-    if g:less.enabled
-        autocmd VimEnter * runtime macros/less.vim
-    endif
+    augroup vimpager
 
-    nnoremap ,v :call <SID>LoadLess()<CR>
+    autocmd!
+
+    " can't pass a:opts in autocmd
+    let s:opts = a:opts
+
+    " can't use VimEnter because that fires after first file is read
+    autocmd BufReadPre,StdinReadPre * call s:SetOptions(s:opts)
+
+    autocmd BufReadPre,StdinReadPre * runtime macros/less.vim
 
     let g:__save_hidden = &hidden
     set nohidden
-    autocmd VimEnter * let &hidden = __save_hidden
+    autocmd VimEnter * let &hidden = __save_hidden | unlet! __save_hidden
 
-    autocmd BufNewFile,BufReadPost * set buftype=nofile modifiable noreadonly
-
-    autocmd VimEnter * call cursor(1, 1)
+    augroup end
 
     set bg=dark
-    syntax on
+    syntax enable
 endfunction
 
 function! s:SetOptions(opts)
-    if !exists('g:vimpager')
-        let g:vimpager = {}
+    if exists('s:options_set') && s:options_set ==# 1
+        return
     endif
 
-    let g:vimpager.enabled = 1
+    let s:options_set = 1
 
     if !exists('g:less')
         let g:less = {}
@@ -33,8 +37,6 @@ function! s:SetOptions(opts)
     if !exists('g:less.enabled')
         if exists('g:vimpager_less_mode')
             let g:less.enabled = g:vimpager_less_mode
-        else
-            let g:less.enabled = 1
         endif
     endif
 
@@ -55,28 +57,8 @@ function! s:SetOptions(opts)
     let g:loaded_surround = 1
 endfunction
 
-function! s:LoadLess()
-    let jump = 5
-    if exists('g:less.scrolloff')
-        let jump = g:less.scrolloff
-    endif
-
-    let curpos = getpos('.')
-
-    if winline() < jump
-        call setpos('.', [curpos[0], curpos[1] + (jump - winline()) + 1, curpos[2], curpos[3]])
-    elseif (winheight(0) - winline()) < jump
-        call setpos('.', [curpos[0], curpos[1] - (jump - (winheight(0) - winline())) - 1 , curpos[2], curpos[3]])
-    endif
-
-    runtime macros/less.vim
-
-    redraw
-    echomsg 'Less Mode Enabled'
-endfunction
-
 function! vimpager#SetupAnsiEsc()
-    autocmd VimEnter * call s:DoAnsiEsc()
+    autocmd vimpager BufReadPost,StdinReadPost * call s:DoAnsiEsc()
 endfunction
 
 function! s:DoAnsiEsc()

@@ -144,6 +144,14 @@ let g:less.number = 1
 they are turned off by default. You can also invoke vimpager with the `-N`
 option to turn on line numbers.
 
+To turn off search highlighting set:
+
+```vim
+let g:less.hlsearch = 0
+```
+
+this can always be toggled with `ESC-u`.
+
 To start vim with -X (no x11 connection, a bit faster startup) put the following
 into your .vimrc/vimpagerrc:
 

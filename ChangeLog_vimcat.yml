@@ -14,6 +14,8 @@
 - default to hi Normal ctermbg=NONE
 - add -s option to squeeze blank lines into one
 - add -n option for line numbers (right justified, in bright white)
+- use `syn enable` instead of `syn on`
+- turn off folds
 
 2.06 2015-06-28:
 - Solaris compatibility fixes
