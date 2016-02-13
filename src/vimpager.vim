@@ -1,6 +1,8 @@
 function! vimpager#Init(opts)
     let g:vimpager = { 'enabled': 1 }
 
+    call s:DisableConflictingPlugins()
+
     augroup vimpager
 
     autocmd!
@@ -19,6 +21,7 @@ function! vimpager#Init(opts)
 
     augroup end
 
+    " allow user's .vimrc or -c commands to override this
     set bg=dark
     syntax enable
 endfunction
@@ -52,7 +55,9 @@ function! s:SetOptions(opts)
     if exists('a:opts.line_numbers')
         let g:less.number = a:opts.line_numbers
     endif
+endfunction
 
+function! s:DisableConflictingPlugins()
     " disable surround plugin
     let g:loaded_surround = 1
 endfunction
@@ -68,6 +73,9 @@ function! s:DoAnsiEsc()
 endfunction
 
 function! s:ConcealRetab()
+    let current_modifiable = &l:modifiable
+    setlocal modifiable
+
     let current_cursor = getpos('.')
 
     call cursor(1,1)
@@ -105,6 +113,8 @@ function! s:ConcealRetab()
     endwhile
 
     call setpos('.', current_cursor)
+
+    let &l:modifiable = current_modifiable
 endfunction
 
 function! s:CheckModelineFiletype()
