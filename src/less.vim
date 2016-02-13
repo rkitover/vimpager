@@ -53,7 +53,7 @@ augroup less
   autocmd BufReadPre,StdinReadPre * if exists('g:less.enabled') && g:less.enabled | call s:LessMode() | endif
 
   " display file on start
-  autocmd BufWinEnter * if exists('g:less.enabled') && g:less.enabled | redraw | file | endif
+  autocmd BufWinEnter * if exists('g:less.enabled') && g:less.enabled | call s:DisplayPosition() | endif
 augroup end
 
 " the toggle mapping we want globally and regardless of enabled setting
@@ -124,9 +124,9 @@ function! s:LessMode()
 
   " Used after each command: put cursor at end and display position
   if &wrap
-    noremap <buffer> <SID>L L0:redraw<CR>:file<CR>
+    noremap <buffer> <SID>L L0:call <SID>DisplayPosition()<CR>
   else
-    noremap <buffer> <SID>L Lg0:redraw<CR>:file<CR>
+    noremap <buffer> <SID>L Lg0:call <SID>DisplayPosition()<CR>
   endif
 
   " Give help
@@ -233,6 +233,17 @@ endfunction
 if exists('g:less.enabled') && g:less.enabled
   call s:LessMode()
 endif
+
+function! s:DisplayPosition()
+  redir => pos
+    silent! file
+  redir END
+  let pos = substitute(pos, '[\r\n]\+', '', 'g')
+  echohl WarningMsg
+  redraw
+  unsilent echo pos . "  [ Press ',h' for help ]"
+  echohl None
+endfunction
 
 function! s:NextPage()
   if line(".") == line("$")
