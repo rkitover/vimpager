@@ -103,7 +103,7 @@ function! s:LessMode()
   setlocal nows
 
   " Inhibit screen updates while searching
-  let g:less.original_lz = getbufvar(bufnr('%'), '&lz')
+  let g:less.original_lz = &l:lz
   setlocal lz
 
   setlocal foldlevel=9999
@@ -119,8 +119,8 @@ function! s:LessMode()
   if !exists('g:less.scrolloff')
     let g:less.scrolloff = 5
   endif
-  let g:less.original_scrolloff = getbufvar(bufnr('%'), '&scrolloff', 0)
-  call setbufvar(bufnr('%'), '&scrolloff', g:less.scrolloff)
+  let g:less.original_scrolloff = &l:scrolloff
+  let &l:scrolloff = g:less.scrolloff
 
   " Used after each command: put cursor at end and display position
   if &wrap
@@ -302,9 +302,9 @@ endfunction
 
 function! s:End()
   setlocal buftype=
-  call setbufvar(bufnr('%'), '&scrolloff', g:less.original_scrolloff)
+  let &l:scrolloff = g:less.original_scrolloff
   if exists('g:less.original_lz')
-    call setbufvar(bufnr('%'), '&lz', g:less.original_lz)
+    let &l:lz = g:less.original_lz
   endif
   let g:less.enabled = 0
   unmap <buffer> ,h
