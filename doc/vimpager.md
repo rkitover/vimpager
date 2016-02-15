@@ -194,6 +194,10 @@ details.
 
 # COMMAND LINE OPTIONS
 
+## -h | --help | --usage
+
+Print summary of options.
+
 ## + | +G
 
 Start at the end of the file, just like less.

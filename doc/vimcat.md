@@ -31,6 +31,10 @@ alias vimcat="vimcat -c 'set bg=light'"
 
 # COMMAND LINE OPTIONS
 
+## -h | --help | --usage
+
+Print summary of options.
+
 ## -n
 
 Display line numbers.

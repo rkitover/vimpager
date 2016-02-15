@@ -24,6 +24,7 @@
 - refactor option naming and processing (almost fully backward compatible)
 - add -N or --LINE-NUMBERS option for line numbers gh#136
 - refactor less.vim and its interaction with vimpager gh#137 gh#140
+- add -h | --help | --usage option to display usage
 
 2.06 2015-06-28:
 - more Solaris fixes
