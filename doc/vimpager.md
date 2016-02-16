@@ -85,6 +85,7 @@ less for the most part:
 |N%       |percentage in file       |,h       |Display this help          |  
 |/pattern |Search forward           |?pattern |Search backward            |  
 |n        |next match               |N        |Previous match             |  
+|`:n`     |next file                |`:N`     |Previous file              |
 |ESC-u    |toggle search highlight  |         |                           |  
 |q        |Quit                     |,v       |Toggle Less Mode           |  
 

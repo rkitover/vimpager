@@ -1,10 +1,7 @@
 ---
 2.07:
-- add usage screen
-- either add multi file support or throw error and update docs
-- better error message for unreadable files
 - position cursor and display % on startup
-- remove ;file from ;messages
+- display actual file name on status line
 
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
@@ -14,7 +11,12 @@ FUTURE:
 - save user's position in file on quit (using viminfo)
 - stream large files and stdin instead of copying to /tmp
 - key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode
+- make a vimpager#CheckGUISize() that only increases the number of columns if necessary for man pages
 
 DONE:
 - merge AnsiEsc changes upstream
 - set cursor wrt scrolloff when toggling less mode
+- remove ;file from ;messages
+- add usage screen
+- multiple file support
+- better error message for unreadable files

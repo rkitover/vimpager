@@ -15,6 +15,9 @@ function! vimpager#Init(opts)
 
     autocmd BufReadPre,StdinReadPre * runtime macros/less.vim
 
+    " any pre and post processing necessary is written to .vim files
+    autocmd BufWinEnter * silent! source %.vim
+
     let g:__save_hidden = &hidden
     set nohidden
     autocmd VimEnter * let &hidden = __save_hidden | unlet! __save_hidden
@@ -62,14 +65,13 @@ function! s:DisableConflictingPlugins()
     let g:loaded_surround = 1
 endfunction
 
-function! vimpager#SetupAnsiEsc()
-    autocmd vimpager BufReadPost,StdinReadPost * call s:DoAnsiEsc()
-endfunction
-
-function! s:DoAnsiEsc()
+function! vimpager#DoAnsiEsc()
     AnsiEsc
     call s:ConcealRetab()
-    call s:CheckModelineFiletype()
+    call s:CheckModelineFiletypeForAnsiEsc()
+
+    " this is necessary so that AnsiEsc is in the right state when returning to the file with :N
+    exe 'autocmd! vimpager BufWinLeave ' . expand('%') . ' AnsiEsc'
 endfunction
 
 function! s:ConcealRetab()
@@ -117,7 +119,7 @@ function! s:ConcealRetab()
     let &l:modifiable = current_modifiable
 endfunction
 
-function! s:CheckModelineFiletype()
+function! s:CheckModelineFiletypeForAnsiEsc()
 	redir => ft_set_from
 	    silent! verb set ft
 	    silent! verb set syntax
@@ -126,5 +128,7 @@ function! s:CheckModelineFiletype()
 	if ft_set_from =~# 'Last set from modeline\>'
 	    execute 'setlocal ft=' . &ft
 	    execute 'setlocal syntax=' . &syntax
+        else
+            noautocmd setlocal ft=ignore
 	endif
 endfunction

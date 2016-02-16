@@ -223,7 +223,7 @@ function! s:LessMode()
   cunmap <buffer> <CR>
 
   " Quitting
-  noremap <buffer> q :<C-u>q<CR>
+  noremap <buffer> q :<C-u>qa!<CR>
 
   " Switch to editing (switch off less mode) with v (,v is global)
   map <buffer> v :call <SID>End()<CR>
@@ -269,7 +269,7 @@ function! s:Help()
   echo "n         next pattern match        N         Previous pattern match"
   echo "<ESC>u    toggle search highlight"
   echo "\n"
-  echo ":n<Enter> Next file                 :p<Enter> Previous file"
+  echo ":n<Enter> Next file                 :N<Enter> Previous file"
   echo "\n"
   echo "q         Quit                      ,v        Toggle Less Mode"
   let i = input("Hit Enter to continue")
