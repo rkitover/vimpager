@@ -29,6 +29,24 @@ function! vimpager#Init(opts)
     syntax enable
 endfunction
 
+function! s:LessStatusLine()
+  redir => pos
+    silent! file
+  redir END
+  " remove trailing newline
+  let pos = substitute(pos, '[\r\n]\+', '', 'g')
+  " remove tmp dir path
+  let pos = substitute(pos, '^.*/', '', '')
+  " remove closing quote
+  let pos = substitute(pos, '"\(\s\+\d\+\s\+line\)', '\1', 'g')
+  " urldecode
+  let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
+  echohl WarningMsg
+  redraw
+  unsilent echo pos . "  [ Press ',h' for HELP ]"
+  echohl None
+endfunction
+
 function! s:SetOptions(opts)
     if exists('s:options_set') && s:options_set ==# 1
         return
@@ -52,6 +70,10 @@ function! s:SetOptions(opts)
         elseif exists('g:vimpager_scrolloff')
             g:less.scrolloff = g:vimpager_scrolloff
         endif
+    endif
+
+    if !exists('g:less.statusfunc')
+        let g:less.statusfunc = function('s:LessStatusLine')
     endif
 
     " process options

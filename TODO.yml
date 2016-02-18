@@ -1,7 +1,6 @@
 ---
 2.07:
 - position cursor and display % on startup
-- display actual file name on status line
 
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
@@ -20,3 +19,4 @@ DONE:
 - add usage screen
 - multiple file support
 - better error message for unreadable files
+- display actual file name on status line

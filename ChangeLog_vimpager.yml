@@ -27,6 +27,7 @@
 - add -h | --help | --usage option to display usage
 - multiple file support
 - better error message for unreadable files
+- display actual file name on the status line
 
 2.06 2015-06-28:
 - more Solaris fixes

@@ -20,6 +20,10 @@ if !exists('g:less.enabled')
   let g:less.enabled = 1
 endif
 
+if !exists('g:less.statusfunc')
+  let g:less.statusfunc = function('s:DisplayPosition')
+endif
+
 " If not reading from stdin, skip files that can't be read.
 " Exit if there is no file at all.
 if g:less.enabled && argc() > 0
@@ -53,7 +57,7 @@ augroup less
   autocmd BufReadPre,StdinReadPre * if exists('g:less.enabled') && g:less.enabled | call s:LessMode() | endif
 
   " display file on start
-  autocmd BufWinEnter * if exists('g:less.enabled') && g:less.enabled | call s:DisplayPosition() | endif
+  autocmd BufWinEnter * if exists('g:less.enabled') && g:less.enabled | call g:less.statusfunc() | endif
 augroup end
 
 " the toggle mapping we want globally and regardless of enabled setting
@@ -124,9 +128,9 @@ function! s:LessMode()
 
   " Used after each command: put cursor at end and display position
   if &wrap
-    noremap <buffer> <SID>L L0:call <SID>DisplayPosition()<CR>
+    noremap <buffer> <SID>L L0:call g:less.statusfunc()<CR>
   else
-    noremap <buffer> <SID>L Lg0:call <SID>DisplayPosition()<CR>
+    noremap <buffer> <SID>L Lg0:call g:less.statusfunc())<CR>
   endif
 
   " Give help
@@ -238,6 +242,7 @@ function! s:DisplayPosition()
   redir => pos
     silent! file
   redir END
+  " remove trailing newline
   let pos = substitute(pos, '[\r\n]\+', '', 'g')
   echohl WarningMsg
   redraw
