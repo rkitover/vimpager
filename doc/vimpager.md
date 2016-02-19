@@ -115,10 +115,9 @@ motion commands, put this into your .vimrc/vimpagerrc:
 let g:less.enabled = 0
 ```
 
-You can still enable less mode with this setting by pressing ",v".
-
-At runtime whenever less mode is toggled with ,v , this variable will
-reflect the current state, regardless of the initial value.
+You can still enable less mode with this setting by pressing ",v". If you
+define `g:mapleader` then it will be the value of `g:mapleader` plus `v`
+instead of `,v`.
 
 Put the following into your .vimrc/vimpagerrc if you want to use gvim/MacVim
 for your pager window:

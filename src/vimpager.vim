@@ -76,6 +76,10 @@ function! s:SetOptions(opts)
         let g:less.statusfunc = function('s:LessStatusLine')
     endif
 
+    if !exists('g:mapleader')
+        let g:mapleader = ','
+    endif
+
     " process options
     if exists('a:opts.line_numbers')
         let g:less.number = a:opts.line_numbers
@@ -154,3 +158,5 @@ function! s:CheckModelineFiletypeForAnsiEsc()
             noautocmd setlocal ft=ignore
 	endif
 endfunction
+
+" vim: set ft=vim sw=4 et:

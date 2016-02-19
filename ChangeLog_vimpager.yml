@@ -28,6 +28,8 @@
 - multiple file support
 - better error message for unreadable files
 - display actual file name on the status line
+- allow overriding status line with `g;less.statusfunc`
+- use mapleader for `,v` mapping in less.vim, defaults to `,`
 
 2.06 2015-06-28:
 - more Solaris fixes

@@ -1,7 +1,4 @@
 ---
-2.07:
-- position cursor and display % on startup
-
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
 - colors seem different on solaris and other OSes
@@ -20,3 +17,4 @@ DONE:
 - multiple file support
 - better error message for unreadable files
 - display actual file name on status line
+- display statusline on startup

@@ -61,7 +61,7 @@ augroup less
 augroup end
 
 " the toggle mapping we want globally and regardless of enabled setting
-nnoremap ,v :call <SID>ToggleLess()<CR>
+nnoremap <Leader>v :call <SID>ToggleLess()<CR>
 
 function! s:Forward()
   " Searching forward
