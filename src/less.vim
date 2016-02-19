@@ -6,7 +6,7 @@
 " same terms as Vim. See uganda.txt.
 
 " Avoid loading this file twice, allow the user to define his own script.
-if exists("g:less.loaded") && g:less.loaded ==# 1
+if (exists('g:less.loaded') && g:less.loaded ==# 1) || (exists('g:loaded_less') && g:loaded_less ==# 1)
   finish
 endif
 
