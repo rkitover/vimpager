@@ -584,27 +584,24 @@ extract_bundled_scripts() {
 	(
 		cd "${tmp}/extra_vim_home"
 
-		mkdir macros autoload
+		mkdir macros autoload plugin syntax bin
 
-		(cd macros; less_vim)
-		(cd autoload; vimpager_vim)
+		vimpager_vim
+		less_vim
 
 		if [ -n "${is_perldoc}" ]; then
-			mkdir syntax
-			(cd syntax; perldoc_vim)
+			perldoc_vim
 		fi
 
 		if [ -n "${use_ansiesc}" ]; then
-			(cd autoload; ansi_esc_vim; conceal_retab_vim)
-
-			mkdir plugin
-			(cd plugin; ansi_esc_plugin_vim; cecutil_plugin_vim)
+			ansi_esc_vim
+			ansi_esc_plugin_vim
+			cecutil_plugin_vim
 		fi
 
 		if [ -f "${tmp}/use_vimcat" ]; then
-			cd "${tmp}"
 			vimcat_script
-			chmod +x ./vimcat
+			chmod +x ./bin/vimcat
 		fi
 	)
 }
@@ -644,12 +641,11 @@ vim_less() {
 	extract_bundled_scripts
 
 	if [ -f "${tmp}/use_vimcat" ]; then
-		cd "${tmp}"
 		# vimcat uses the same shell finding mechanism, the vars break it
 		unset _MY_SHELL
 		unset IN_BASH
 		unset IN_KSH
-		./vimcat \
+		"${tmp}/extra_vim_home/bin/vimcat" \
 			-u "${vimrc}" \
 			--cmd "set rtp^=${tmp}/extra_vim_home | let vimpager={ 'enabled': 1 }" \
 			"${@}" "${filename}" </dev/tty
@@ -1015,8 +1011,8 @@ l[">8"]=l[">9"]=l[">:"]=l[">;"]=l["><"]=l[">="]=l[">>"]=l[">?"]=l[">0"]=l[">1"]=
 }
 
 less_vim() {
-	(cat <<'EOF') | do_uudecode > less.vim
-begin 644 src/less.vim
+	(cat <<'EOF') | do_uudecode > macros/less.vim
+begin 644 src/macros/less.vim
 M(B(@5FEM('-C<FEP="!T;R!W;W)K(&QI:V4@(FQE<W,B"B(@36%I;G1A:6YE
 M<CH)0G)A;2!-;V]L96YA87(@/$)R86U`=FEM+F]R9SX*(B!,87-T($-H86YG
 M93H),C`Q-"!-87D@,3,*"B(@5&AI<R!F:6QE(&ES(&1E<FEV960@9G)O;2!T
@@ -1233,7 +1229,7 @@ EOF
 }
 
 vimcat_script() {
-	(cat <<'EOF') | do_uudecode > vimcat
+	(cat <<'EOF') | do_uudecode > bin/vimcat
 begin 755 vimcat
 M(R$O8FEN+W-H"B,A+W5S<B]B:6XO96YV('9I;0HC(2!4:&ES(&ES(&$@8F%S
 M:"!S8W)I<'0@=&AA="!E>&5C=71E<R!I='-E;&8@87,@82!V:6US8W)I<'0@
@@ -1520,8 +1516,8 @@ EOF
 }
 
 perldoc_vim() {
-	(cat <<'EOF') | do_uudecode > perldoc.vim
-begin 644 src/perldoc.vim
+	(cat <<'EOF') | do_uudecode > syntax/perldoc.vim
+begin 644 src/syntax/perldoc.vim
 M(B!.86UE.B`@("`@("!P97)L9&]C+G9I;0HB($UA:6YT86EN97(Z('1R87!D
 M,#!R"B(@3&]C871I;VXZ("`@:'1T<#HO+W1R87!D,#!R+G-E+V-O;F9I9W,O
 M<&5R;&1O8RYV:6T@("`@(`H*(B!4:&ES(&ES('1H92!S=&%N9&%R9"!P97)L
@@ -2113,40 +2109,9 @@ EOF
 # END OF perldoc.vim
 }
 
-conceal_retab_vim() {
-	(cat <<'EOF') | do_uudecode > ConcealRetab.vim
-begin 644 src/ConcealRetab.vim
-M8V]M;6%N9"$@+6YA<F=S/3`@+6)A;F<@+6)A<B!#;VYC96%L4F5T86(@.F-A
-M;&P@0V]N8V5A;%)E=&%B(T-O;F-E86Q2971A8B@I"@IF=6YC=&EO;B$@0V]N
-M8V5A;%)E=&%B(T-O;F-E86Q2971A8B@I"B`@("!L970@;#IC=7)R96YT7V-U
-M<G-O<B`](&=E='!O<R@G+B<I"@H@("`@8V%L;"!C=7)S;W(H,2PQ*0H*("`@
-M(&QE="!L.FQN=6T@/2!S96%R8V@H)UQT)RD*"B`@("!W:&EL92!L.FQN=6T@
-M(3TC(#`*("`@("`@("!L970@;#IN97=L:6YE(#T@)R<*("`@("`@("!L970@
-M;#IC;VQU;6X@(#T@,`H@("`@("`@(&QE="!L.FQI;F5P;W,@/2`Q"@H@("`@
-M("`@(&9O<B!L.F,@:6X@<W!L:70H9V5T;&EN92@G+B<I+"`G7'IS)RD*("`@
-M("`@("`@("`@:68@;#IC(#T](R`B7'0B"B`@("`@("`@("`@("`@("!L970@
-M;#IS<&%C97,@("`](#@@+2`H;#IC;VQU;6X@)2`X*0H@("`@("`@("`@("`@
-M("`@;&5T(&PZ8V]L=6UN("`K/2!L.G-P86-E<PH*("`@("`@("`@("`@("`@
-M(&QE="!L.FYE=VQI;F4@+CT@<F5P96%T*"<@)RP@;#IS<&%C97,I"B`@("`@
-M("`@("`@(&5L<V4*("`@("`@("`@("`@("`@(&QE="!L.F-O;F-E86QE9"`]
-M('-Y;F-O;F-E86QE9"AL.FQN=6TL(&PZ;&EN97!O<RD*"B`@("`@("`@("`@
-M("`@("!I9B!L.F-O;F-E86QE9%LP72`]/2,@,"!\?"!L.F-O;F-E86QE9%LQ
-M72`A/2,@)R<*("`@("`@("`@("`@("`@("`@("!L970@;#IC;VQU;6X@*ST@
-M,0H@("`@("`@("`@("`@("`@96YD:68*"B`@("`@("`@("`@("`@("!L970@
-M;#IN97=L:6YE("X](&,*("`@("`@("`@("`@96YD:68*"B`@("`@("`@("`@
-M(&QE="!L.FQI;F5P;W,@*ST@,0H@("`@("`@(&5N9&9O<@H*("`@("`@("!C
-M86QL('-E=&QI;F4H;#IL;G5M+"!L.FYE=VQI;F4I"@H@("`@("`@(&QE="!L
-M.FQN=6T@/2!S96%R8V@H)UQT)RD*("`@(&5N9'=H:6QE"@H@("`@8V%L;"!S
-D971P;W,H)RXG+"!L.F-U<G)E;G1?8W5R<V]R*0IE;F1F=6X*
-`
-end
-EOF
-# END OF ConcealRetab.vim
-}
-
 ansi_esc_vim() {
-	(cat <<'EOF') | do_uudecode > AnsiEsc.vim
-begin 644 src/ansiesc/autoload/AnsiEsc.vim
+	(cat <<'EOF') | do_uudecode > autoload/AnsiEsc.vim
+begin 644 src/autoload/AnsiEsc.vim
 M(B!!;G-I17-C+G9I;3H@57-E<R!V:6T@-RXP('-Y;G1A>"!H:6=H;&EG:'1I
 M;F<*(B!,86YG=6%G93H)"51E>'0@=VET:"!A;G-I(&5S8V%P92!S97%U96YC
 M97,*(B!-86EN=&%I;F5R.@E#:&%R;&5S($4N($-A;7!B96QL(#Q.9')/8VAI
@@ -6769,8 +6734,8 @@ EOF
 }
 
 ansi_esc_plugin_vim() {
-	(cat <<'EOF') | do_uudecode > AnsiEscPlugin.vim
-begin 644 src/ansiesc/plugin/AnsiEscPlugin.vim
+	(cat <<'EOF') | do_uudecode > plugin/AnsiEscPlugin.vim
+begin 644 src/plugin/AnsiEscPlugin.vim
 M(B!!;G-I17-C4&QU9VEN+G9I;0HB("`@075T:&]R.B!#:&%R;&5S($4N($-A
 M;7!B96QL"B(@("!$871E.B`@($%P<B`P-RP@,C`Q,`HB("`@5F5R<VEO;CH@
 M,3-I"B(@+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM
@@ -6799,8 +6764,8 @@ EOF
 }
 
 cecutil_plugin_vim() {
-	(cat <<'EOF') | do_uudecode > cecutil.vim
-begin 644 src/ansiesc/plugin/cecutil.vim
+	(cat <<'EOF') | do_uudecode > plugin/cecutil.vim
+begin 644 src/plugin/cecutil.vim
 M(B!C96-U=&EL+G9I;2`Z('-A=F4O<F5S=&]R92!W:6YD;W<@<&]S:71I;VX*
 M(B`@("`@("`@("`@("`@('-A=F4O<F5S=&]R92!M87)K('!O<VET:6]N"B(@
 M("`@("`@("`@("`@("!S879E+W)E<W1O<F4@<V5L96-T960@=7-E<B!M87!S
@@ -7235,8 +7200,8 @@ EOF
 }
 
 vimpager_vim() {
-	(cat <<'EOF') | do_uudecode > vimpager.vim
-begin 644 src/vimpager.vim
+	(cat <<'EOF') | do_uudecode > autoload/vimpager.vim
+begin 644 src/autoload/vimpager.vim
 M9G5N8W1I;VXA('9I;7!A9V5R(TEN:70H;W!T<RD*("`@(&QE="!G.G9I;7!A
 M9V5R(#T@>R`G96YA8FQE9"<Z(#$@?0H*("`@(&-A;&P@<SI$:7-A8FQE0V]N
 M9FQI8W1I;F=0;'5G:6YS*"D*"B`@("!A=6=R;W5P('9I;7!A9V5R"@H@("`@

@@ -193,7 +193,8 @@ see the section "ANSI ESCAPE SEQUENCES AND OVERSTRIKES" for more
 details.
 
 You can also set your own function for the message on the statusline via
-`g:less.statusfunc`, see `src/vimpager.vim` for the default one as an example.
+`g:less.statusfunc`, see `src/autoload/vimpager.vim` for the default one as an
+example.
 
 # COMMAND LINE OPTIONS
 

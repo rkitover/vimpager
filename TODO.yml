@@ -1,13 +1,16 @@
 ---
+2.07:
+- for gvim only increase the number of columns if necessary for man pages
+- key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode
+- stream large files and stdin instead of copying to /tmp
+- allow clicking on man links in man and perldoc mode
+- reorganize src/ to be actual rtp paths
+
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
 - colors seem different on solaris and other OSes
-- allow clicking on man links in man and perldoc mode
 - merge less.vim changes upstream
 - save user's position in file on quit (using viminfo)
-- stream large files and stdin instead of copying to /tmp
-- key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode
-- make a vimpager#CheckGUISize() that only increases the number of columns if necessary for man pages
 
 DONE:
 - merge AnsiEsc changes upstream
