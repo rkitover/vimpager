@@ -453,7 +453,7 @@ main() {
 			filename=$(cygpath -w "${filename}" | tr '\\' /)
 		fi
 
-		files="${files} $(vim_escape_encoded_filename "${filename}")"
+		files="${files} $(escape_filename_for_vim "${filename}")"
 	done
 
 	vim_less -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}"
@@ -621,7 +621,7 @@ BEGIN {
     res = ""
     for (i = 1; i <= len; i++) {
 	c = substr($0, i, 1);
-	if (c ~ /[\/#%<> 	]/)
+	if (c ~ /[\/#%<>|\\ 	]/)
 	    res = res "%" sprintf("%02X", ord[c])
 	else
 	    res = res c
@@ -631,9 +631,9 @@ BEGIN {
 '
 }
 
-# Since % is special, we must escape it before passing it to vim.
-vim_escape_encoded_filename() {
-	echo "${@}" | sed -e 's/%/\\%/g'
+# Escape chars special to vim in file name.
+escape_filename_for_vim() {
+	echo "${@}" | sed -e 's!\([/#%<>|\\ 	]\)!\\\1!g'
 }
 
 # this actually runs vim or gvim
