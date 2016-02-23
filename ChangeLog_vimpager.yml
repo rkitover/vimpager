@@ -2,6 +2,7 @@
 # Revision history for vimpager from the vimpager project.
 # https://github.com/rkitover/vimpager
 
+2.07 UNRELEASED:
 - escape special characters in file names so they can be opened, like # and % gh#120
 - turn hlsearch on by default, configurable via less.hlsearch, better toggle with <Esc>u gh#121
 - fix extra Scratch buffer by setting nohidden at load and restoring it gh#121

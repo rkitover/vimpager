@@ -2,6 +2,7 @@
 # Revision history for vimcat from the vimpager project.
 # https://github.com/rkitover/vimpager
 
+2.07 UNRELEASED:
 - allow using /bin/sh as the shell gh#118
 - invoke vim with -N to set nocp
 - make visual the first --cmd so that user --cmd and -c commands are in visual mode
@@ -17,6 +18,7 @@
 - use `syn enable` instead of `syn on`
 - turn off folds
 - add -h | --help | --usage option to display usage
+- preliminary support for neovim
 
 2.06 2015-06-28:
 - Solaris compatibility fixes

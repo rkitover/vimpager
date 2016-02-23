@@ -66,7 +66,7 @@
   tmp_dir="${tmp_dir}/vimcat_${$}"
 
   if ! mkdir ${mkdir_options} "${tmp_dir}"; then
-    echo Could not create temporary directory "${tmp_dir}" >&2
+    echo "Could not create temporary directory ${tmp_dir}" >&2
     exit 1
   fi 
 
@@ -75,6 +75,11 @@
   tmp_file_out="${tmp_dir}/vimcat_out.txt"
 
   script="$(command -v ${0})"
+
+quit() {
+  rm -rf "${tmp_dir}"
+  exit "${@}"
+}
 
 usage() {
     cat <<'EOF'
@@ -105,8 +110,7 @@ EOF
     case "${1}" in
       '-h'|'--help'|'-help'|'--usage'|'-usage')
         usage
-        rm -rf "${tmp_dir}"
-        exit 0
+        quit 0
         ;;
       "-c")
         shift
@@ -150,7 +154,7 @@ EOF
         ;;
       -*)
         echo "${0}: bad option '${1}'"
-        exit 1
+        quit 1
         ;;
       *)
         break
@@ -219,10 +223,19 @@ EOF
           dest_file="${output_file}"
         fi
 
-        if [ -n "${vimcatrc}" ]; then
-          vim -N -E -X -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+        if command -v vim >/dev/null; then
+          vim=vim
+        elif command -v nvim >/dev/null; then
+          vim=nvim
         else
-          vim -N -E -X -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
+          quit 1
+        fi
+
+        if [ -n "${vimcatrc}" ]; then
+          $vim -N -E -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+        else
+          $vim -N -E -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
 
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
@@ -250,9 +263,7 @@ EOF
     fi
   done
 
-  rm -rf "${tmp_dir}"
-
-  exit
+  quit 0
 
 : endif
 : endif
