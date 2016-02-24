@@ -18,7 +18,7 @@
 - use `syn enable` instead of `syn on`
 - turn off folds
 - add -h | --help | --usage option to display usage
-- preliminary support for neovim
+- preliminary support for neovim gh#133
 
 2.06 2015-06-28:
 - Solaris compatibility fixes
