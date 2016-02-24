@@ -128,20 +128,25 @@ main() {
 	fi
 
 	# determine location of rc file
+	vim_dir="$(read_vim_var '$VIM')"
 
 	# first check for a user ~/.vimpagerrc
 	if [ -n "${VIMPAGER_RC}" ]; then
 		vimrc="${VIMPAGER_RC}"
-	elif [ -f ~/.vimpagerrc ]; then
+	elif [ -r ~/.vimpagerrc ]; then
 		vimrc=~/.vimpagerrc
-	elif [ -f ~/.vim/vimpagerrc ]; then
+	elif [ -r ~/.vim/vimpagerrc ]; then
 		vimrc=~/.vim/vimpagerrc
-	elif [ -f ~/_vimpagerrc ]; then
+	elif [ -r ~/_vimpagerrc ]; then
 		vimrc=~/_vimpagerrc
+	elif [ -r ~/vimfiles/vimpagerrc ]; then
+		vimrc=~/vimfiles/vimpagerrc
+	elif [ -r "${vim_dir}/_vimpagerrc" ]; then
+		vimrc="${vim_dir}/_vimpagerrc"
 	fi
 
 	# then check if the user has a ~/.vimrc
-	[ -z "${vimrc}" ] && vimrc="$(find_rc vim vimrc)"
+	[ -z "${vimrc}" ] && vimrc="$(read_vim_var '$MYVIMRC')"
 
 	# then check for a global /etc/vimpagerrc and fall back to NORC
 	if [ -z "${vimrc}" ]; then
@@ -219,9 +224,6 @@ main() {
 	fi
 
 	if [ -n "${use_gvim}" ]; then
-		# find the .gvimrc
-		gvimrc="$(find_rc gvim gvimrc)"
-
 		# determine if this is an ssh session and/or $DISPLAY is set
 		if [ -n "${osx}" ]; then
 			if [ -z "${SSH_CONNECTION}" ] && command -v mvim >/dev/null; then
@@ -234,7 +236,7 @@ main() {
 				if [ -n "${SSH_CONNECTION}" ]; then
 					vim_cmd="vim"
 				# The Cygwin gvim uses X
-				elif [ -z "${win32_native_gvim}" ]; then
+				elif win32_native gvim; then
 					if [ -z "${DISPLAY}" ]; then
 						vim_cmd="vim"
 					else
@@ -571,11 +573,16 @@ tail_n() {
 	fi
 }
 
-find_vim_dir() {
-	vim -E -c 'call writefile([ $VIM ], "'${tmp}'/vimpager_vim_dir_'${$}'") | q' </dev/null
-	vim_dir=$(head_n 1 "${tmp}/vimpager_vim_dir_${$}")
+read_vim_var() {
+	vim -N -E -R -i NONE -c 'call writefile([ '"$1"' ], "'${tmp}'/vimpager_vimvar_'${$}'") | q' </dev/tty >/dev/null 2>&1
+	_var="$(head -n 1 "${tmp}/vimpager_vimvar_${$}")"
 
-	rm -f "${tmp}/vimpager_vim_dir_${$}"
+	rm -f "${tmp}/vimpager_vimrc_${$}"
+
+	echo "${_var}"
+	unset _var
+
+	return 0
 }
 
 extract_bundled_scripts() {
@@ -673,24 +680,12 @@ vim_less() {
 			return "${?}"
 			;;
 		*) # gvim or mvim GUI
-			[ -n "${gvimrc}" ] && colors=$(grep guifg ${gvimrc} 2>/dev/null | head_n 1)
-
-			# Check if the user maximized the window in ~/_gvimrc on Win32, if
-			# so restore on startup.
-			if [ -n "${gvimrc}" -a \( -n "${cygwin}" -o -n "${msys}" \) ]; then
-				simalt=$(grep simalt "${gvimrc}" 2>/dev/null | head_n 1)
-
-				if [ -n "${simalt}" ]; then
-					restore="simalt ~r"
-				fi
-			fi
-
 			(
 			${vim_cmd} -N \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd "call vimpager#Init({ ${init_opts} })" \
-				-c "${colors:-echo} | ${restore:-echo} | set columns=${cols}" \
+				-c "set columns=${cols}" \
 				-c "silent! args ${files}" \
 				-c 'autocmd vimpager VimLeave * call writefile([], "'"${tmp}"'/gvim_done")' \
 				"${@}"
@@ -756,41 +751,28 @@ _do_ptree() {
 	fi
 }
 
-# silence warnings about DY* variables on OSX
 do_ptree() {
 	_do_ptree "$@" 2>/dev/null
 }
 
-
-# this uses the heuristics described in :help startup
-find_rc() {
-	_cmd=$1
-	_rc_file=$2
-
-	[ -e "${HOME}/.${_rc_file}" ] && _rc="${HOME}/.${_rc_file}"
-	[ -z "${_rc}" ] && [ -e "${HOME}/_${_rc_file}" ] && _rc="${HOME}/_${_rc_file}"
-
-	if [ -n "${msys}" -o -n "${cygwin}" ]; then
-		if command -v ${_cmd} 2>/dev/null | grep_q '^\/(cygdrive\/)?[a-z]\/'; then
-			eval "win32_native_${cmd}=1"
-
-			if [ -e "${HOME}/_${_rc_file}" ]; then
-				_rc="${HOME}/_${_rc_file}"
-			elif [ -z "${_rc}" ]; then
-				[ -z "${vim_dir}" ] && find_vim_dir
-
-				if [ -e "${vim_dir}/_${_rc_file}" ]; then
-					_rc="${vim_dir}/_${_rc_file}"
-				elif [ -e "${vim_dir}/.${_rc_file}" ]; then
-					_rc="${vim_dir}/.${_rc_file}"
-				fi
+win32_native() {
+	if [ "$(eval "echo \${_win32_native_${1}}")" = 1 ]; then
+		return 0
+	else
+		if [ -n "${msys}" -o -n "${cygwin}" ]; then
+			if command -v "${1}" 2>/dev/null | grep_q '^\/(cygdrive\/)?[a-z]\/'; then
+				eval "_win32_native_${1}=1"
+				return 0
+			else
+				eval "_win32_native_${1}=0"
+				return 1
 			fi
+		else
+			eval "_win32_native_${1}=0"
+			return 1
 		fi
 	fi
-
-	echo "${_rc}"
-
-	unset _cmd _rc_file _rc
+	return 1
 }
 
 ansi_filter() {
