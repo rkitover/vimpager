@@ -32,6 +32,7 @@
 - allow overriding status line with `g;less.statusfunc`
 - use mapleader for `,v` mapping in less.vim, defaults to `,`
 - use vim's value of $MYVIMRC and $VIM for finding vimrc or vimpagerrc gh#141
+- disable viminfo, viminfo handling to be improved in the future gh#141
 
 2.06 2015-06-28:
 - more Solaris fixes

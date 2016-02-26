@@ -170,7 +170,7 @@ main() {
 	fi
 
 	# read settings
-	vim -N -u "${vimrc}" -E --cmd 'let g:vimpager = { "enabled": 1 }' -c '
+	vim -N -u "${vimrc}" -E -R -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' -c '
 		if !exists("g:vimpager.gvim")
 			if !exists("g:vimpager_use_gvim")
 				let g:vimpager.gvim = 0
@@ -681,7 +681,7 @@ vim_less() {
 				vim_cmd="${vim_cmd} -X"
 			fi
 
-			${vim_cmd} -N \
+			${vim_cmd} -N -i NONE \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd "call vimpager#Init({ ${init_opts} })" \
@@ -691,7 +691,7 @@ vim_less() {
 			;;
 		*) # gvim or mvim GUI
 			(
-			${vim_cmd} -N \
+			${vim_cmd} -N -i NONE \
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd "call vimpager#Init({ ${init_opts} })" \

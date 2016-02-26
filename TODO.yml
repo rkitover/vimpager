@@ -4,7 +4,7 @@
 - key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode
 - stream large files and stdin instead of copying to /tmp
 - allow clicking on man links in man and perldoc mode
-- reorganize src/ to be actual rtp paths
+- make vimpager usable from vim with pathogen and other plugin handlers
 
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
