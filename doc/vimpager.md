@@ -306,3 +306,7 @@ issue with the path and your OS version.
 
 vimpager works correctly with the native Windows gvim, just put it in
 your PATH and set the vimpager_use_gvim option as described above.
+
+# ENVIRONMENT
+
+You can specify the vimrc to use with the `VIMPAGER_RC` environment variable.

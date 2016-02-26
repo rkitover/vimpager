@@ -130,9 +130,19 @@ main() {
 	# determine location of rc file
 	vim_dir="$(read_vim_var '$VIM')"
 
+	user_vimrc="$(read_vim_var '$MYVIMRC')"
+
 	# first check for a user ~/.vimpagerrc
 	if [ -n "${VIMPAGER_RC}" ]; then
 		vimrc="${VIMPAGER_RC}"
+	# check for vimpagerrc in same dir as vimrc in case it is set in VIMINIT
+	elif [ -r "$(dirname "${user_vimrc}")"/.vimpagerrc ]; then
+		vimrc="$(dirname "${user_vimrc}")"/.vimpagerrc
+	elif [ -r "$(dirname "${user_vimrc}")"/_vimpagerrc ]; then
+		vimrc="$(dirname "${user_vimrc}")"/_vimpagerrc
+	elif [ -r "$(dirname "${user_vimrc}")"/vimpagerrc ]; then
+		vimrc="$(dirname "${user_vimrc}")"/vimpagerrc
+	# check standard paths, according to :h initialization
 	elif [ -r ~/.vimpagerrc ]; then
 		vimrc=~/.vimpagerrc
 	elif [ -r ~/.vim/vimpagerrc ]; then
@@ -145,10 +155,10 @@ main() {
 		vimrc="${vim_dir}/_vimpagerrc"
 	fi
 
-	# then check if the user has a ~/.vimrc
-	[ -z "${vimrc}" ] && vimrc="$(read_vim_var '$MYVIMRC')"
+	# use user's ~/.vimrc
+	[ -z "${vimrc}" ] && vimrc="${user_vimrc}"
 
-	# then check for a global /etc/vimpagerrc and fall back to NORC
+	# if no user vimrc, then check for a global /etc/vimpagerrc and fall back to NORC
 	if [ -z "${vimrc}" ]; then
 		if [ -f /usr/local/etc/vimpagerrc ]; then
 			vimrc=/usr/local/etc/vimpagerrc
