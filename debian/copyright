@@ -3,7 +3,7 @@ Upstream-Name: vimpager
 Upstream-Contact: Rafael Kitover <rkitover@gmail.com>
 Source: http://github.com/rkitover/vimpager
 
-Files: vimpager vimpagerrc *.yml Makefile LICENSE doc/vimpager.md doc/vimcat.md src/autoload/vimpager.vim src/prototypes/* scripts/awk-sh
+Files: vimpager vimpagerrc *.yml Makefile doc/vimpager.md doc/vimcat.md autoload/vimpager.vim prototypes/* scripts/awk-sh
 Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 
@@ -19,15 +19,15 @@ Files: debian/*
 Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 
-Files: src/plugin/cecutil.vim src/autoload/AnsiEsc.vim src/plugin/AnsiEscPlugin.vim
+Files: plugin/cecutil.vim autoload/AnsiEsc.vim plugin/AnsiEscPlugin.vim
 Copyright: 2013 Charles E. Campbell <drchip@campbellfamily.biz>
 License: Vim
 
-Files: src/less.vim uganda.txt
-Copyright: Bram Moolenaar <Bram@moolenaar.net>
+Files: macros/less.vim uganda.txt
+Copyright: 2016 Bram Moolenaar <Bram@moolenaar.net>
 License: Vim
 
-Files: src/perldoc.vim
+Files: syntax/perldoc.vim
 Copyright: 2012 Magnus Woldrich <m@japh.se>
 License: Vim
 
