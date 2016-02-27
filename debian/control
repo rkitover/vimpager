@@ -12,6 +12,10 @@ Package: vimpager
 Architecture: all
 Depends: gvim | vim, ${misc:Depends}
 Recommends: sharutils, gawk
-Description: PAGER using Vim and less.vim
- PAGER that uses Vim and less.vim for less compatible keystrokes, with support
- for highlighting man pages and many other features.
+Description: pager using vim and less.vim
+ Provides "vimpager", a pager that uses vim and less.vim to page files using
+ less compatible keystrokes, with support for syntax highlighting in man pages
+ and many other features.
+ .
+ Also provides "vimcat", which outputs files with vim syntax highlighting using
+ ANSI escape codes.
