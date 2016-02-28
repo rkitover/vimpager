@@ -99,6 +99,7 @@ install-deb:
 	@apt-get -y install debhelper devscripts equivs fakeroot gdebi-core
 	@mk-build-deps
 	@yes | gdebi vimpager-build-deps*.deb
+	@tar zcf ../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar.gz *
 	@dpkg-buildpackage -us -uc -rfakeroot
 	@yes | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
