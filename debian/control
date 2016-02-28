@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/rkitover/vimpager
 
 Package: vimpager
 Architecture: all
-Depends: gvim | vim, ${misc:Depends}
+Depends: vim-nox | gvim | vim, ${misc:Depends}
 Recommends: sharutils, gawk
 Description: pager using vim and less.vim
  Provides "vimpager", a pager that uses vim and less.vim to page files using
