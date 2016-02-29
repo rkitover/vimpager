@@ -41,9 +41,12 @@ function! s:LessStatusLine()
   let pos = substitute(pos, '"\(\s\+\d\+\s\+line\)', '\1', 'g')
   " urldecode
   let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
+  let pos .= "  [ Press ',h' for HELP ]"
+  " Trim the status line to fit the window width.
+  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
   echohl WarningMsg
   redraw
-  unsilent echo pos . "  [ Press ',h' for HELP ]"
+  unsilent echo pos
   echohl None
 endfunction
 
