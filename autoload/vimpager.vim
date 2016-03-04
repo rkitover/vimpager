@@ -37,14 +37,17 @@ function! s:LessStatusLine()
   let pos = substitute(pos, '[\r\n]\+', '', 'g')
   " remove tmp dir path
   let pos = substitute(pos, '^.*/', '', '')
+  " remove possible [readonly] tag (edge case)
+  let pos = substitute(pos, '\[readonly\]\s\+', '', '')
   " remove closing quote
-  let pos = substitute(pos, '"\(\s\+\d\+\s\+line\)', '\1', 'g')
+  let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
   " urldecode
   let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
   let pos .= "  [ Press ',h' for HELP ]"
   " Trim the status line to fit the window width.
   let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
-  echohl WarningMsg
+  highlight VimpagerStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
+  echohl VimpagerStatusLine
   redraw
   unsilent echo pos
   echohl None

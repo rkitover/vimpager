@@ -20,10 +20,6 @@ if !exists('g:less.enabled')
   let g:less.enabled = 1
 endif
 
-if !exists('g:less.statusfunc')
-  let g:less.statusfunc = function('s:DisplayPosition')
-endif
-
 " If not reading from stdin, skip files that can't be read.
 " Exit if there is no file at all.
 if g:less.enabled && argc() > 0
@@ -244,11 +240,19 @@ function! s:DisplayPosition()
   redir END
   " remove trailing newline
   let pos = substitute(pos, '[\r\n]\+', '', 'g')
-  echohl WarningMsg
+  let pos .= "  [ Press ',h' for help ]"
+  " Trim the status line to fit the window width.
+  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
+  highlight LessStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
+  echohl LessStatusLine
   redraw
-  unsilent echo pos . "  [ Press ',h' for help ]"
+  unsilent echo pos
   echohl None
 endfunction
+
+if !exists('g:less.statusfunc')
+  let g:less.statusfunc = function('s:DisplayPosition')
+endif
 
 function! s:NextPage()
   if line(".") == line("$")
