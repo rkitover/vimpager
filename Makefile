@@ -132,7 +132,7 @@ doc/html/%.html: %.md.work
 	@if command -v pandoc >/dev/null; then \
 		echo 'generating $@'; \
 		${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-		pandoc -s -f Markdown $< -o $@; \
+		pandoc -f markdown_github -s $< -o $@; \
 		rm -f $<; \
 	else \
 		if [ ! -r docs-warn-stamp ]; then \
