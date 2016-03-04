@@ -18,11 +18,12 @@ function! vimpager#Init(opts)
     " any pre and post processing necessary is written to .vim files
     autocmd BufWinEnter * silent! source %.vim
 
-    let g:__save_hidden = &hidden
+    " prevent an empty scratch buffer from appearing if user has set hidden
     set nohidden
+    autocmd BufReadPre,StdinReadPre * let g:__save_hidden = &hidden
     autocmd VimEnter * let &hidden = __save_hidden | unlet! __save_hidden
 
-    augroup end
+    augroup END
 
     " allow user's .vimrc or -c commands to override this
     set bg=dark
