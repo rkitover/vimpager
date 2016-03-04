@@ -1520,7 +1520,7 @@ EOF
 
 perldoc_vim() {
 	(cat <<'EOF') | do_uudecode > syntax/perldoc.vim
-begin 644 src/syntax/perldoc.vim
+begin 644 syntax/perldoc.vim
 M(B!.86UE.B`@("`@("!P97)L9&]C+G9I;0HB($UA:6YT86EN97(Z('1R87!D
 M,#!R"B(@3&]C871I;VXZ("`@:'1T<#HO+W1R87!D,#!R+G-E+V-O;F9I9W,O
 M<&5R;&1O8RYV:6T@("`@(`H*(B!4:&ES(&ES('1H92!S=&%N9&%R9"!P97)L
@@ -2114,7 +2114,7 @@ EOF
 
 ansi_esc_vim() {
 	(cat <<'EOF') | do_uudecode > autoload/AnsiEsc.vim
-begin 644 src/autoload/AnsiEsc.vim
+begin 644 autoload/AnsiEsc.vim
 M(B!!;G-I17-C+G9I;3H@57-E<R!V:6T@-RXP('-Y;G1A>"!H:6=H;&EG:'1I
 M;F<*(B!,86YG=6%G93H)"51E>'0@=VET:"!A;G-I(&5S8V%P92!S97%U96YC
 M97,*(B!-86EN=&%I;F5R.@E#:&%R;&5S($4N($-A;7!B96QL(#Q.9')/8VAI
@@ -6738,7 +6738,7 @@ EOF
 
 ansi_esc_plugin_vim() {
 	(cat <<'EOF') | do_uudecode > plugin/AnsiEscPlugin.vim
-begin 644 src/plugin/AnsiEscPlugin.vim
+begin 644 plugin/AnsiEscPlugin.vim
 M(B!!;G-I17-C4&QU9VEN+G9I;0HB("`@075T:&]R.B!#:&%R;&5S($4N($-A
 M;7!B96QL"B(@("!$871E.B`@($%P<B`P-RP@,C`Q,`HB("`@5F5R<VEO;CH@
 M,3-I"B(@+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM+2TM
@@ -6768,7 +6768,7 @@ EOF
 
 cecutil_plugin_vim() {
 	(cat <<'EOF') | do_uudecode > plugin/cecutil.vim
-begin 644 src/plugin/cecutil.vim
+begin 644 plugin/cecutil.vim
 M(B!C96-U=&EL+G9I;2`Z('-A=F4O<F5S=&]R92!W:6YD;W<@<&]S:71I;VX*
 M(B`@("`@("`@("`@("`@('-A=F4O<F5S=&]R92!M87)K('!O<VET:6]N"B(@
 M("`@("`@("`@("`@("!S879E+W)E<W1O<F4@<V5L96-T960@=7-E<B!M87!S
