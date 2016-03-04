@@ -76,7 +76,7 @@ can override it by creating a ~/.vimpagerrc or a ~/.vim/vimpagerrc.
 These are the keys for paging while in vimpager, they are the same as in
 less for the most part:
 
-| _Key_   | _Action_                | _Key_   | _Action_                  |  
+| **Key** | **Action**              | **Key** | **Action**                |  
 |---------|-------------------------|---------|---------------------------|  
 |Space    |One page forward         |b        |One page backward          |  
 |d        |Half a page forward      |u        |Half a page backward       |  
