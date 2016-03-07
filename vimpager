@@ -675,6 +675,11 @@ vim_less() {
 		init_opts="${init_opts} 'line_numbers': ${line_numbers} "
 	fi
 
+	quiet='silent! '
+	if [ -n "${VIMPAGER_DEBUG}" -a "${VIMPAGER_DEBUG}" != 0 ]; then
+		quiet=''
+	fi
+
 	case ${vim_cmd} in
 		vim*)
 			if [ -n "${disable_x11}" ]; then
@@ -685,7 +690,7 @@ vim_less() {
 				-u "${vimrc}" \
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd "call vimpager#Init({ ${init_opts} })" \
-				-c "silent! args ${files}" \
+				-c "${quiet}args ${files}" \
 				"${@}" </dev/tty
 			return "${?}"
 			;;
@@ -696,7 +701,7 @@ vim_less() {
 				--cmd "set rtp^=${tmp}/extra_vim_home" \
 				--cmd "call vimpager#Init({ ${init_opts} })" \
 				-c "set columns=${cols}" \
-				-c "silent! args ${files}" \
+				-c "${quiet}args ${files}" \
 				-c 'autocmd vimpager VimLeave * call writefile([], "'"${tmp}"'/gvim_done")' \
 				"${@}"
 			(
