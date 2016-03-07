@@ -1,7 +1,6 @@
 ---
 2.07:
 - for gvim only increase the number of columns if necessary for man pages
-- key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode
 - stream large files and stdin instead of copying to /tmp
 - allow clicking on man links in man and perldoc mode
 - make vimpager usable from vim with pathogen and other plugin handlers
@@ -21,3 +20,4 @@ DONE:
 - better error message for unreadable files
 - display actual file name on status line
 - display statusline on startup
+- key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode

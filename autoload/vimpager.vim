@@ -3,8 +3,14 @@ function! vimpager#Init(opts)
 
     call s:DisableConflictingPlugins()
 
-    augroup vimpager
+    augroup vimpager_process
+    autocmd!
 
+    " any pre and post processing necessary is written to .vim files
+    autocmd BufWinEnter * silent! source %.vim
+    augroup END
+
+    augroup vimpager
     autocmd!
 
     " can't pass a:opts in autocmd
@@ -12,16 +18,15 @@ function! vimpager#Init(opts)
 
     " can't use VimEnter because that fires after first file is read
     autocmd BufReadPre,StdinReadPre * call s:SetOptions(s:opts)
-
-    autocmd BufReadPre,StdinReadPre * runtime macros/less.vim
-
-    " any pre and post processing necessary is written to .vim files
-    autocmd BufWinEnter * silent! source %.vim
+    autocmd BufReadPre,StdinReadPre * let s:save_enabled = g:less.enabled | let g:less.enabled = 0 | runtime macros/less.vim | let g:less.enabled = s:save_enabled | unlet s:save_enabled
 
     " prevent an empty scratch buffer from appearing if user has set hidden
     set nohidden
     autocmd BufReadPre,StdinReadPre * let g:__save_hidden = &hidden
     autocmd VimEnter * let &hidden = __save_hidden | unlet! __save_hidden
+
+    " remove autocmds when done initializing
+    autocmd VimEnter * autocmd! vimpager
 
     augroup END
 
@@ -68,6 +73,8 @@ function! s:SetOptions(opts)
     if !exists('g:less.enabled')
         if exists('g:vimpager_less_mode')
             let g:less.enabled = g:vimpager_less_mode
+        else
+            let g:less.enabled = 1
         endif
     endif
 

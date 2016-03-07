@@ -7,6 +7,12 @@
 
 " Avoid loading this file twice, allow the user to define his own script.
 if (exists('g:less.loaded') && g:less.loaded ==# 1) || (exists('g:loaded_less') && g:loaded_less ==# 1)
+  " if the user re-read the file, he probably intends to turn on less mode
+  if exists('*s:LessMode')
+    call s:LessMode()
+  endif
+
+  " no need to redefine anything
   finish
 endif
 
@@ -47,13 +53,117 @@ if g:less.enabled && argc() > 0
   endwhile
 endif
 
+" called on OptionSet for options we track
+function! s:UpdateOption()
+  let opt = expand('<amatch>')
+  let val = v:option_new
+
+  let less_buffer = has_key(g:less.buffers, bufnr('%'))
+  let in_less     = less_buffer && g:less.buffers[bufnr('%')].enabled
+
+  if v:option_type ==? 'global'
+    execute 'let g:less.current_'.opt.' = val'
+
+    " if setting outside of less, assume the original is meant to be changed
+    if !in_less
+      execute 'let g:less.original_'.opt.' = val'
+    endif
+  endif
+
+  " if the option is global, assume the user used :set and wants to set both local and global
+  if in_less
+    execute 'let g:less.buffers[bufnr(''%'')].current_'.opt.' = val'
+  elseif less_buffer
+    execute 'let g:less.buffers[bufnr(''%'')].original_'.opt.' = val'
+  endif
+endfunction
+
+function! s:SaveSetOpt(opt, val)
+  if !exists('g:less.buffers.'.bufnr('%').'.original_'.a:opt)
+    execute 'let g:less.buffers[bufnr(''%'')].original_'.a:opt.' = &l:'.a:opt
+  endif
+  if !exists('g:less.original_'.a:opt)
+    execute 'let g:less.original_'.a:opt.' = &g:'.a:opt
+  endif
+  noautocmd execute 'let &l:'.a:opt.' = a:val'
+  execute 'let g:less.buffers[bufnr(''%'')].current_'.a:opt.' = &l:'.a:opt
+  execute 'let g:less.current_'.a:opt.' = &g:'.a:opt
+
+  augroup less
+    execute 'autocmd! OptionSet '.a:opt.' call s:UpdateOption()'
+  augroup END
+endfunction
+
+function! s:RestoreLocalOpts()
+  for k in keys(g:less.buffers[bufnr('%')])
+    if match(k, '^original_') !=# -1
+      let opt = k[9:-1]
+      execute 'let &l:'.opt.' = g:less.buffers[bufnr(''%'')].original_'.opt
+    endif
+  endfor
+endfunction
+
+function! s:RestoreGlobalOpts()
+  for k in keys(g:less)
+    if match(k, '^original_') !=# -1
+      let opt = k[9:-1]
+      execute 'let &g:'.opt.' = g:less.original_'.opt
+    endif
+  endfor
+endfunction
+
+function! s:RestoreOpts()
+  call s:RestoreGlobalOpts()
+  call s:RestoreLocalOpts()
+endfunction
+
+function! s:ReenableLocalOpts()
+  for k in keys(g:less.buffers[bufnr('%')])
+    if match(k, '^current_') !=# -1
+      let opt = k[8:-1]
+      execute 'let &l:'.opt.' = g:less.buffers[bufnr(''%'')].current_'.opt
+    endif
+  endfor
+endfunction
+
+function! s:ReenableGlobalOpts()
+  for k in keys(g:less)
+    if match(k, '^current_') !=# -1
+      let opt = k[8:-1]
+      execute 'let &g:'.opt.' = g:less.current_'.opt
+    endif
+  endfor
+endfunction
+
+function! s:ReenableOpts()
+  call s:ReenableGlobalOpts()
+  call s:ReenableLocalOpts()
+endfunction
+
+function! s:InLessBuffer()
+  return exists('g:less.buffers.'.bufnr('%'))
+endfunction
+
+function! s:InEnabledLessBuffer()
+  return s:InLessBuffer() && g:less.buffers[bufnr('%')].enabled
+endfunction
+
+function! s:EnterWindow()
+  if s:InEnabledLessBuffer()
+    call s:ReenableOpts()
+    call g:less.statusfunc()
+  else
+    call s:RestoreGlobalOpts()
+  endif
+endfunction
+
 " set up less mode before reading each file
 augroup less
   autocmd!
-  autocmd BufReadPre,StdinReadPre * if exists('g:less.enabled') && g:less.enabled | call s:LessMode() | endif
+  autocmd BufReadPost,StdinReadPost * if exists('g:less.enabled') && g:less.enabled | call s:LessMode() | endif
 
   " display file on start
-  autocmd BufWinEnter * if exists('g:less.enabled') && g:less.enabled | call g:less.statusfunc() | endif
+  autocmd BufWinEnter * call s:EnterWindow()
 augroup end
 
 " the toggle mapping we want globally and regardless of enabled setting
@@ -81,46 +191,82 @@ function! s:Backward()
   cnoremap <buffer> <silent> <script> <CR> <CR>:cunmap <lt>buffer> <lt>CR><CR>zt<SID>L
 endfunction
 
+function! s:DisplayPosition()
+  redir => pos
+    silent! file
+  redir END
+  " remove trailing newline
+  let pos = substitute(pos, '[\r\n]\+', '', 'g')
+  let pos .= "  [ Press ',h' for help ]"
+  " Trim the status line to fit the window width.
+  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
+  highlight LessStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
+  echohl LessStatusLine
+  redraw
+  unsilent echo pos
+  echohl None
+endfunction
+
 function! s:LessMode()
   if !exists('g:less')
-    let g:less = { 'enabled': 1 }
-  else
-    let g:less.enabled = 1
+    let g:less = {}
   endif
 
-  setlocal buftype=nofile modifiable noreadonly
-
-  if !exists('g:less.hlsearch') || g:less.hlsearch
-    setlocal hlsearch
-  else
-    setlocal nohlsearch
-    nohlsearch
+  if !exists('g:less.buffers')
+    let g:less.buffers = {}
   endif
 
-  setlocal incsearch
+  if !s:InLessBuffer()
+    let g:less.buffers[bufnr('%')] = {}
+  endif
+
+  let g:less.buffers[bufnr('%')].enabled = 1
+
+  if !exists('g:less.statusfunc')
+    let g:less.statusfunc = function('s:DisplayPosition')
+  endif
+
+  call s:SaveSetOpt('buftype', 'nowrite')
+  call s:SaveSetOpt('modifiable', 1)
+  call s:SaveSetOpt('readonly', 0)
+
   " Don't remember file names and positions
-  setlocal viminfo=
-  setlocal nows
+  call s:SaveSetOpt('viminfo', '')
 
   " Inhibit screen updates while searching
-  let g:less.original_lz = &l:lz
-  setlocal lz
+  call s:SaveSetOpt('lazyredraw', 1)
 
-  setlocal foldlevel=9999
+  " disable folds
+  call s:SaveSetOpt('foldlevel', 9999)
 
   if exists('g:less.number')
-    setlocal nu
+    call s:SaveSetOpt('number', 1)
   else
-    setlocal nonu
+    call s:SaveSetOpt('number', 0)
   endif
 
-  silent! set nornu
+  silent! call s:SaveSetOpt('relativenumber', 0)
 
   if !exists('g:less.scrolloff')
     let g:less.scrolloff = 5
   endif
-  let g:less.original_scrolloff = &l:scrolloff
-  let &l:scrolloff = g:less.scrolloff
+  call s:SaveSetOpt('scrolloff', g:less.scrolloff)
+
+  if !exists('g:less.hlsearch')
+    let g:less.hlsearch = 1
+  endif
+
+  if g:less.hlsearch
+    call s:SaveSetOpt('hlsearch', 1)
+    let g:less.buffers[bufnr('%')].hlsearch = 1
+  else
+    call s:SaveSetOpt('hlsearch', 0)
+    nohlsearch
+    let g:less.buffers[bufnr('%')].hlsearch = 0
+  endif
+
+  call s:SaveSetOpt('incsearch', 1)
+  call s:SaveSetOpt('wrapscan', 0)
 
   " Used after each command: put cursor at end and display position
   if &wrap
@@ -212,12 +358,8 @@ function! s:LessMode()
     noremap <buffer> <script> ? Hg0:call <SID>Backward()<CR>?
   endif
 
-  if !exists('g:less.hlsearch')
-    let g:less.hlsearch = 1
-  endif
-
   " esc-u to toggle search highlighting like in less
-  nnoremap <buffer> <ESC>u :if g:less.hlsearch ==# 1 \| set nohlsearch \| nohlsearch \| let g:less.hlsearch = 0 \| else \| set hlsearch \| let g:less.hlsearch = 1 \| endif<CR><CR>
+  nnoremap <buffer> <ESC>u :if g:less.buffers[bufnr('%')].hlsearch ==# 1 \| set nohlsearch \| nohlsearch \| let g:less.buffers[bufnr('%')].hlsearch = 0 \| else \| set hlsearch \| let g:less.buffers[bufnr('%')].hlsearch = 1 \| endif<CR><CR>
 
   call s:Forward()
   cunmap <buffer> <CR>
@@ -234,26 +376,6 @@ if exists('g:less.enabled') && g:less.enabled
   call s:LessMode()
 endif
 
-function! s:DisplayPosition()
-  redir => pos
-    silent! file
-  redir END
-  " remove trailing newline
-  let pos = substitute(pos, '[\r\n]\+', '', 'g')
-  let pos .= "  [ Press ',h' for help ]"
-  " Trim the status line to fit the window width.
-  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
-  highlight LessStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
-  echohl LessStatusLine
-  redraw
-  unsilent echo pos
-  echohl None
-endfunction
-
-if !exists('g:less.statusfunc')
-  let g:less.statusfunc = function('s:DisplayPosition')
-endif
-
 function! s:NextPage()
   if line(".") == line("$")
     if argidx() + 1 >= argc()
@@ -263,7 +385,7 @@ function! s:NextPage()
     next
     1
   else
-    exe "normal! \<C-F>"
+    execute "normal! \<C-F>"
   endif
 endfunction
 
@@ -285,7 +407,7 @@ function! s:Help()
 endfunction
 
 function! s:ToggleLess()
-  if !exists('g:less.enabled') || g:less.enabled ==# 0
+  if !exists('g:less.buffers.'.bufnr('%').'.enabled') || g:less.buffers[bufnr('%')].enabled ==# 0
     let jump = 5
     if exists('g:less.scrolloff')
       let jump = g:less.scrolloff
@@ -310,12 +432,8 @@ function! s:ToggleLess()
 endfunction
 
 function! s:End()
-  setlocal buftype=
-  let &l:scrolloff = g:less.original_scrolloff
-  if exists('g:less.original_lz')
-    let &l:lz = g:less.original_lz
-  endif
-  let g:less.enabled = 0
+  call s:RestoreOpts()
+  let g:less.buffers[bufnr('%')].enabled = 0
   unmap <buffer> ,h
   unmap <buffer> ,H
   unmap <buffer> <Space>
