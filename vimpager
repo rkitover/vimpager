@@ -665,6 +665,7 @@ vim_less() {
 		"${tmp}/extra_vim_home/bin/vimcat" \
 			-u "${vimrc}" \
 			--cmd "set rtp^=${tmp}/extra_vim_home | let vimpager={ 'enabled': 1 }" \
+			-c 'silent! source %.vim' \
 			"${@}" "${filename}" </dev/tty
 		return "${?}"
 	fi
