@@ -270,9 +270,9 @@ function! s:LessMode()
 
   " Used after each command: put cursor at end and display position
   if &wrap
-    noremap <buffer> <SID>L L0:call g:less.statusfunc()<CR>
+    noremap <silent> <buffer> <SID>L L0:call g:less.statusfunc()<CR>
   else
-    noremap <buffer> <SID>L Lg0:call g:less.statusfunc())<CR>
+    noremap <silent> <buffer> <SID>L Lg0:call g:less.statusfunc())<CR>
   endif
 
   " Give help
