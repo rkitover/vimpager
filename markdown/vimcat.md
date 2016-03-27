@@ -1,6 +1,20 @@
-% VIMCAT(1) vimcat user manual
-% Abdó Roig-Maranges <abdo.roig@gmail.com>
-% February 6, 2016
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+### Vimpager User Manual
+
+- [NAME](#name)
+- [SYNOPSIS](#synopsis)
+- [DESCRIPTION](#description)
+- [COMMAND LINE OPTIONS](#command-line-options)
+  - [-h | --help | --usage](#-h----help----usage)
+  - [-n](#-n)
+  - [-c cmd](#-c-cmd)
+  - [--cmd cmd](#--cmd-cmd)
+  - [-u vimrc](#-u-vimrc)
+  - [-o output_file](#-o-output_file)
+  - [-s](#-s)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # NAME
 
@@ -11,7 +25,8 @@ vimcat - vim based syntax highlighter
 vimcat [options] file1 [file2 ...]
 
 # DESCRIPTION
-cat's a file to stdout, syntax-highlighting it using vim as a backend.
+
+Prints a file to stdout, syntax-highlighting it using vim as a backend.
 
 On GitHub: <http://github.com/rkitover/vimpager>
 

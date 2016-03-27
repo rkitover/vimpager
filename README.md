@@ -1,1 +1,1 @@
-doc/vimpager.md
+markdown/vimpager.md

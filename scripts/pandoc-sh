@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Add metadata to generated docs.
+
+# Make section title for man pages.
+title=`echo "$@" | \
+    sed -e 's/.*-o *\([^ ]*\).*/\1/'
+`
+
+title=`basename "$title"`
+
+# Capitalize.
+title=`echo "$title" | tr 'a-z' 'A-Z'`
+
+title=`echo "$title" | sed \
+    -e 's/\.\([0-9][0-9]*\)/(\1)/' \
+    -e 's/\..*//' \
+    -e 's/$/ Vimpager User Manual/'
+`
+
+# Only do this for man pages.
+title=`echo "$title" | \
+    sed -e 's/^[^()]*Vimpager User Manual$/Vimpager User Manual/'
+`
+
+set -- "$@" -M title="$title"
+
+OLDIFS="$IFS"
+IFS='
+'
+
+for author in `sed -ne 's/^- //p' DOC_AUTHORS.yml`; do
+    set -- "$@" -M author="$author"
+done
+
+IFS="$OLDIFS"
+
+set -- "$@" -M date="`date +'%B %d, %Y'`"
+
+pandoc "$@"

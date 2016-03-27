@@ -1,12 +1,11 @@
 # These files can be made by the makefile
 #########################################
-vimpager.1
-vimcat.1
-man.tar.gz
+*.tar.gz
 *.work
 *.uu
 *-stamp
-doc/html
+html/
+man/
 
 # Test files
 #####################

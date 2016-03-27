@@ -73,7 +73,7 @@ Examples:
   [32mvimcat [1;35mprogram.py[0m		# output [1;35mprogram.py[0m with highlighting to terminal
 
 Project homepage: <[1;34mhttp://github.com/rkitover/vimpager[0m>
-and documentation: <[1;34mhttps://github.com/rkitover/vimpager/blob/master/doc/vimcat.md[0m>
+and documentation: <[1;34mhttps://github.com/rkitover/vimpager/blob/master/markdown/vimcat.md[0m>
 or available locally via: [32mman [1;35mvimcat[0m
 EOF
 }

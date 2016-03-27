@@ -1,6 +1,29 @@
-% VIMPAGER(1) vimpager user manual
-% Rafael Kitover <rkitover@gmail.com>
-% February 6, 2015
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+### Vimpager User Manual
+
+- [NAME](#name)
+- [SYNOPSIS](#synopsis)
+- [RUN-TIME DEPENDENCIES](#run-time-dependencies)
+- [BUILD DEPENDENCIES](#build-dependencies)
+- [INSTALL](#install)
+- [PATHOGEN INSTALLATION](#pathogen-installation)
+- [DESCRIPTION](#description)
+- [USING FROM VIM](#using-from-vim)
+- [COMMAND LINE OPTIONS](#command-line-options)
+  - [-h | --help | --usage](#-h----help----usage)
+  - [+ | +G](#--g)
+  - [-N | --LINE-NUMBERS](#-n----line-numbers)
+  - [-c cmd](#-c-cmd)
+  - [--cmd cmd](#--cmd-cmd)
+  - [-u vimrc](#-u-vimrc)
+  - [-s](#-s)
+- [ANSI ESCAPE SEQUENCES AND OVERSTRIKES](#ansi-escape-sequences-and-overstrikes)
+- [PASSTHROUGH MODE](#passthrough-mode)
+- [CYGWIN/MSYS/MSYS2 NOTES](#cygwinmsysmsys2-notes)
+- [ENVIRONMENT](#environment)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # NAME
 
@@ -14,7 +37,7 @@ vimpager [options] 'some file'
 
 cat 'some file' | vimpager [options]
 
-For vimcat see [here](doc/vimcat.md) or 'man vimcat'.
+For vimcat see [here](markdown/vimcat.md) or 'man vimcat'.
 
 # RUN-TIME DEPENDENCIES
 
@@ -22,8 +45,9 @@ For vimcat see [here](doc/vimcat.md) or 'man vimcat'.
 
 # BUILD DEPENDENCIES
 
-* sharutils or some uuencode (only if you change the src/*.vim sources)
+* sharutils or some uuencode (only if you change the */*.vim sources)
 * pandoc (for man pages and html, optional)
+* doctoc (for markdown TOCs, optional)
 
 # INSTALL
 
@@ -95,18 +119,18 @@ be used if the user does not have a `.vimrc` or `.vimpagerrc`.
 These are the keys for paging while in vimpager, they are the same as in
 less for the most part:
 
-| **Key** | **Action**              | **Key** | **Action**                |  
-|---------|-------------------------|---------|---------------------------|  
-|Space    |One page forward         |b        |One page backward          |  
-|d        |Half a page forward      |u        |Half a page backward       |  
-|Enter    |One line forward         |k        |One line backward          |  
-|G        |End of file              |g        |Start of file              |  
-|N%       |percentage in file       |,h       |Display this help          |  
-|/pattern |Search forward           |?pattern |Search backward            |  
-|n        |next match               |N        |Previous match             |  
+| **Key** | **Action**              | **Key** | **Action**                |
+|---------|-------------------------|---------|---------------------------|
+|Space    |One page forward         |b        |One page backward          |
+|d        |Half a page forward      |u        |Half a page backward       |
+|Enter    |One line forward         |k        |One line backward          |
+|G        |End of file              |g        |Start of file              |
+|N%       |percentage in file       |,h       |Display this help          |
+|/pattern |Search forward           |?pattern |Search backward            |
+|n        |next match               |N        |Previous match             |
 |`:n`     |next file                |`:N`     |Previous file              |
-|ESC-u    |toggle search highlight  |         |                           |  
-|q        |Quit                     |,v       |Toggle Less Mode           |  
+|ESC-u    |toggle search highlight  |         |                           |
+|q        |Quit                     |,v       |Toggle Less Mode           |
 
 The commands that start with `,` will use your value of `g:mapleader` if you set
 one instead.
@@ -183,7 +207,7 @@ let g:vimpager.X11 = 0
 
 **NOTE:** this may disable clipboard integration in X terminals.
 
-The scroll offset (:help scrolloff), may be specified by placing the 
+The scroll offset (:help scrolloff), may be specified by placing the
 following into your .vimrc/vimpagerrc (default = 5, disable = 0):
 
 ```vim
