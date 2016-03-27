@@ -1,3 +1,8 @@
+scriptencoding utf-8
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 function! vimpager#Init(opts)
     let g:vimpager = { 'enabled': 1 }
 
@@ -6,8 +11,9 @@ function! vimpager#Init(opts)
     augroup vimpager_process
     autocmd!
 
-    " any pre and post processing necessary is written to .vim files
-    autocmd BufWinEnter * silent! source %.vim
+    " any pre-processing necessary is written to .vim files
+    autocmd BufReadPost * silent! source %.vim
+
     augroup END
 
     augroup vimpager
@@ -17,13 +23,15 @@ function! vimpager#Init(opts)
     let s:opts = a:opts
 
     " can't use VimEnter because that fires after first file is read
-    autocmd BufReadPre,StdinReadPre * call s:SetOptions(s:opts)
-    autocmd BufReadPre,StdinReadPre * let s:save_enabled = g:less.enabled | let g:less.enabled = 0 | runtime macros/less.vim | let g:less.enabled = s:save_enabled | unlet s:save_enabled
+    autocmd BufReadPre,StdinReadPre * call s:SetOptions()
+    autocmd BufReadPre,StdinReadPre * runtime macros/less.vim
 
-    " prevent an empty scratch buffer from appearing if user has set hidden
-    set nohidden
-    autocmd BufReadPre,StdinReadPre * let g:__save_hidden = &hidden
-    autocmd VimEnter * let &hidden = __save_hidden | unlet! __save_hidden
+    " delete the "[No Name]" buffer since we don't use file args
+    autocmd BufReadPre,StdinReadPre * if bufname(1) ==# '' | bdelete 1 | endif
+
+    if has('gui')
+        autocmd VimEnter * call s:GUIInit()
+    endif
 
     " remove autocmds when done initializing
     autocmd VimEnter * autocmd! vimpager
@@ -33,39 +41,25 @@ function! vimpager#Init(opts)
     " allow user's .vimrc or -c commands to override this
     set bg=dark
     syntax enable
+    set mouse=a
+
+    if !has('nvim') " neovim has its own clipboard support
+        set ttymouse=xterm2
+        set clipboard=autoselect
+    endif
 endfunction
 
-function! s:LessStatusLine()
-  redir => pos
-    silent! file
-  redir END
-  " remove trailing newline
-  let pos = substitute(pos, '[\r\n]\+', '', 'g')
-  " remove tmp dir path
-  let pos = substitute(pos, '^.*/', '', '')
-  " remove possible [readonly] tag (edge case)
-  let pos = substitute(pos, '\[readonly\]\s\+', '', '')
-  " remove closing quote
-  let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
-  " urldecode
-  let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
-  let pos .= "  [ Press ',h' for HELP ]"
-  " Trim the status line to fit the window width.
-  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
-  highlight VimpagerStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
-  echohl VimpagerStatusLine
-  redraw
-  unsilent echo pos
-  echohl None
-endfunction
-
-function! s:SetOptions(opts)
-    if exists('s:options_set') && s:options_set ==# 1
-        return
+function! s:GUIInit()
+    if exists('s:opts.columns') && exists('s:opts.is_doc') && s:opts.is_doc && &columns < s:opts.columns
+        let &columns = s:opts.columns
     endif
 
-    let s:options_set = 1
+    augroup vimpager_finish
+        autocmd VimLeave * call writefile([], s:opts.tmp_dir . '/gvim_done')
+    augroup END
+endfunction
 
+function! s:SetOptions()
     if !exists('g:less')
         let g:less = {}
     endif
@@ -87,7 +81,7 @@ function! s:SetOptions(opts)
     endif
 
     if !exists('g:less.statusfunc')
-        let g:less.statusfunc = function('s:LessStatusLine')
+        let g:less.statusfunc = function('vimpager#CallStatusLineFunc')
     endif
 
     if !exists('g:mapleader')
@@ -95,82 +89,23 @@ function! s:SetOptions(opts)
     endif
 
     " process options
-    if exists('a:opts.line_numbers')
-        let g:less.number = a:opts.line_numbers
+    if exists('s:opts.line_numbers')
+        let g:less.number = s:opts.line_numbers
     endif
 endfunction
 
+" 7.3 has no partial funcrefs, and does not allow funcrefs to s:Func()
+function! vimpager#CallStatusLineFunc()
+    call vimpager_utils#StatusLine(s:opts)
+endfunction
+
 function! s:DisableConflictingPlugins()
-    " disable surround plugin
-    let g:loaded_surround = 1
+    " we can't use <nowait> on 7.3 in mappings in less.vim, so surround must be disabled in that case
+    if v:version < 704
+        let g:loaded_surround = 1
+    endif
 endfunction
 
-function! vimpager#DoAnsiEsc()
-    AnsiEsc
-    call s:ConcealRetab()
-    call s:CheckModelineFiletypeForAnsiEsc()
-
-    " this is necessary so that AnsiEsc is in the right state when returning to the file with :N
-    exe 'autocmd! vimpager BufWinLeave ' . expand('%') . ' AnsiEsc'
-endfunction
-
-function! s:ConcealRetab()
-    let current_modifiable = &l:modifiable
-    setlocal modifiable
-
-    let current_cursor = getpos('.')
-
-    call cursor(1,1)
-
-    let lnum = search('\t')
-
-    while lnum !=# 0
-        let newline = ''
-        let column  = 0
-        let linepos = 1
-	let line    = getline('.')
-
-        while linepos <=# len(line)
-            if line[linepos-1] ==# "\t"
-                let spaces   = 8 - (column % 8)
-                let column  += spaces
-
-                let newline .= repeat(' ', spaces)
-            else
-                let concealed = synconcealed(lnum, linepos)
-
-                if concealed[0] ==# 0 || (concealed[1] !=# '' && (&conceallevel ==# 1 || &conceallevel ==# 2))
-                    let column += 1
-                endif
-
-                let newline .= line[linepos-1]
-            endif
-
-            let linepos += 1
-        endwhile
-
-        call setline(lnum, newline)
-
-        let lnum = search('\t')
-    endwhile
-
-    call setpos('.', current_cursor)
-
-    let &l:modifiable = current_modifiable
-endfunction
-
-function! s:CheckModelineFiletypeForAnsiEsc()
-	redir => ft_set_from
-	    silent! verb set ft
-	    silent! verb set syntax
-	redir END
-
-	if ft_set_from =~# 'Last set from modeline\>'
-	    execute 'setlocal ft=' . &ft
-	    execute 'setlocal syntax=' . &syntax
-        else
-            noautocmd setlocal ft=ignore
-	endif
-endfunction
+let &cpo = s:save_cpo
 
 " vim: set ft=vim sw=4 et:

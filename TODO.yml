@@ -1,9 +1,7 @@
 ---
 2.07:
-- for gvim only increase the number of columns if necessary for man pages
 - stream large files and stdin instead of copying to /tmp
 - allow clicking on man links in man and perldoc mode
-- make vimpager usable from vim with pathogen and other plugin handlers
 
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
@@ -21,3 +19,5 @@ DONE:
 - display actual file name on status line
 - display statusline on startup
 - key less dict values on bufnr, there are weird bugs with multiple buffers when toggling less mode
+- for gvim only increase the number of columns if necessary for man pages
+- make vimpager usable from vim with pathogen and other plugin handlers

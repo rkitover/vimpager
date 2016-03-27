@@ -6,6 +6,12 @@
 " same terms as Vim. See uganda.txt.
 
 " Avoid loading this file twice, allow the user to define his own script.
+
+scriptencoding utf-8
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 if (exists('g:less.loaded') && g:less.loaded ==# 1) || (exists('g:loaded_less') && g:loaded_less ==# 1)
   " if the user re-read the file, he probably intends to turn on less mode
   if exists('*s:LessMode')
@@ -13,6 +19,7 @@ if (exists('g:less.loaded') && g:less.loaded ==# 1) || (exists('g:loaded_less') 
   endif
 
   " no need to redefine anything
+  let &cpo = s:save_cpo
   finish
 endif
 
@@ -22,35 +29,10 @@ endif
 
 let g:less.loaded = 1
 
-if !exists('g:less.enabled')
-  let g:less.enabled = 1
-endif
-
-" If not reading from stdin, skip files that can't be read.
-" Exit if there is no file at all.
-if g:less.enabled && argc() > 0
-  let s:i = 0
-  while 1
-    if filereadable(argv(s:i))
-      if s:i != 0
-	sleep 3
-      endif
-      break
-    endif
-    if isdirectory(argv(s:i))
-      echomsg "Skipping directory " . argv(s:i)
-    elseif getftime(argv(s:i)) < 0
-      echomsg "Skipping non-existing file " . argv(s:i)
-    else
-      echomsg "Skipping unreadable file " . argv(s:i)
-    endif
-    echo "\n"
-    let s:i = s:i + 1
-    if s:i == argc()
-      quit
-    endif
-    next
-  endwhile
+" This must be set before the first LessMode(), so that if enabled for the
+" current file at source time, there is no jump.
+if !exists('g:less.scrolloff')
+  let g:less.scrolloff = 5
 endif
 
 " called on OptionSet for options we track
@@ -89,9 +71,11 @@ function! s:SaveSetOpt(opt, val)
   execute 'let g:less.buffers[bufnr(''%'')].current_'.a:opt.' = &l:'.a:opt
   execute 'let g:less.current_'.a:opt.' = &g:'.a:opt
 
-  augroup less
-    execute 'autocmd! OptionSet '.a:opt.' call s:UpdateOption()'
-  augroup END
+  if exists('##OptionSet')
+    augroup less
+      execute 'autocmd! OptionSet '.a:opt.' call s:UpdateOption()'
+    augroup END
+  endif
 endfunction
 
 function! s:RestoreLocalOpts()
@@ -166,38 +150,55 @@ augroup less
   autocmd BufWinEnter * call s:EnterWindow()
 augroup end
 
+" 7.3 does not support <nowait> in maps, so we only add it for 7.4+
+function! s:Map(cmd)
+  let cmd = a:cmd
+
+  if v:version >= 704
+    let cmd = substitute(cmd, '^\(\s*\S*map\s\+\)', '\1<nowait> ', '')
+  endif
+
+  execute cmd
+endfunction
+
 " the toggle mapping we want globally and regardless of enabled setting
-nnoremap <Leader>v :call <SID>ToggleLess()<CR>
+call s:Map('nnoremap <silent> <Leader>v :call <SID>ToggleLess()<CR>')
 
 function! s:Forward()
   " Searching forward
-  noremap <buffer> <script> n H$nzt<SID>L
+  call s:Map('noremap <buffer> <script> n H$nzt<SID>L')
   if &wrap
-    noremap <buffer> <script> N H0Nzt<SID>L
+    call s:Map('noremap <buffer> <script> N H0Nzt<SID>L')
   else
-    noremap <buffer> <script> N Hg0Nzt<SID>L
+    call s:Map('noremap <buffer> <script> N Hg0Nzt<SID>L')
   endif
-  cnoremap <buffer> <silent> <script> <CR> <CR>:cunmap <lt>buffer> <lt>CR><CR>zt<SID>L
+  call s:Map('cnoremap <silent> <buffer> <script> <CR> <CR>:silent! cunmap <lt>buffer> <lt>CR><CR>zt<SID>L')
 endfunction
 
 function! s:Backward()
   " Searching backward
   if &wrap
-    noremap <buffer> <script> n H0nzt<SID>L
+    call s:Map('noremap <buffer> <script> n H0nzt<SID>L')
   else
-    noremap <buffer> <script> n Hg0nzt<SID>L
+    call s:Map('noremap <buffer> <script> n Hg0nzt<SID>L')
   endif
-  noremap <buffer> <script> N H$Nzt<SID>L
-  cnoremap <buffer> <silent> <script> <CR> <CR>:cunmap <lt>buffer> <lt>CR><CR>zt<SID>L
+  call s:Map('noremap <buffer> <script> N H$Nzt<SID>L')
+  call s:Map('cnoremap <silent> <buffer> <silent> <script> <CR> <CR>:silent! cunmap <lt>buffer> <lt>CR><CR>zt<SID>L')
 endfunction
 
-function! s:DisplayPosition()
+function! s:StatusLine()
   redir => pos
     silent! file
   redir END
   " remove trailing newline
   let pos = substitute(pos, '[\r\n]\+', '', 'g')
-  let pos .= "  [ Press ',h' for help ]"
+  " remove any beginning quotes
+  let pos = substitute(pos, '^"*', '', '')
+  " remove closing quote
+  let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
+  " add help message
+  let leader = exists('g:mapleader') ? g:mapleader : '\'
+  let pos .= "  [ Press '".leader."h' for HELP ]"
   " Trim the status line to fit the window width.
   let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
   highlight LessStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
@@ -205,6 +206,136 @@ function! s:DisplayPosition()
   redraw
   unsilent echo pos
   echohl None
+endfunction
+
+" In 7.3 calling a funcref to an s:Func() from a mapping is not allowed, so we call it indirectly
+function! s:CallStatusFunc()
+  call g:less.statusfunc()
+endfunction
+
+" define Less command
+
+command! -nargs=* -complete=customlist,s:LessCmdComplete -bang Less call s:LessCmd('<args>', '<bang>')
+
+function! s:LessCmdComplete(arg_lead, cmd_line, cur_pos)
+  " if the user hasn't typed a space, return a space
+  if a:cmd_line !~# '\s'
+    return [' ']
+  endif
+
+  " complete option, -b, -t or -w
+  if a:arg_lead ==# '-'
+    return ['-t', '-v', '-w', '-b']
+  endif
+
+  " check for absolute path
+  if a:arg_lead =~# '^/'
+    return glob(a:arg_lead . '*', 0, 1)
+  endif
+
+  " check if command (first word after :Less!)
+  if a:cmd_line =~# '^Less!\s\+\S\+$'
+    return map(globpath(substitute($PATH, '[:;]', ',', 'g'), a:arg_lead . '*', 1, 1),
+      \ 'substitute(v:val, ''^.*/\(.*\)'', ''\1'', '''')')
+  endif
+
+  " otherwise complete files in current dir
+  return glob(a:arg_lead . '*', 0, 1)
+endfunction
+
+function! s:LessCmd(args, bang)
+  let args = split(a:args, '\%(\\\)\@<!\s')
+
+  if !len(args)
+    if a:bang ==# '!'
+      call s:LessMode()
+    else
+      call s:ToggleLess()
+    endif
+    return
+  endif
+
+  if args[0] =~# '^-[tvwb]$'
+    let opt  = args[0]
+    let args = args[1:-1]
+
+    if !len(args)
+      let missing = a:bang ==# '!' ? 'command' : 'file'
+      echohl Error
+      unsilent echomsg missing . ' is required!'
+      echohl None
+      return
+    endif
+
+    if opt ==# '-t'
+      tabnew
+    elseif opt ==# '-w'
+      new
+    elseif opt ==# '-v'
+      vnew
+    else
+      enew
+    endif
+  else
+    enew
+  endif
+
+  if a:bang ==# '!'
+    silent execute '0read! ' . join(args, ' ')
+
+    " check if it's a man command
+    if args[0] =~? '^\%(man\|perldoc\|pydoc\|ri\)$'
+      " remove leading blank lines
+      while getline(1) =~# '^\s*$'
+        1d
+      endwhile
+
+      " remove overstrikes
+      %s/.\b//eg
+
+      " remove ANSI codes
+      %s/\e\[[;?]*[0-9.;]*[A-Za-z]//eg
+
+      setlocal filetype=man
+    endif
+
+    call s:LessMode()
+  else
+    let save_less_mode = g:less.enabled
+    let g:less.enabled = 1
+
+    execute 'edit ' . join(args, ' ')
+
+    let g:less.enabled = save_less_mode
+  endif
+
+  " move to top
+  normal gg0
+
+  " check for ansi Codes
+  if search('\e\[[;?]*[0-9.;]*[A-Za-z]', 'c') !=# 0
+    " if ft or syntax is set from modeline, do nothing
+    redir => ft_set_from
+        silent! verb setlocal ft
+        silent! verb setlocal syntax
+    redir END
+
+    if ft_set_from !~# '\<Last set from modeline\>'
+      " use AnsiEsc if available
+      if exists(':AnsiEsc') ==# 2
+        noautocmd setlocal filetype=ignored
+        AnsiEsc
+      else
+        " otherwise remove ANSI codes
+        %s/\e\[[;?]*[0-9.;]*[A-Za-z]//eg
+      endif
+    endif
+  endif
+
+  filetype detect
+
+  " move to top again, because search() moves the cursor
+  normal gg0
 endfunction
 
 function! s:LessMode()
@@ -223,7 +354,7 @@ function! s:LessMode()
   let g:less.buffers[bufnr('%')].enabled = 1
 
   if !exists('g:less.statusfunc')
-    let g:less.statusfunc = function('s:DisplayPosition')
+    let g:less.statusfunc = function('s:StatusLine')
   endif
 
   call s:SaveSetOpt('buftype', 'nowrite')
@@ -240,16 +371,27 @@ function! s:LessMode()
   call s:SaveSetOpt('foldlevel', 9999)
 
   if exists('g:less.number')
-    call s:SaveSetOpt('number', 1)
+    call s:SaveSetOpt('number', g:less.number)
   else
     call s:SaveSetOpt('number', 0)
   endif
 
   silent! call s:SaveSetOpt('relativenumber', 0)
 
+  " adjust cursor position for scrolloff setting
   if !exists('g:less.scrolloff')
     let g:less.scrolloff = 5
   endif
+  let jump = g:less.scrolloff
+
+  let curpos = getpos('.')
+
+  if winline() <= jump
+      call setpos('.', [curpos[0], curpos[1] + (jump - winline()) + 1, curpos[2], curpos[3]])
+  elseif (winheight(0) - winline()) <= jump
+      call setpos('.', [curpos[0], curpos[1] - (jump - (winheight(0) - winline())) - 1 , curpos[2], curpos[3]])
+  endif
+
   call s:SaveSetOpt('scrolloff', g:less.scrolloff)
 
   if !exists('g:less.hlsearch')
@@ -270,111 +412,130 @@ function! s:LessMode()
 
   " Used after each command: put cursor at end and display position
   if &wrap
-    noremap <silent> <buffer> <SID>L L0:call g:less.statusfunc()<CR>
+    call s:Map('noremap <silent> <buffer> <SID>L L0:call <SID>CallStatusFunc()<CR>')
   else
-    noremap <silent> <buffer> <SID>L Lg0:call g:less.statusfunc())<CR>
+    call s:Map('noremap <silent> <buffer> <SID>L Lg0:silent! call <SID>CallStatusFunc())<CR>')
   endif
 
   " Give help
-  noremap <buffer> ,h :call <SID>Help()<CR>
-  map <buffer> ,H ,h
+  call s:Map('nnoremap <silent> <buffer> <Leader>h :unsilent call <SID>Help()<CR>')
+  call s:Map('nnoremap <silent> <buffer> <Leader>H :unsilent call <SID>Help()<CR>')
 
   " Scroll one page forward
-  noremap <buffer> <script> <Space> :call <SID>NextPage()<CR><SID>L
-  map <buffer> <C-V> <Space>
-  map <buffer> f <Space>
-  map <buffer> <C-F> <Space>
-  map <buffer> <PageDown> <Space>
-  map <buffer> <kPageDown> <Space>
-  map <buffer> <S-Down> <Space>
-  map <buffer> z <Space>
-  map <buffer> <Esc><Space> <Space>
+  call s:Map('noremap <silent> <buffer> <script> <Space> :call <SID>NextPage()<CR><SID>L')
+  call s:Map('map <buffer> <C-V> <Space>')
+  call s:Map('map <buffer> f <Space>')
+  call s:Map('map <buffer> <C-F> <Space>')
+  call s:Map('map <buffer> <PageDown> <Space>')
+  call s:Map('map <buffer> <kPageDown> <Space>')
+  call s:Map('map <buffer> <S-Down> <Space>')
+  call s:Map('map <buffer> z <Space>')
+  call s:Map('map <buffer> <Esc><Space> <Space>')
 
   " Re-read file and page forward "tail -f"
-  map <buffer> F :e<CR>G<SID>L:sleep 1<CR>F
+  call s:Map('map <silent> <buffer> F :e<CR>G<SID>L:sleep 1<CR>F')
 
   " Scroll half a page forward
-  noremap <buffer> <script> d <C-D><SID>L
-  map <buffer> <C-D> d
+  call s:Map('noremap <buffer> <script> d <C-D><SID>L')
+  call s:Map('map <buffer> <C-D> d')
 
   " Scroll one line forward
-  noremap <buffer> <script> <CR> <C-E><SID>L
-  map <buffer> <C-N> <CR>
-  map <buffer> e <CR>
-  map <buffer> <C-E> <CR>
-  map <buffer> j <CR>
-  map <buffer> <C-J> <CR>
-  map <buffer> <Down> 1<C-d>
+  call s:Map('noremap <buffer> <script> <CR> <C-E><SID>L')
+  call s:Map('map <buffer> <C-N> <CR>')
+  call s:Map('map <buffer> e <CR>')
+  call s:Map('map <buffer> <C-E> <CR>')
+  call s:Map('map <buffer> j <CR>')
+  call s:Map('map <buffer> <C-J> <CR>')
+  call s:Map('map <buffer> <Down> 1<C-d>')
 
   " Scroll one page backward
-  noremap <buffer> <script> b <C-B><SID>L
-  map <buffer> <C-B> b
-  map <buffer> <PageUp> b
-  map <buffer> <kPageUp> b
-  map <buffer> <S-Up> b
-  map <buffer> w b
-  map <buffer> <Esc>v b
+  call s:Map('noremap <buffer> <script> b <C-B><SID>L')
+  call s:Map('map <buffer> <C-B> b')
+  call s:Map('map <buffer> <PageUp> b')
+  call s:Map('map <buffer> <kPageUp> b')
+  call s:Map('map <buffer> <S-Up> b')
+  call s:Map('map <buffer> w b')
+  call s:Map('map <buffer> <Esc>v b')
 
   " Scroll half a page backward
-  noremap <buffer> <script> u <C-U><SID>L
-  noremap <buffer> <script> <C-U> <C-U><SID>L
+  call s:Map('noremap <buffer> <script> u <C-U><SID>L')
+  call s:Map('noremap <buffer> <script> <C-U> <C-U><SID>L')
 
   " Scroll one line backward
-  noremap <buffer> <script> k <C-Y><SID>L
-  map <buffer> y k
-  map <buffer> <C-Y> k
-  map <buffer> <C-P> k
-  map <buffer> <C-K> k
-  map <buffer> <Up> 1<C-u>
+  call s:Map('noremap <buffer> <script> k <C-Y><SID>L')
+  call s:Map('map <buffer> y k')
+  call s:Map('map <buffer> <C-Y> k')
+  call s:Map('map <buffer> <C-P> k')
+  call s:Map('map <buffer> <C-K> k')
+  call s:Map('map <buffer> <Up> 1<C-u>')
 
   " Redraw
-  noremap <buffer> <script> r <C-L><SID>L
-  noremap <buffer> <script> <C-R> <C-L><SID>L
-  noremap <buffer> <script> R <C-L><SID>L
+  call s:Map('noremap <buffer> <script> r <C-L><SID>L')
+  call s:Map('noremap <buffer> <script> <C-R> <C-L><SID>L')
+  call s:Map('noremap <buffer> <script> R <C-L><SID>L')
 
   " Start of file
-  noremap <buffer> <script> g gg<SID>L
-  map <buffer> < g
-  map <buffer> <Esc>< g
-  map <buffer> <Home> g
-  map <buffer> <kHome> g
+  call s:Map('noremap <buffer> <script> g gg<SID>L')
+  call s:Map('map <buffer> < g')
+  call s:Map('map <buffer> <Esc>< g')
+  call s:Map('map <buffer> <Home> g')
+  call s:Map('map <buffer> <kHome> g')
 
   " End of file
-  noremap <buffer> <script> G G<SID>L
-  map <buffer> > G
-  map <buffer> <Esc>> G
-  map <buffer> <End> G
-  map <buffer> <kEnd> G
+  call s:Map('noremap <buffer> <script> G G<SID>L')
+  call s:Map('map <buffer> > G')
+  call s:Map('map <buffer> <Esc>> G')
+  call s:Map('map <buffer> <End> G')
+  call s:Map('map <buffer> <kEnd> G')
 
   " Go to percentage
-  noremap <buffer> <script> % %<SID>L
-  map <buffer> p %
+  call s:Map('noremap <buffer> <script> % %<SID>L')
+  call s:Map('map <buffer> p %')
 
   " Search
-  noremap <buffer> <script> / H$:call <SID>Forward()<CR>/
+  call s:Map('noremap <silent> <buffer> <script> / H$:call <SID>Forward()<CR>/')
   if &wrap
-    noremap <buffer> <script> ? H0:call <SID>Backward()<CR>?
+    call s:Map('noremap <silent> <buffer> <script> ? H0:call <SID>Backward()<CR>?')
   else
-    noremap <buffer> <script> ? Hg0:call <SID>Backward()<CR>?
+    call s:Map('noremap <silent> <buffer> <script> ? Hg0:call <SID>Backward()<CR>?')
   endif
 
   " esc-u to toggle search highlighting like in less
-  nnoremap <buffer> <ESC>u :if g:less.buffers[bufnr('%')].hlsearch ==# 1 \| set nohlsearch \| nohlsearch \| let g:less.buffers[bufnr('%')].hlsearch = 0 \| else \| set hlsearch \| let g:less.buffers[bufnr('%')].hlsearch = 1 \| endif<CR><CR>
+  call s:Map('nnoremap <silent> <buffer> <ESC>u :if g:less.buffers[bufnr(''%'')].hlsearch ==# 1 \| set nohlsearch \| nohlsearch \| let g:less.buffers[bufnr(''%'')].hlsearch = 0 \| else \| set hlsearch \| let g:less.buffers[bufnr(''%'')].hlsearch = 1 \| endif<CR><CR>')
 
   call s:Forward()
-  cunmap <buffer> <CR>
+  silent! cunmap <buffer> <CR>
 
   " Quitting
-  noremap <buffer> q :<C-u>qa!<CR>
+  call s:Map('noremap <silent> <buffer> q :<C-u>call <SID>CloseBuffer()<CR>')
 
   " Switch to editing (switch off less mode) with v (,v is global)
-  map <buffer> v :call <SID>End()<CR>
+  call s:Map('map <silent> <buffer> v :call <SID>ToggleLess()<CR>')
+
+  call g:less.statusfunc()
 endfunction
 
-" enable for current file
-if exists('g:less.enabled') && g:less.enabled
-  call s:LessMode()
-endif
+function! s:CloseBuffer()
+  redir => ls_out
+    silent! ls
+  redir END
+
+  " check if this is the last buffer, if so quit
+  if ls_out =~# '^\n\s\+\d\+\s\+%\S*a[^\n]*$'
+    quit
+  endif
+
+  " check if there are unopened args
+  if ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
+    let cur_buf = bufnr('%')
+    silent! next
+    execute 'bdelete ' . cur_buf
+    return
+  endif
+
+  " otherwise delete the buffer
+  bdelete
+endfunction
 
 function! s:NextPage()
   if line(".") == line("$")
@@ -390,11 +551,12 @@ function! s:NextPage()
 endfunction
 
 function! s:Help()
+  let leader = exists('g:mapleader') ? g:mapleader : '\'
   echo "<Space>   One page forward          b         One page backward"
   echo "d         Half a page forward       u         Half a page backward"
   echo "<Enter>   One line forward          k         One line backward"
   echo "G         End of file               g         Start of file"
-  echo "N%        percentage in file        ,h        Display this help"
+  echo "N%        percentage in file        ".leader."h        Display this help"
   echo "\n"
   echo "/pattern  Search for pattern        ?pattern  Search backward for pattern"
   echo "n         next pattern match        N         Previous pattern match"
@@ -402,25 +564,12 @@ function! s:Help()
   echo "\n"
   echo ":n<Enter> Next file                 :N<Enter> Previous file"
   echo "\n"
-  echo "q         Quit                      ,v        Toggle Less Mode"
+  echo "q         Quit                      ".leader."v        Toggle Less Mode"
   let i = input("Hit Enter to continue")
 endfunction
 
 function! s:ToggleLess()
   if !exists('g:less.buffers.'.bufnr('%').'.enabled') || g:less.buffers[bufnr('%')].enabled ==# 0
-    let jump = 5
-    if exists('g:less.scrolloff')
-      let jump = g:less.scrolloff
-    endif
-
-    let curpos = getpos('.')
-
-    if winline() <= jump
-        call setpos('.', [curpos[0], curpos[1] + (jump - winline()) + 1, curpos[2], curpos[3]])
-    elseif (winheight(0) - winline()) <= jump
-        call setpos('.', [curpos[0], curpos[1] - (jump - (winheight(0) - winline())) - 1 , curpos[2], curpos[3]])
-    endif
-
     call s:LessMode()
     redraw
     echomsg 'Less Mode Enabled'
@@ -431,66 +580,73 @@ function! s:ToggleLess()
   endif
 endfunction
 
+" enable for current file at source time, but disable for other files and from .vimrc
+if !has('vim_starting') && (!exists('g:less.enabled') || g:less.enabled)
+  Less
+endif
+
 function! s:End()
   call s:RestoreOpts()
   let g:less.buffers[bufnr('%')].enabled = 0
-  unmap <buffer> ,h
-  unmap <buffer> ,H
-  unmap <buffer> <Space>
-  unmap <buffer> <C-V>
-  unmap <buffer> f
-  unmap <buffer> <C-F>
-  unmap <buffer> z
-  unmap <buffer> <Esc><Space>
-  unmap <buffer> F
-  unmap <buffer> d
-  unmap <buffer> <C-D>
-  unmap <buffer> <CR>
-  unmap <buffer> <C-N>
-  unmap <buffer> e
-  unmap <buffer> <C-E>
-  unmap <buffer> j
-  unmap <buffer> <C-J>
-  unmap <buffer> b
-  unmap <buffer> <C-B>
-  unmap <buffer> w
-  unmap <buffer> <Esc>v
-  unmap <buffer> u
-  unmap <buffer> <C-U>
-  unmap <buffer> k
-  unmap <buffer> y
-  unmap <buffer> <C-Y>
-  unmap <buffer> <C-P>
-  unmap <buffer> <C-K>
-  unmap <buffer> r
-  unmap <buffer> <C-R>
-  unmap <buffer> R
-  unmap <buffer> g
-  unmap <buffer> <
-  unmap <buffer> <Esc><
-  unmap <buffer> G
-  unmap <buffer> >
-  unmap <buffer> <Esc>>
-  unmap <buffer> %
-  unmap <buffer> p
-  unmap <buffer> n
-  unmap <buffer> N
-  unmap <buffer> q
-  unmap <buffer> v
-  unmap <buffer> /
-  unmap <buffer> ?
-  unmap <buffer> <Up>
-  unmap <buffer> <Down>
-  unmap <buffer> <PageDown>
-  unmap <buffer> <kPageDown>
-  unmap <buffer> <PageUp>
-  unmap <buffer> <kPageUp>
-  unmap <buffer> <S-Down>
-  unmap <buffer> <S-Up>
-  unmap <buffer> <Home>
-  unmap <buffer> <kHome>
-  unmap <buffer> <End>
-  unmap <buffer> <kEnd>
+  silent! unmap <buffer> <Leader>h
+  silent! unmap <buffer> <Leader>H
+  silent! unmap <buffer> <Space>
+  silent! unmap <buffer> <C-V>
+  silent! unmap <buffer> f
+  silent! unmap <buffer> <C-F>
+  silent! unmap <buffer> z
+  silent! unmap <buffer> <Esc><Space>
+  silent! unmap <buffer> F
+  silent! unmap <buffer> d
+  silent! unmap <buffer> <C-D>
+  silent! unmap <buffer> <CR>
+  silent! unmap <buffer> <C-N>
+  silent! unmap <buffer> e
+  silent! unmap <buffer> <C-E>
+  silent! unmap <buffer> j
+  silent! unmap <buffer> <C-J>
+  silent! unmap <buffer> b
+  silent! unmap <buffer> <C-B>
+  silent! unmap <buffer> w
+  silent! unmap <buffer> <Esc>v
+  silent! unmap <buffer> u
+  silent! unmap <buffer> <C-U>
+  silent! unmap <buffer> k
+  silent! unmap <buffer> y
+  silent! unmap <buffer> <C-Y>
+  silent! unmap <buffer> <C-P>
+  silent! unmap <buffer> <C-K>
+  silent! unmap <buffer> r
+  silent! unmap <buffer> <C-R>
+  silent! unmap <buffer> R
+  silent! unmap <buffer> g
+  silent! unmap <buffer> <
+  silent! unmap <buffer> <Esc><
+  silent! unmap <buffer> G
+  silent! unmap <buffer> >
+  silent! unmap <buffer> <Esc>>
+  silent! unmap <buffer> %
+  silent! unmap <buffer> p
+  silent! unmap <buffer> n
+  silent! unmap <buffer> N
+  silent! unmap <buffer> q
+  silent! unmap <buffer> v
+  silent! unmap <buffer> /
+  silent! unmap <buffer> ?
+  silent! unmap <buffer> <Up>
+  silent! unmap <buffer> <Down>
+  silent! unmap <buffer> <PageDown>
+  silent! unmap <buffer> <kPageDown>
+  silent! unmap <buffer> <PageUp>
+  silent! unmap <buffer> <kPageUp>
+  silent! unmap <buffer> <S-Down>
+  silent! unmap <buffer> <S-Up>
+  silent! unmap <buffer> <Home>
+  silent! unmap <buffer> <kHome>
+  silent! unmap <buffer> <End>
+  silent! unmap <buffer> <kEnd>
 endfunction
+
+let &cpo = s:save_cpo
 
 " vim: sw=2

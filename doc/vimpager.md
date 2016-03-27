@@ -59,7 +59,26 @@ alias less=$PAGER
 alias zless=$PAGER
 ```
 
+# PATHOGEN INSTALLATION
+
+```bash
+cd ~/.vim/bundle
+git clone https://github.com/rkitover/vimpager.git
+```
+
+If you installed using one of the above methods, you can add the runtime to your
+`runtimepath` by putting the following in your `.vimrc`:
+
+```vim
+set rtp^=/usr/share/vimpager
+```
+
+Set `PAGER` and aliases as above with the path into `~/.vim/bundle/vimpager`.
+
+See [Using From Vim](#using-from-vim).
+
 # DESCRIPTION
+
 A PAGER using less.vim with support for highlighting of man pages and
 many other features. Works on most UNIX-like systems as well as Cygwin
 and MSYS.
@@ -70,8 +89,8 @@ To use a different vimrc with vimpager, put your settings into a ~/.vimpagerrc
 or ~/.vim/vimpagerrc or a file pointed to by the VIMPAGER_RC environment
 variable.
 
-You can also have a global config file for all users in /etc/vimpagerrc, users
-can override it by creating a ~/.vimpagerrc or a ~/.vim/vimpagerrc.
+You can also have a global config file for all users in /etc/vimpagerrc, it will
+be used if the user does not have a `.vimrc` or `.vimpagerrc`.
 
 These are the keys for paging while in vimpager, they are the same as in
 less for the most part:
@@ -88,6 +107,9 @@ less for the most part:
 |`:n`     |next file                |`:N`     |Previous file              |
 |ESC-u    |toggle search highlight  |         |                           |  
 |q        |Quit                     |,v       |Toggle Less Mode           |  
+
+The commands that start with `,` will use your value of `g:mapleader` if you set
+one instead.
 
 To disable loading plugins, put "set noloadplugins" into a vimpagerrc
 file.
@@ -189,12 +211,73 @@ set:
 let g:vimpager.ansiesc = 0
 ```
 
-see the section "ANSI ESCAPE SEQUENCES AND OVERSTRIKES" for more
-details.
+see the section [ANSI ESCAPE SEQUENCES AND
+OVERSTRIKES](#ansi-escape-sequences-and-overstrikes) for more details.
 
 You can also set your own function for the message on the statusline via
-`g:less.statusfunc`, see `src/autoload/vimpager.vim` for the default one as an
+`g:less.statusfunc`, see `autoload/vimpager_utils.vim` for the default one as an
 example.
+
+# USING FROM VIM
+
+If you installed vimpager via [Pathogen](#pathogen-installation) or added it to
+your `runtimepath`, then the `Page` command is available from normal vim
+sessions, and it is also available when invoking the vimpager script.
+
+You may want to add something like the following to your `.vimrc` to enable the
+mapping to turn on less mode:
+
+```vim
+let g:mapleader = ','
+runtime macros/less.vim
+```
+
+Then `,v` will toggle less mode in any buffer. The default `mapleader` is `\`.
+
+**NOTE:** If you are using Vim 7.3 or earlier, the Surround plugin will conflict
+with less.vim mappings such as Ctrl-D, on 7.4+ this is not an issue as the
+`<nowait>` tag is used for mappings.
+
+The syntax of the `Page` command is:
+
+| **Command** | **Option**       | **Arg**        | **Action**                          |
+|-------------|------------------|----------------|-------------------------------------|
+| Page        | -t, -v, -w or -b | file_path      | open file in less mode              |
+| Page!       | -t, -v, -w or -b | shell_command  | open output of command in less mode |
+| Page        |                  |                | toggle less mode for current file   |
+| Page!       |                  |                | turn on less mode for current file  |
+
+The option switch is optional and determines where the file or command is
+opened:
+
+| **Option** | **Target**           |
+|------------|----------------------|
+| -t         | new tab              |
+| -v         | vertical split       |
+| -w         | new window           |
+| -b         | new buffer (default) |
+
+The default is to open a new buffer.
+
+I recommend adding `set hidden` to your `.vimrc`.
+
+If the command is one of `man`, `perldoc`, `pydoc` or `ri` it will be handled
+specially, overstrikes will be removed and `filetype` will be set to `man` or
+`perldoc`.
+
+Ansi escapes will be handled with `AnsiEsc` if available, or removed otherwise.
+See [here](#ansi-escape-sequences-and-overstrikes) for details. The
+`g:vimpager.ansiesc` setting applies to the `Page` command if set.
+
+Here is an example of how you can use this command in a mapping to look up
+the python documentation for the module under the cursor in a new tab:
+
+```vim
+nnoremap <silent> <Leader>d :Page! -t pydoc <C-R><C-W><CR>
+```
+
+Then pressing `,d` on a module name under the cursor will open the pydoc for it
+in a new tab.
 
 # COMMAND LINE OPTIONS
 
@@ -236,7 +319,7 @@ used to show them, rather than the normal vim highlighting, however read
 the caveats below. If this is not possible, they will be stripped out
 and normal vim highlighting will be used instead.
 
-Overstrikes such as in man pages will always be removed.
+Overstrikes in man pages, perl, python or ruby docs will always be removed.
 
 vimpager bundles the
 [AnsiEsc](http://www.vim.org/scripts/script.php?script_id=4979)
@@ -274,7 +357,7 @@ To turn off AnsiEsc while viewing a file, simply run
 To turn off AnsiEsc on the commandline, use an invocation such as the following:
 
 ```sh
-vimpager -c 'au VimEnter * exe "setlocal syntax=".&syntax' somefile
+vimpager -c 'set ft=&ft' somefile
 ```
 
 **NOTE:** The `conceal` feature of vim is still very buggy, especially as
@@ -297,10 +380,6 @@ You can turn this off by using:
 ```vim
 let g:vimpager.passthrough = 0
 ```
-
-Passthrough mode requires a POSIX shell with arithmetic expansion, if
-there is one on your system and it is not detected please submit an
-issue with the path and your OS version.
 
 # CYGWIN/MSYS/MSYS2 NOTES
 

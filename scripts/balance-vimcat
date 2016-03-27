@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Add balancing end(if|for|while) statements for the shell code so it is parsed
+# as vimscript correctly.
+
+rm -f vimcat.work
+# Write the shell code half up to current balancing statements.
+awk '/^: end/ { exit } { print }' vimcat >> vimcat.work
+# Create the balancing statements and write them.
+awk '/^ *(if|for|while)/ { print $1 } /^: end/ { exit }' vimcat \
+    | sed '1!G;h;$!d' \
+    | sed -e 's/^/: end/' >> vimcat.work
+# Last ": endif" to balance the beginning ": if 0"
+echo ': endif' >> vimcat.work
+# Write out the second vimscript half after the balancing statements.
+awk '
+    !skip { print; next }
+    /^: end/ { skip_block = 1; next }
+    skip_block { skip = 0; print }
+' skip=1 skip_block=0 vimcat >> vimcat.work
+# Replace the file.
+mv vimcat.work vimcat
+chmod +x vimcat

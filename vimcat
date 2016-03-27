@@ -49,33 +49,6 @@
 
   # hopefully we're now POSIX, and shell is saved in ${_MY_SHELL}
 
-  tmp_dir=/tmp
-  mkdir_options="-m 700"
-
-  case "$(uname -s)" in
-    MINGW*|MSYS*)
-      if [ -n "${temp}" ]; then
-        # MSYS2 is a little tricky, we're gonna stick to the user's private temp
-        # the -m mode switch to mkdir doesn't work
-        tmp_dir="$(cygpath --unix "${temp}")"
-        mkdir_options=""
-      fi
-    ;;
-  esac
-
-  tmp_dir="${tmp_dir}/vimcat_${$}"
-
-  if ! mkdir ${mkdir_options} "${tmp_dir}"; then
-    echo "Could not create temporary directory ${tmp_dir}" >&2
-    exit 1
-  fi 
-
-  trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
-  tmp_file_in="${tmp_dir}/vimcat_in.txt"
-  tmp_file_out="${tmp_dir}/vimcat_out.txt"
-
-  script="$(command -v ${0})"
-
 quit() {
   rm -rf "${tmp_dir}"
   exit "${@}"
@@ -105,13 +78,52 @@ or available locally via: [32mman [1;35mvimcat[0m
 EOF
 }
 
-  # check for arguments
-  while [ "${#}" -gt 0 ] ; do
-    case "${1}" in
-      '-h'|'--help'|'-help'|'--usage'|'-usage')
+  # if no args and no stdin, display usage
+  if [ "${#}" -eq 0 -a -t 0 ]; then
+    usage
+    quit 0
+  fi
+
+  # check for -h before main option parsing, this is much faster
+  for arg in "${@}"; do
+    case "${@}" in
+      "-h"|"--help"|"-help"|"--usage"|"-usage")
         usage
         quit 0
         ;;
+    esac
+  done
+
+  tmp_dir=/tmp
+  mkdir_options="-m 700"
+
+  case "$(uname -s)" in
+    MINGW*|MSYS*)
+      if [ -n "${temp}" ]; then
+        # MSYS2 is a little tricky, we're gonna stick to the user's private temp
+        # the -m mode switch to mkdir doesn't work
+        tmp_dir="$(cygpath --unix "${temp}")"
+        mkdir_options=""
+      fi
+    ;;
+  esac
+
+  tmp_dir="${tmp_dir}/vimcat_${$}"
+
+  if ! mkdir ${mkdir_options} "${tmp_dir}"; then
+    echo "Could not create temporary directory ${tmp_dir}" >&2
+    exit 1
+  fi
+
+  trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
+  tmp_file_in="${tmp_dir}/vimcat_in.txt"
+  tmp_file_out="${tmp_dir}/vimcat_out.txt"
+
+  script="$(command -v ${0})"
+
+  # check for arguments
+  while [ "${#}" -gt 0 ] ; do
+    case "${1}" in
       "-c")
         shift
         if [ -z "${extra_c}" ]; then
@@ -233,9 +245,9 @@ EOF
         fi
 
         if [ -n "${vimcatrc}" ]; then
-          $vim -N -E -R -i NONE -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          $vim -N -E -s -i NONE -n -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          $vim -N -E -R -i NONE                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script} | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | q" -- "${file}" </dev/tty >/dev/null 2>&1
+          $vim -N -E -s -i NONE -n                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
 
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
@@ -270,9 +282,33 @@ EOF
 : endif
 : endif
 : endif
-: endwhile
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
 : endif
 : endfor
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endif
+: endwhile
+: endif
+: endif
+: endfor
+: endif
+: endif
+: endif
+: endif
 
 " AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
 " the syntax changes colors, for easy, faithful reproduction.

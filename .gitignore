@@ -1,22 +1,24 @@
 # These files can be made by the makefile
 #########################################
-README
 vimpager.1
 vimcat.1
 man.tar.gz
 *.work
 *.uu
+*-stamp
 doc/html
 
-# Compiled source #
-###################
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
-*.pyc
+# Test files
+#####################
+*.txt
+*.ans
+*.out
+*.bak
+
+# Vim temp files
+#####################
+.*.sw?
+.sw?
 
 # Logs and databases #
 ######################

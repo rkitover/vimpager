@@ -12,9 +12,15 @@
 
 " Remove any old syntax stuff that was loaded (5.x) or quit when a syntax file
 " was already loaded (6.x).
+scriptencoding utf-8
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 if version < 600
   syntax clear
 elseif exists("b:current_syntax")
+  let &cpo = s:save_cpo
   finish
 endif
 
@@ -506,5 +512,7 @@ syn sync match perlSyncPOD	grouphere perlPOD "^=item"
 syn sync match perlSyncPOD	grouphere NONE "^=cut"
 
 let b:current_syntax = "perl"
+
+let &cpo = s:save_cpo
 
 " vim: ts=8

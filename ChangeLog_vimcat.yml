@@ -19,6 +19,7 @@
 - turn off folds
 - add -h | --help | --usage option to display usage
 - preliminary support for neovim gh#133
+- reduce vimscript errors by balancing the shell control statements with ': end*' statements
 
 2.06 2015-06-28:
 - Solaris compatibility fixes
