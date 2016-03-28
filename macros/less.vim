@@ -511,8 +511,6 @@ function! s:LessMode()
 
   " Switch to editing (switch off less mode) with v (,v is global)
   call s:Map('map <silent> <buffer> v :call <SID>ToggleLess()<CR>')
-
-  call g:less.statusfunc()
 endfunction
 
 function! s:CloseBuffer()
@@ -525,16 +523,37 @@ function! s:CloseBuffer()
     quit
   endif
 
-  " check if there are unopened args
-  if ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
-    let cur_buf = bufnr('%')
-    silent! next
-    execute 'bdelete ' . cur_buf
+  " if modifiable buffer was modified, force error message
+  if &l:buftype !~? '^no\%(write\|file\)$' && &l:modified
+    unsilent bdelete " this will error out
     return
   endif
 
-  " otherwise delete the buffer
-  bdelete
+  " check if there are unopened args
+  if argc() > 1 && ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
+    let cur_buf = bufnr('%')
+
+    " splice out current arg and move next one to the front
+    let args         = argv()
+    let next_arg_idx = (argidx() + 1) % argc()
+    let next_arg     = argv(next_arg_idx)
+
+    call remove(args, argidx())
+
+    if next_arg_idx > argidx()
+      let next_arg_idx -= 1
+    endif
+
+    call remove(args, next_arg_idx)
+
+    unsilent execute 'args ' . join(map([next_arg] + args, 'fnameescape(v:val)'))
+
+    unsilent execute 'bdelete ' . cur_buf
+    return
+  endif
+
+  " otherwise try to delete the buffer
+  unsilent bdelete
 endfunction
 
 function! s:NextPage()

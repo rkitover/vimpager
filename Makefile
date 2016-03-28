@@ -161,7 +161,7 @@ docs.tar.gz: ${GEN_DOCS} ${DOC_SRC}
 	tar cf docs.tar ${GEN_DOCS} ${DOC_SRC}
 	gzip -9 docs.tar
 
-# Buld markdown with TOCs
+# Build markdown with TOCs
 markdown/%.md: markdown_src/%.md
 	@if command -v doctoc >/dev/null; then \
 		echo 'generating $@'; \

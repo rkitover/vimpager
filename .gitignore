@@ -6,6 +6,7 @@
 *-stamp
 html/
 man/
+*.[0-9]
 
 # Test files
 #####################
