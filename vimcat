@@ -245,9 +245,9 @@ EOF
         fi
 
         if [ -n "${vimcatrc}" ]; then
-          $vim -N -E -s -i NONE -n -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
+          $vim -N -E -i NONE -n -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
         else
-          $vim -N -E -s -i NONE -n                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
+          $vim -N -E -i NONE -n                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
         fi
 
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
