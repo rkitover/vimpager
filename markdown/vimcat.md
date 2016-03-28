@@ -44,6 +44,13 @@ something like this:
 alias vimcat="vimcat -c 'set bg=light'"
 ```
 
+To use with less, add the following to your `~/.bashrc`:
+
+```bash
+export LESS='-R'
+export LESSOPEN='|vimcat -o - %s'
+```
+
 # COMMAND LINE OPTIONS
 
 ## -h | --help | --usage
