@@ -533,26 +533,22 @@ function! s:CloseBuffer()
   if argc() > 1 && ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
     let cur_buf = bufnr('%')
 
-    " splice out current arg and move next one to the front
-    let args         = argv()
-    let next_arg_idx = (argidx() + 1) % argc()
-    let next_arg     = argv(next_arg_idx)
+    unsilent execute (argidx() + 1) . 'argdelete'
 
-    call remove(args, argidx())
-
-    if next_arg_idx > argidx()
-      let next_arg_idx -= 1
-    endif
-
-    call remove(args, next_arg_idx)
-
-    unsilent execute 'args ' . join(map([next_arg] + args, 'fnameescape(v:val)'))
+    unsilent execute 'argument ' . (argidx() + 1)
 
     unsilent execute 'bdelete ' . cur_buf
+
     return
   endif
 
   " otherwise try to delete the buffer
+
+  " if current buffer is the current arg, delete from arg list
+  if argv(argidx()) ==# bufname('%')
+    unsilent execute (argidx() + 1) . 'argdelete'
+  endif
+
   unsilent bdelete
 endfunction
 
