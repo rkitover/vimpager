@@ -927,10 +927,10 @@ ansi_filter() {
 	sed -e 's/'"${ANSI_RE}"'//g' "${@:--}"
 }
 
-# We use vim for this to make sure the locale charset is handled correctly, in
-# case sed doesn't.
+# Even /bin/sed on Solaris handles UTF-8 characters correctly, so we can safely
+# use sed for this.
 overstrike_filter() {
-	vim -Es +'%s/.\b//eg' +'%p' +'q!' "${@:-/dev/stdin}"
+	sed 's/.//g' "${@:--}"
 }
 
 fits_on_screen() {
