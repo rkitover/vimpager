@@ -22,35 +22,40 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-all: balance-vimcat-stamp vimpager docs
+all: balance-vimcat-stamp standalone/vimpager docs
 
 balance-vimcat-stamp: vimcat
 	@scripts/balance-vimcat
 	@touch balance-vimcat-stamp
 
-vimpager: ${SRC}
+standalone/vimpager: ${SRC}
+	@echo building standalone/vimpager
 	@SRC="$?"; \
+	${MKPATH} standalone; \
+	sed 's/^	stripped=1$$/	stripped=0/; /^# END OF BUNDLED SCRIPTS$$/{ q; }' \
+		vimpager > standalone/vimpager; \
+	cat inc/bundled_scripts.sh >> standalone/vimpager; \
+	sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> standalone/vimpager; \
 	chmod +x ${AWK} 2>/dev/null || true; \
 	for src in $$SRC; do \
-	    echo "installing $$src into vimpager"; \
-	    mv vimpager vimpager.work; \
+	    mv standalone/vimpager standalone/vimpager.work; \
 	    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
 	    ${AWK} '\
 		/^begin [0-9]* '"$$src_escaped"'/ { exit } \
 		{ print } \
-	    ' vimpager.work > vimpager; \
+	    ' standalone/vimpager.work > standalone/vimpager; \
 	    uuencode "$$src" "$$src" > "$${src}.uu"; \
-	    cat "$${src}.uu" >> vimpager; \
-	    echo EOF >> vimpager; \
+	    cat "$${src}.uu" >> standalone/vimpager; \
+	    echo EOF >> standalone/vimpager; \
 	    ${AWK} '\
 		BEGIN { skip = 1 } \
 		/^# END OF '"$$src_escaped"'/ { skip = 0 } \
 		skip == 1 { next } \
 		{ print } \
-	    ' vimpager.work >> vimpager; \
-	    rm -f vimpager.work "$${src}.uu"; \
+	    ' standalone/vimpager.work >> standalone/vimpager; \
+	    rm -f standalone/vimpager.work "$${src}.uu"; \
 	done
-	@chmod +x vimpager
+	@chmod +x standalone/vimpager
 
 uninstall:
 	rm -f "${PREFIX}/bin/vimpager"
@@ -67,11 +72,11 @@ uninstall:
 		rm -f "${SYSCONFDIR}/vimpagerrc"; \
 	fi
 
-install: docs vimpager.stripped
+install: docs vimpager.configured
 	@chmod +x ./install-sh 2>/dev/null || true; \
 	${MKPATH} "${DESTDIR}${PREFIX}/bin"; \
-	echo ${INSTALLBIN} vimpager.stripped "${DESTDIR}${PREFIX}/bin/vimpager"; \
-	${INSTALLBIN} vimpager.stripped "${DESTDIR}${PREFIX}/bin/vimpager"; \
+	echo ${INSTALLBIN} vimpager.configured "${DESTDIR}${PREFIX}/bin/vimpager"; \
+	${INSTALLBIN} vimpager.configured "${DESTDIR}${PREFIX}/bin/vimpager"; \
 	echo ${INSTALLBIN} vimcat "${DESTDIR}${PREFIX}/bin/vimcat"; \
 	${INSTALLBIN} vimcat "${DESTDIR}${PREFIX}/bin/vimcat"; \
 	if [ -d man ]; then \
@@ -123,14 +128,11 @@ install: docs vimpager.stripped
 	echo ${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"; \
 	${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"
 
-vimpager.stripped: vimpager
-	@sed_script=`echo ${STRIP_FUNCS} | sed -e 's!\([^ ]*\) *!/\1() {$$/,/^}$$/d;!g'`; \
-	echo stripping vimpager; \
-	sed -e "$${sed_script}" \
-		-e 's/^	stripped=0$$/	stripped=1/' \
-		-e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
-		vimpager > vimpager.stripped; \
-	chmod +x vimpager.stripped
+vimpager.configured: vimpager
+	@echo configuring vimpager; \
+	sed  -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
+	     -e 's!^	configured=0!	configured=1!' vimpager > vimpager.configured; \
+	chmod +x vimpager.configured
 
 install-deb:
 	@if [ "`id | cut -d'=' -f2 | cut -d'(' -f1`" -ne "0" ]; then \
@@ -211,9 +213,7 @@ html/%.html: %.md.work
 	fi
 
 realclean distclean clean:
-	rm -f *.work *-stamp *.deb *.stripped
-	rm -rf man html
-	rm -f `find . -name '*.uu'`
+	rm -rf *.work */*.work *-stamp *.deb *.configured *.uu */*.uu man html standalone
 
 .PHONY: all install uninstall docs gen-TOCs realclean distclean clean
 
