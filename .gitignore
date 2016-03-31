@@ -4,6 +4,7 @@
 *.work
 *.uu
 *-stamp
+*.stripped
 html/
 man/
 *.[0-9]
