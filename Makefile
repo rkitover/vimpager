@@ -145,9 +145,9 @@ install-deb:
 	@mk-build-deps
 	@yes | gdebi vimpager-build-deps*.deb
 	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar; \
-		rm -f "$orig_tar_ball"; \
-		tar cf "$orig_tar_ball" *; \
-		gzip "$orig_tar_ball"
+		rm -f "$$orig_tar_ball".gz; \
+		tar cf "$$orig_tar_ball" *; \
+		gzip "$$orig_tar_ball"
 	@dpkg-buildpackage -us -uc -rfakeroot
 	@yes | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
