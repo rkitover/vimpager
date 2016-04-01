@@ -57,9 +57,9 @@ case $(uname -s) in
 	Linux) linux=1 ;;
 	SunOS) solaris=1 ;;
         Darwin) osx=1; bsd=1 ;;
-	CYGWIN*) cygwin=1 ;;
-	MINGW*) msys=1 ;;
-	MSYS*) msys=1 ;;
+	CYGWIN*) cygwin=1; win32=1 ;;
+	MINGW*) msys=1; win32=1 ;;
+	MSYS*) msys=1; win32=1 ;;
 	OpenBSD) openbsd=1; bsd=1 ;;
 	FreeBSD) freebsd=1; bsd=1 ;;
 	NetBSD) netbsd=1; bsd=1 ;;
@@ -850,27 +850,9 @@ page_files() {
 	return "${_vim_exit_status}"
 }
 
-awk_pstree_freebsd() {
-	awk -v mypid=${1} '{
-		cmd[$1]=$3
-		ppid[$1]=$2
-		arg[$1]=$4
-	}
-	END {
-		while (mypid != 1 && cmd[mypid]) {
-			if (cmd[mypid] == "/bin/sh" && arg[mypid] == "/usr/bin/man")
-				ptree=mypid " /usr/bin/man\n" ptree
-			else
-				ptree=mypid " " cmd[mypid] "\n" ptree
-			mypid=ppid[mypid]
-		}
-		print ptree
-	}'
-}
-
 awk_pstree() {
 	awk -v mypid=${1} '{
-		cmd[$1]=$3
+	        cmd[$1]=substr($0, index($0, $3))
 		ppid[$1]=$2
 	}
 	END {
@@ -882,21 +864,18 @@ awk_pstree() {
 	}'
 }
 
+cygwin_ps() {
+	ps | sed 's/^[^0-9]*//; /^$/d' | awk '{ print $1 " " $2 " " substr($0, index($0, $8)) }'
+}
+
 _do_ptree() {
 	if [ -n "${solaris}" ]; then
 		# Tested on Solaris 8 and 10
-		ptree ${$}
-	elif [ -n "${cygwin}" -o -n "${msys}" ]; then
-		ps | awk '{ print $1 "\t" $2 "\t" $NF }' | awk_pstree ${$}
-	elif [ -n "${openbsd}" ]; then
-		ps awo pid=,ppid=,command= | awk_pstree ${$}
-	elif [ -n "${freebsd}" ]; then
-		ps aw -o pid= -o ppid= -o command= | awk_pstree_freebsd ${$}
-	elif [ -n "${netbsd}" ]; then
-		ps aw -o pid= -o ppid= -o command= | awk_pstree ${$}
+		ptree "${$}"
+	elif [ -n "${win32}" ]; then
+		cygwin_ps | awk_pstree "${$}"
 	else
-		# Tested on Linux and OS X
-		ps awo pid=,ppid=,comm= | awk_pstree ${$}
+		ps aw -o pid= -o ppid= -o command= | awk_pstree "${$}"
 	fi
 }
 
