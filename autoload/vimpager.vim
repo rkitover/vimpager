@@ -8,19 +8,22 @@ function! vimpager#Init(opts)
 
     call s:DisableConflictingPlugins()
 
+    " can't pass a:opts in autocmd
+    let s:opts = a:opts
+
     augroup vimpager_process
     autocmd!
 
+    " make buffers modifiable and not complain on quit
+    autocmd BufReadPre,StdinReadPre * call s:SetBufType()
+
     " any pre-processing necessary is written to .vim files
-    autocmd BufReadPost * silent! source %.vim
+    autocmd BufReadPost,StdinReadPost * silent! source %.vim
 
     augroup END
 
     augroup vimpager
     autocmd!
-
-    " can't pass a:opts in autocmd
-    let s:opts = a:opts
 
     " can't use VimEnter because that fires after first file is read
     autocmd BufReadPre,StdinReadPre * call s:SetOptions()
@@ -91,6 +94,12 @@ function! s:SetOptions()
     " process options
     if exists('s:opts.line_numbers')
         let g:less.number = s:opts.line_numbers
+    endif
+endfunction
+
+function! s:SetBufType()
+    if bufname('%') =~# '^\V' . s:opts.tmp_dir
+        setlocal buftype=nowrite modifiable noreadonly viminfo=
     endif
 endfunction
 

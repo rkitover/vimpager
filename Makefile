@@ -28,12 +28,13 @@ balance-vimcat-stamp: vimcat
 	@scripts/balance-vimcat
 	@touch balance-vimcat-stamp
 
-standalone/vimpager: ${SRC}
+standalone/vimpager: ${SRC} inc/*
 	@echo building standalone/vimpager
 	@SRC="$?"; \
 	${MKPATH} standalone; \
-	sed 's/^	stripped=1$$/	stripped=0/; /^# END OF BUNDLED SCRIPTS$$/{ q; }' \
+	sed 's/^	stripped=1$$/	stripped=0/; /^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		vimpager > standalone/vimpager; \
+	cat inc/do_uudecode.sh >> standalone/vimpager; \
 	cat inc/bundled_scripts.sh >> standalone/vimpager; \
 	sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> standalone/vimpager; \
 	chmod +x ${AWK} 2>/dev/null || true; \

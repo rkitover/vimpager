@@ -357,13 +357,6 @@ function! s:LessMode()
     let g:less.statusfunc = function('s:StatusLine')
   endif
 
-  call s:SaveSetOpt('buftype', 'nowrite')
-  call s:SaveSetOpt('modifiable', 1)
-  call s:SaveSetOpt('readonly', 0)
-
-  " Don't remember file names and positions
-  call s:SaveSetOpt('viminfo', '')
-
   " Inhibit screen updates while searching
   call s:SaveSetOpt('lazyredraw', 1)
 
