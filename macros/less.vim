@@ -522,8 +522,8 @@ function! s:CloseBuffer()
     return
   endif
 
-  " check if there are unopened args
-  if argc() > 1 && ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
+  " check if there are unopened args and we are on an arg
+  if argc() > 1 && argv(argidx()) ==# bufname('%') && ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
     let cur_buf = bufnr('%')
 
     unsilent execute (argidx() + 1) . 'argdelete'
