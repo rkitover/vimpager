@@ -7,7 +7,12 @@
 %:
 	dh $@ 
 
+override_dh_auto_build:
+	touch doctoc-warn-stamp
+	dh_auto_build
+
 override_dh_auto_install:
+	touch doctoc-warn-stamp
 	dh_auto_install -- PREFIX=/usr
 
 override_dh_compress:

@@ -14,8 +14,6 @@ DOC_SRC=markdown_src/vimpager.md markdown_src/vimcat.md
 
 GEN_DOCS=man/vimpager.1 man/vimcat.1 html/vimpager.html html/vimcat.html markdown/vimpager.md markdown/vimcat.md
 
-STRIP_FUNCS=do_uudecode less_vim vimcat_script perldoc_vim ansi_esc_vim ansi_esc_plugin_vim cecutil_plugin_vim autoload_vimpager_vim autoload_vimpager_utils_vim plugin_vimpager_vim
-
 ANSIESC=autoload/AnsiEsc.vim plugin/AnsiEscPlugin.vim plugin/cecutil.vim
 
 RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim macros/less.vim syntax/perldoc.vim ${ANSIESC}
