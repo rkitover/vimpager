@@ -486,7 +486,7 @@ function! s:LessMode()
   call s:Map('map <buffer> p %')
 
   " Search
-  call s:Map('noremap <silent> <buffer> <script> / H$:call <SID>Forward()<CR>/')
+  call s:Map('noremap <buffer> <script> / H$:call <SID>Forward()<CR>/')
   if &wrap
     call s:Map('noremap <silent> <buffer> <script> ? H0:call <SID>Backward()<CR>?')
   else
