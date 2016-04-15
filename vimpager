@@ -14,39 +14,34 @@ fi
 
 PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
 
-_MY_SHELL=/bin/sh
+_MY_SHELL="${_MY_SHELL:-/bin/sh}"
 export _MY_SHELL
 
 if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
 	IN_BASH=1
 	export IN_BASH
 	_MY_SHELL=`command -v bash`
-	export _MY_SHELL
 	exec bash "$0" "$@"
 elif [ -z "$IN_BASH" ] && [ -z "$IN_KSH" ]; then
 	if command -v dtksh >/dev/null; then
 		IN_KSH=1
 		export IN_KSH
 		_MY_SHELL=`command -v dtksh`
-		export _MY_SHELL
 		exec dtksh "$0" "$@"
 	elif [ -x /usr/xpg4/bin/sh ]; then
 		IN_KSH=1
 		export IN_KSH
 		_MY_SHELL=/usr/xpg4/bin/sh
-		export _MY_SHELL
 		exec /usr/xpg4/bin/sh "$0" "$@"
 	elif command -v ksh93 >/dev/null; then
 		IN_KSH=1
 		export IN_KSH
 		_MY_SHELL=`command -v ksh93`
-		export _MY_SHELL
 		exec ksh93 "$0" "$@"
 	elif command -v ksh >/dev/null; then
 		IN_KSH=1
 		export IN_KSH
 		_MY_SHELL=`command -v ksh`
-		export _MY_SHELL
 		exec ksh "$0" "$@"
 	fi
 fi
@@ -805,11 +800,11 @@ page_files() {
 				cat "${cur_file}"
 				_exit_status="${?}"
 			else
-				# vimcat uses the same shell finding mechanism, the vars break it
-				unset _MY_SHELL
-				unset IN_BASH
-				unset IN_KSH
-				"${vimcat}" \
+				# vimcat uses the same shell finding mechanism,
+				# so we use the shell we already found and skip
+				# the search in vimcat with our exported
+				# $IN_BASH or $IN_KSH.
+				"${_MY_SHELL}" "${vimcat}" \
 					-u "${vimrc}" \
 					--cmd "set rtp^=${runtime} | let vimpager={ 'enabled': 1 }" \
 					-c 'silent! source %.vim' \
