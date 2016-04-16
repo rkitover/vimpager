@@ -622,7 +622,7 @@ awk_seq() {
 
 # grep -q is often not available
 grep_q() {
-	_pat="$(echo $1 | sed -e 's!/!\\/!g')"
+	_pat="$(echo "$1" | sed -e 's!/!\\/!g')"
 	shift
 	awk '
 		BEGIN { exit_val = 1 }
@@ -856,7 +856,7 @@ cygwin_ps() {
 	ps | sed 's/^[^0-9]*//; /^$/d' | awk '{ print $1 " " $2 " " substr($0, index($0, $8)) }'
 }
 
-_do_ptree() {
+do_ptree() {
 	if [ -n "${solaris}" ]; then
 		# Tested on Solaris 8 and 10
 		ptree "${$}"
@@ -864,11 +864,7 @@ _do_ptree() {
 		cygwin_ps | awk_pstree "${$}"
 	else
 		ps aw -o pid= -o ppid= -o command= | awk_pstree "${$}"
-	fi
-}
-
-do_ptree() {
-	_do_ptree "$@" 2>/dev/null
+	fi 2>/dev/null
 }
 
 win32_native() {
