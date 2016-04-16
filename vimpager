@@ -401,7 +401,7 @@ main() {
 		if [ "${file}" = - ]; then
 			filename=stdin
 		else
-			if [ \! -r "${file}" ]; then
+			if [ ! -r "${file}" ]; then
 				echo "${0}: cannot read file '${file}'" >&2
 				quit 1
 			fi
@@ -416,19 +416,19 @@ main() {
 
 		case "$(echo "${file}" | tr 'A-Z' 'a-z')" in
 			*.gz)
-				filename="$(echo ${filename} | sed -e 's/\.[Gg][Zz]$//')"
+				filename=${filename%.??}
 				gunzip -c -- "${file}" > "${filename}"
 				;;
 			*.bz2)
-				filename="$(echo ${filename} | sed -e 's/\.[Bb][Zz]2$//')"
+				filename=${filename%.??2}
 				bunzip2 -c -- "${file}" > "${filename}"
 				;;
 			*.xz)
-				filename="$(echo ${filename} | sed -e 's/\.[Xx][Zz]$//')"
+				filename=${filename%.??}
 				xzcat -c -- "${file}" > "${filename}"
 				;;
 			*.z)
-				filename="$(echo ${filename} | sed -e 's/\.[Zz]$//')"
+				filename=${filename%.?}
 				uncompress -c -- "${file}" > "${filename}"
 				;;
 			*)
