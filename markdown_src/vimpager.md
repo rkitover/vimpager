@@ -14,7 +14,9 @@ For vimcat see [here](markdown/vimcat.md) or 'man vimcat'.
 
 # RUN-TIME DEPENDENCIES
 
-* vim
+* vim, version >= 7.3
+* a POSIX conform shell, see [the
+  standard](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
 
 # BUILD DEPENDENCIES
 
