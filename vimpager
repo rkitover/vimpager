@@ -239,13 +239,6 @@ main() {
 
 	[ "$(line_n 3 "${tmp}/vimpager_opts")" -eq 0 ] && no_pass_thru=1
 
-	if [ "${no_pass_thru}" = 0 ]; then
-		# check if arithmetic expansion works, passthrough mode relies on it
-		if [ x$(echo $((2+2)) 2>/dev/null) != x4 ]; then
-			no_pass_thru=1
-		fi
-	fi
-
 	[ "$(line_n 4 "${tmp}/vimpager_opts")" -ne 0 ] && ansiesc_available=1
 
 	rm -f "${tmp}/vimpager_opts"
