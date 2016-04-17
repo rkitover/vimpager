@@ -14,14 +14,14 @@
   if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
     IN_BASH=1
     export IN_BASH
-    _MY_SHELL=`command -v bash`
+    _MY_SHELL=$(command -v bash)
     export _MY_SHELL
     exec bash "$0" "$@"
   elif [ -z "$IN_BASH" ] && [ -z "$IN_KSH" ]; then
     if command -v dtksh >/dev/null; then
       IN_KSH=1
       export IN_KSH
-      _MY_SHELL=`command -v dtksh`
+      _MY_SHELL=$(command -v dtksh)
       export _MY_SHELL
       exec dtksh "$0" "$@"
     elif [ -x /usr/xpg4/bin/sh ]; then
@@ -33,13 +33,13 @@
     elif command -v ksh93 >/dev/null; then
       IN_KSH=1
       export IN_KSH
-      _MY_SHELL=`command -v ksh93`
+      _MY_SHELL=$(command -v ksh93)
       export _MY_SHELL
       exec ksh93 "$0" "$@"
     elif command -v ksh >/dev/null; then
       IN_KSH=1
       export IN_KSH
-      _MY_SHELL=`command -v ksh`
+      _MY_SHELL=$(command -v ksh)
       export _MY_SHELL
       exec ksh "$0" "$@"
     else
