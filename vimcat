@@ -4,36 +4,16 @@
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
-  # try to find a better shell, especially on Solaris
+  . "`dirname \"$0\"`"/inc/prologue.sh
 
-  PATH="$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin"
-
-
-  if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
-    IN_BASH=1
-    export IN_BASH
-    exec bash "$0" "$@"
-  elif [ -z "$IN_BASH" ] && [ -z "$IN_KSH" ]; then
-    if command -v dtksh >/dev/null; then
-      IN_KSH=1
-      export IN_KSH
-      exec dtksh "$0" "$@"
-    elif [ -x /usr/xpg4/bin/sh ]; then
-      IN_KSH=1
-      export IN_KSH
-      exec /usr/xpg4/bin/sh "$0" "$@"
-    elif command -v ksh93 >/dev/null; then
-      IN_KSH=1
-      export IN_KSH
-      exec ksh93 "$0" "$@"
-    elif command -v ksh >/dev/null; then
-      IN_KSH=1
-      export IN_KSH
-      exec ksh "$0" "$@"
-    fi
+  if command -v vim >/dev/null; then
+    vim=vim
+  elif command -v nvim >/dev/null; then
+    vim=nvim
+  else
+    echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
+    exit 1
   fi
-
-  # hopefully we're now POSIX.
 
 quit() {
   rm -rf "${tmp_dir}"
@@ -62,6 +42,16 @@ Project homepage: <[1;34mhttp://github.com/rkitover/vimpager[0m>
 and documentation: <[1;34mhttps://github.com/rkitover/vimpager/blob/master/markdown/vimcat.md[0m>
 or available locally via: [32mman [1;35mvimcat[0m
 EOF
+}
+
+start_highlight_job() {
+  set -- -N -E -i NONE -n --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!"
+
+  if [ -n "${vimcatrc}" ]; then
+    set -- "$@" -u "${vimcatrc}"
+  fi
+
+  $vim "$@" -- "${file}" </dev/tty >/dev/null 2>&1
 }
 
   # if no args and no stdin, display usage
@@ -103,7 +93,9 @@ EOF
 
   trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
   tmp_file_in="${tmp_dir}/vimcat_in.txt"
-  tmp_file_out="${tmp_dir}/vimcat_out.txt"
+  out_fifo="${tmp_dir}/vimcat_out.fifo"
+
+  mkfifo "${out_fifo}"
 
   script="$(command -v ${0})"
 
@@ -216,45 +208,19 @@ EOF
     if test -r "${file}" -a -f "${file}"; then
       if test -s "${file}"; then
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          dest_file="${tmp_file_out}"
+          dest_file="${out_fifo}"
         else
           dest_file="${output_file}"
         fi
 
-        if command -v vim >/dev/null; then
-          vim=vim
-        elif command -v nvim >/dev/null; then
-          vim=nvim
-        else
-          echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
-          quit 1
-        fi
-
-        if [ -n "${vimcatrc}" ]; then
-          $vim -N -E -i NONE -n -u "${vimcatrc}" --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
-        else
-          $vim -N -E -i NONE -n                  --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!" -- "${file}" </dev/tty >/dev/null 2>&1
-        fi
-
         if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          cat "${tmp_file_out}"
+          tail -f "${out_fifo}" &
+          tail_pid="${!}"
         fi
 
-        if [ -z "${output_file}" ]; then
-          # if file doesn't end in a newline, output a newline
-          # regular Solaris tail does not work for this
-          tail_cmd=tail
-          if [ -x /usr/xpg4/bin/tail ]; then
-            tail_cmd=/usr/xpg4/bin/tail
-          fi
-          if command -v gtail >/dev/null; then
-            tail_cmd=gtail
-          fi
-          last_char="$($tail_cmd -c 1 "${tmp_file_out}")"
-          if [ "${last_char}" != "" ]; then
-            echo
-          fi
-        fi
+        start_highlight_job
+
+        [ -n "${tail_pid}" ] && kill "${tail_pid}"
       fi
     else
       echo "${0}: Cannot read file: ${file}" >&2
@@ -263,12 +229,6 @@ EOF
 
   quit 0
 
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
 : endif
 : endif
 : endif
@@ -429,7 +389,9 @@ function! s:GroupToAnsi(groupnum)
 endfunction
 
 function! AnsiHighlight(output_file, line_numbers)
-  let retv = []
+  filetype detect
+  syntax enable
+  syntaex sync minlines=500 maxlines=500
 
   if a:line_numbers
     let ln_field_len = len(line('$'))
@@ -439,11 +401,11 @@ function! AnsiHighlight(output_file, line_numbers)
     let last = hlID('Normal')
     let output = s:GroupToAnsi(last) . "\<Esc>[K" " Clear to right
 
-        " Hopefully fix highlighting sync issues
+    " Hopefully fix highlighting sync issues
     exe "norm! " . lnum . "G$"
 
-    let line  = getline(lnum)
-    let cnum  = 1
+    let line = getline(lnum)
+    let cnum = 1
 
     while cnum <=# col('.')
       " skip ansi codes in the file
@@ -484,12 +446,10 @@ function! AnsiHighlight(output_file, line_numbers)
       let output = printf("\<Esc>[0m\<Esc>[37;1m%" . ln_field_len . "d ", lnum) . output
     endif
 
-    let retv += [output]
+    call writefile([output . "\<Esc>[0m\r"], a:output_file, 'a')
   endfor
-  " Reset the colors to default after displaying the file
-  let retv[-1] .= "\<Esc>[0m"
 
-  return writefile(retv, a:output_file)
+  return 1
 endfunction
 
 " See copyright in the vim script above (for the vim script) and in

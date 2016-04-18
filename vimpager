@@ -10,43 +10,7 @@ if [ ! -t 1 ]; then
 	exec cat "${@}"
 fi
 
-# try to find a better shell, especially on Solaris
-
-PATH=$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/dt/bin:/usr/xpg4/bin:/usr/bin:/bin
-
-_MY_SHELL="${_MY_SHELL:-/bin/sh}"
-export _MY_SHELL
-
-if [ -z "$IN_BASH" ] && command -v bash >/dev/null; then
-	IN_BASH=1
-	export IN_BASH
-	_MY_SHELL=`command -v bash`
-	exec bash "$0" "$@"
-elif [ -z "$IN_BASH" ] && [ -z "$IN_KSH" ]; then
-	if command -v dtksh >/dev/null; then
-		IN_KSH=1
-		export IN_KSH
-		_MY_SHELL=`command -v dtksh`
-		exec dtksh "$0" "$@"
-	elif [ -x /usr/xpg4/bin/sh ]; then
-		IN_KSH=1
-		export IN_KSH
-		_MY_SHELL=/usr/xpg4/bin/sh
-		exec /usr/xpg4/bin/sh "$0" "$@"
-	elif command -v ksh93 >/dev/null; then
-		IN_KSH=1
-		export IN_KSH
-		_MY_SHELL=`command -v ksh93`
-		exec ksh93 "$0" "$@"
-	elif command -v ksh >/dev/null; then
-		IN_KSH=1
-		export IN_KSH
-		_MY_SHELL=`command -v ksh`
-		exec ksh "$0" "$@"
-	fi
-fi
-
-# hopefully we're now POSIX, and shell is saved in ${_MY_SHELL}
+. "`dirname \"$0\"`"/inc/prologue.sh
 
 case $(uname -s) in
 	Linux) linux=1 ;;
@@ -636,7 +600,7 @@ head_n() {
 	shift
 
 	if [ -z "$_head_syntax" ]; then
-		_head1_test=`echo xx | head -n 1 2>/dev/null`
+		_head1_test="$(echo xx | head -n 1 2>/dev/null)"
 		if [ "$_head1_test" = "xx" ]; then
 			_head_syntax=new
 		else
@@ -656,7 +620,7 @@ tail_n() {
 	shift
 
 	if [ -z "$_tail_syntax" ]; then
-		_tail1_test=`echo xx | tail -n 1 2>/dev/null`
+		_tail1_test="$(echo xx | tail -n 1 2>/dev/null)"
 		if [ "$_tail1_test" = "xx" ]; then
 			_tail_syntax=new
 		else
@@ -793,11 +757,7 @@ page_files() {
 				cat "${cur_file}"
 				_exit_status="${?}"
 			else
-				# vimcat uses the same shell finding mechanism,
-				# so we use the shell we already found and skip
-				# the search in vimcat with our exported
-				# $IN_BASH or $IN_KSH.
-				"${_MY_SHELL}" "${vimcat}" \
+				"${MY_SHELL}" "${vimcat}" \
 					-u "${vimrc}" \
 					--cmd "set rtp^=${runtime} | let vimpager={ 'enabled': 1 }" \
 					-c 'silent! source %.vim' \

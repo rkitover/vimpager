@@ -1,0 +1,4 @@
+#!/bin/sh
+
+. inc/prologue.sh
+echo $MY_SHELL

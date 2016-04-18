@@ -20,41 +20,56 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-all: balance-vimcat-stamp standalone/vimpager docs
+all: balance-vimcat-stamp standalone/vimpager standalone/vimcat docs
 
 balance-vimcat-stamp: vimcat
 	@scripts/balance-vimcat
 	@touch balance-vimcat-stamp
 
-standalone/vimpager: ${SRC} inc/*
-	@echo building standalone/vimpager
+standalone/%: ${SRC} inc/*
+	@echo building $@
 	@SRC="$?"; \
-	${MKPATH} standalone; \
-	sed 's/^	stripped=1$$/	stripped=0/; /^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
-		vimpager > standalone/vimpager; \
-	cat inc/do_uudecode.sh >> standalone/vimpager; \
-	cat inc/bundled_scripts.sh >> standalone/vimpager; \
-	sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> standalone/vimpager; \
-	chmod +x ${AWK} 2>/dev/null || true; \
-	for src in $$SRC; do \
-	    mv standalone/vimpager standalone/vimpager.work; \
-	    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
-	    ${AWK} '\
-		/^begin [0-9]* '"$$src_escaped"'/ { exit } \
-		{ print } \
-	    ' standalone/vimpager.work > standalone/vimpager; \
-	    uuencode "$$src" "$$src" > "$${src}.uu"; \
-	    cat "$${src}.uu" >> standalone/vimpager; \
-	    echo EOF >> standalone/vimpager; \
-	    ${AWK} '\
-		BEGIN { skip = 1 } \
-		/^# END OF '"$$src_escaped"'/ { skip = 0 } \
-		skip == 1 { next } \
-		{ print } \
-	    ' standalone/vimpager.work >> standalone/vimpager; \
-	    rm -f standalone/vimpager.work "$${src}.uu"; \
-	done
-	@chmod +x standalone/vimpager
+	${MKPATH} `dirname $@`; \
+	base="`basename $@`"; \
+	cp "$$base" $@; \
+	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
+		cp $@ ${@}.work; \
+		sed 's/^	stripped=1$$/	stripped=0/; /^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
+			${@}.work > $@; \
+		cat inc/do_uudecode.sh >> $@; \
+		cat inc/bundled_scripts.sh >> $@; \
+		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
+		chmod +x ${AWK} 2>/dev/null || true; \
+		for src in $$SRC; do \
+		    mv $@ ${@}.work; \
+		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
+		    ${AWK} '\
+			/^begin [0-9]* '"$$src_escaped"'/ { exit } \
+			{ print } \
+		    ' ${@}.work > $@; \
+		    uuencode "$$src" "$$src" > "$${src}.uu"; \
+		    cat "$${src}.uu" >> $@; \
+		    echo EOF >> $@; \
+		    ${AWK} '\
+			BEGIN { skip = 1 } \
+			/^# END OF '"$$src_escaped"'/ { skip = 0 } \
+			skip == 1 { next } \
+			{ print } \
+		    ' ${@}.work >> $@; \
+		    rm -f ${@}.work "$${src}.uu"; \
+		done; \
+	fi; \
+	cp $@ ${@}.work; \
+	nlinit="`echo 'nl=\"'; echo '\"'`"; eval "$$nlinit"; \
+	sed "/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*"'$$'"/{$${nl}\
+		x$${nl}\
+		r inc/prologue.sh$${nl}\
+	}" ${@}.work > $@; \
+	rm -f ${@}.work; \
+	if grep '^: if 0$$' ${@} >/dev/null; then \
+		scripts/balance-vimcat $@; \
+	fi
+	@chmod +x $@
 
 uninstall:
 	rm -f "${PREFIX}/bin/vimpager"
@@ -71,13 +86,13 @@ uninstall:
 		rm -f "${SYSCONFDIR}/vimpagerrc"; \
 	fi
 
-install: docs vimpager.configured
+install: docs vimpager.configured vimcat.configured
 	@chmod +x ./install-sh 2>/dev/null || true; \
 	${MKPATH} "${DESTDIR}${PREFIX}/bin"; \
 	echo ${INSTALLBIN} vimpager.configured "${DESTDIR}${PREFIX}/bin/vimpager"; \
 	${INSTALLBIN} vimpager.configured "${DESTDIR}${PREFIX}/bin/vimpager"; \
-	echo ${INSTALLBIN} vimcat "${DESTDIR}${PREFIX}/bin/vimcat"; \
-	${INSTALLBIN} vimcat "${DESTDIR}${PREFIX}/bin/vimcat"; \
+	echo ${INSTALLBIN} vimcat.configured "${DESTDIR}${PREFIX}/bin/vimcat"; \
+	${INSTALLBIN} vimcat.configured "${DESTDIR}${PREFIX}/bin/vimcat"; \
 	if [ -d man ]; then \
 		${MKPATH} "${DESTDIR}${PREFIX}/share/man/man1"; \
 		echo ${INSTALLMAN} man/vimpager.1 "${DESTDIR}${PREFIX}/share/man/man1/vimpager.1"; \
@@ -127,11 +142,15 @@ install: docs vimpager.configured
 	echo ${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"; \
 	${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"
 
-vimpager.configured: vimpager
-	@echo configuring vimpager; \
-	sed  -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
-	     -e 's!^	configured=0!	configured=1!' vimpager > vimpager.configured; \
-	chmod +x vimpager.configured
+%.configured: %
+	@echo configuring $<; \
+	MY_SHELL="`scripts/find_shell`"; \
+	MY_SHELL="`command -v \"$$MY_SHELL\"`"; \
+	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
+	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*$$/d' \
+	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
+	     -e 's!^	configured=0!	configured=1!' $< > $@; \
+	chmod +x $@
 
 install-deb:
 	@if [ "`id | cut -d'=' -f2 | cut -d'(' -f1`" -ne "0" ]; then \

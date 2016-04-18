@@ -5,9 +5,11 @@
 *.uu
 *-stamp
 *.stripped
+*.configured
 html/
 man/
 standalone/
+tmp/
 *.[0-9]
 
 # Test files
