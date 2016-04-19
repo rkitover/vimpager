@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. inc/platform.sh
+
+echo \
+    bsd=$bsd \
+    cygwin=$cygwin \
+    freebsd=$freebsd \
+    linux=$linux \
+    msys=$msys \
+    netbsd=$netbsd \
+    openbsd=$openbsd \
+    osx=$osx \
+    solaris=$solaris \
+    win32=$win32 \
+
+# vim: sw=4 et tw=0:

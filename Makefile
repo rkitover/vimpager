@@ -50,6 +50,10 @@ standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
+	    -e '/^[ 	]*\.[ 	]*.*inc\/platform.sh.*$$/{' \
+	    -e     'r inc/platform.sh' \
+	    -e     d \
+	    -e '}' \
 	    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
 	    -e 's|^version=.*|version="'"`cat vimpager-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 	    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
@@ -184,6 +188,7 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
+	    -e 's/^ *\. .*inc\/platform.sh"$$/'"`scripts/find_platform`"/ \
 	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
