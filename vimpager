@@ -2,7 +2,6 @@
 
 # Script for using ViM as a PAGER.
 # Based on Bram's less.sh.
-# Version 2.06
 # git://github.com/rkitover/vimpager.git
 
 # Just pass through if not on a tty
@@ -11,6 +10,7 @@ if [ ! -t 1 ]; then
 fi
 
 . "`dirname \"$0\"`"/inc/prologue.sh
+version="$(git describe) (git)"
 
 case $(uname -s) in
 	Linux) linux=1 ;;
@@ -37,6 +37,10 @@ main() {
 		case "${arg}" in
 			'-h'|'--help'|'-help'|'--usage'|'-usage')
 				usage
+				quit 0
+				;;
+			'-v'|'--version'|'-version')
+				echo "vimpager $version"
 				quit 0
 				;;
 		esac
@@ -492,7 +496,8 @@ Display [1;35mFILE[0m(s) in vim with a pager emulating less.
 
 With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard input.
 
-  [1;37m-h, --help, --usage[0m		This help screen.
+  [1;37m-h, --help, --usage[0m		Show this help screen and exit.
+  [1;37m-v, --version[0m			Show version information and exit.
   [1;37m+G, +[0m				Go to the end of the file.
   [1;37m-N, --LINE-NUMBERS[0m		Show line numbers.
   [1;37m-s[0m				Squeeze multiple blank lines into one.
