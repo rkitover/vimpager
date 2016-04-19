@@ -739,7 +739,7 @@ page_files() {
 		vimcat="${runtime}/bin/vimcat"
 	else
 		if command -v vimcat > /dev/null; then
-			vimcat=vimcat
+			vimcat="$(command -v vimcat)"
 		elif [ "${configured}" -eq 0 ]; then
 			vimcat="${0%/*}/vimcat"
 		else
