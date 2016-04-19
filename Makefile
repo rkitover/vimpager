@@ -83,7 +83,7 @@ uninstall:
 	@if [ '${PREFIX}' = '/usr' ] && diff /etc/vimpagerrc vimpagerrc >/dev/null 2>&1; then \
 		echo rm -f /etc/vimpagerrc; \
 		rm -rf /etc/vimpagerrc; \
-	elif diff "${SYSCONFDIR}/vimpagerrc" vimpagerrc >/dev/null 2>&1; then
+	elif diff "${SYSCONFDIR}/vimpagerrc" vimpagerrc >/dev/null 2>&1; then \
 		echo rm -f "${SYSCONFDIR}/vimpagerrc"; \
 		rm -f "${SYSCONFDIR}/vimpagerrc"; \
 	fi
