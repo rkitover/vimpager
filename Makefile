@@ -62,11 +62,10 @@ standalone/%: ${SRC} inc/*
 		done; \
 	fi; \
 	cp $@ ${@}.work; \
-	nlinit="`echo 'nl=\"'; echo '\"'`"; eval "$$nlinit"; \
-	sed "/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*"'$$'"/{$${nl}\
-		x$${nl}\
-		r inc/prologue.sh$${nl}\
-	}" ${@}.work > $@; \
+	sed -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/{' \
+	    -e     'r inc/prologue.sh' \
+	    -e     d \
+	    -e '}' ${@}.work > $@; \
 	rm -f ${@}.work; \
 	if grep '^: if 0$$' ${@} >/dev/null; then \
 		scripts/balance-vimcat $@; \
@@ -148,7 +147,7 @@ install: docs vimpager.configured vimcat.configured
 	@echo configuring $<; \
 	MY_SHELL="`scripts/find_shell`"; \
 	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
-	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*$$/d' \
+	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
 	     -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
 	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
 	     -e 's!^	configured=0!	configured=1!' $< > $@; \
