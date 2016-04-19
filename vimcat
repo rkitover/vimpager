@@ -4,7 +4,7 @@
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
-  . "`dirname \"$0\"`"/inc/prologue.sh
+  . "${0%/*}/inc/prologue.sh"
 
   if command -v vim >/dev/null; then
     vim=vim
