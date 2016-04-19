@@ -34,7 +34,7 @@ standalone/%: ${SRC} inc/*
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ ${@}.work; \
-		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell='"$$MY_SHELL"')"|' \
+		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$MY_SHELL))"|' \
 		    -e 's/^	stripped=1$$/	stripped=0/' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    ${@}.work > $@; \
