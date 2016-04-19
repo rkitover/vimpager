@@ -9,9 +9,9 @@ if [ ! -t 1 ]; then
 	exec cat "${@}"
 fi
 
-. "`dirname \"$0\"`"/inc/prologue.sh
+. "${0%/*}/inc/prologue.sh"
 
-version="$(cd "$(dirname "${0}")"; git describe) (git)"
+version="$(cd "${0%/*}"; git describe) (git)"
 
 case $(uname -s) in
 	Linux) linux=1 ;;
@@ -112,7 +112,7 @@ main() {
 	if [ "${stripped}" -eq 0 ]; then
 		runtime="${tmp}/runtime"
 	elif [ "${configured}" -eq 0 ]; then
-		runtime="$(dirname "${0}")"
+		runtime="${0%/*}"
 	else
 		runtime="${PREFIX}/share/vimpager"
 	fi
@@ -122,7 +122,7 @@ main() {
 
 	user_vimrc="$(read_vim_var '$MYVIMRC')"
 
-	user_vimrc_dir="$(dirname "${user_vimrc}")"
+	user_vimrc_dir="${user_vimrc%/*}"
 
 	# first check for a user ~/.vimpagerrc
 	if [ -n "${VIMPAGER_RC}" ]; then
@@ -741,7 +741,7 @@ page_files() {
 		if command -v vimcat > /dev/null; then
 			vimcat=vimcat
 		elif [ "${configured}" -eq 0 ]; then
-			vimcat="$(dirname "${0}")/vimcat"
+			vimcat="${0%/*}/vimcat"
 		else
 			vimcat="${PREFIX}/bin/vimcat"
 		fi
@@ -907,7 +907,7 @@ fits_on_screen() {
 config() {
 	stripped=1
 	configured=0
-	PREFIX="$(dirname "${0}")"
+	PREFIX="${0%/*}"
 }
 
 # INCLUDE BUNDLED SCRIPTS HERE
