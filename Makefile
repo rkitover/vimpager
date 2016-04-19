@@ -34,8 +34,10 @@ standalone/%: ${SRC} inc/*
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ ${@}.work; \
-		sed 's/^	stripped=1$$/	stripped=0/; /^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
-			${@}.work > $@; \
+		sed -e 's|^version="\$$(git describe) (git)"$$|version="'"`git describe`"' (standalone, shell='"$$MY_SHELL"')"|' \
+		    -e 's/^	stripped=1$$/	stripped=0/' \
+		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
+		    ${@}.work > $@; \
 		cat inc/do_uudecode.sh >> $@; \
 		cat inc/bundled_scripts.sh >> $@; \
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
@@ -148,6 +150,7 @@ install: docs vimpager.configured vimcat.configured
 	MY_SHELL="`command -v \"$$MY_SHELL\"`"; \
 	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
 	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*$$/d' \
+	     -e 's|^version="\$$(git describe) (git)"$$|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
 	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
 	     -e 's!^	configured=0!	configured=1!' $< > $@; \
 	chmod +x $@
