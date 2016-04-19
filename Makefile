@@ -147,7 +147,6 @@ install: docs vimpager.configured vimcat.configured
 %.configured: %
 	@echo configuring $<; \
 	MY_SHELL="`scripts/find_shell`"; \
-	MY_SHELL="`command -v \"$$MY_SHELL\"`"; \
 	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
 	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*$$/d' \
 	     -e 's|^version="\$$(git describe) (git)"$$|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
