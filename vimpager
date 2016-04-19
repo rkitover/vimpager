@@ -9,7 +9,7 @@ if [ ! -t 1 ]; then
 	exec cat "${@}"
 fi
 
-. "${0%/*}/inc/prologue.sh"
+. "`dirname \"$0\"`/inc/prologue.sh"
 
 version="$(cd "${0%/*}"; git describe) (git)"
 

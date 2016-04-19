@@ -63,7 +63,7 @@ standalone/%: ${SRC} inc/*
 	fi; \
 	cp $@ ${@}.work; \
 	nlinit="`echo 'nl=\"'; echo '\"'`"; eval "$$nlinit"; \
-	sed "/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*"'$$'"/{$${nl}\
+	sed "/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*"'$$'"/{$${nl}\
 		x$${nl}\
 		r inc/prologue.sh$${nl}\
 	}" ${@}.work > $@; \
@@ -148,7 +148,7 @@ install: docs vimpager.configured vimcat.configured
 	@echo configuring $<; \
 	MY_SHELL="`scripts/find_shell`"; \
 	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
-	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*$$/d' \
+	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
 	     -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
 	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
 	     -e 's!^	configured=0!	configured=1!' $< > $@; \
