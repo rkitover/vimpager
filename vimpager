@@ -10,7 +10,8 @@ if [ ! -t 1 ]; then
 fi
 
 . "`dirname \"$0\"`"/inc/prologue.sh
-version="$(git describe) (git)"
+
+version="$(cd "$(dirname "${0}")"; git describe) (git)"
 
 case $(uname -s) in
 	Linux) linux=1 ;;
