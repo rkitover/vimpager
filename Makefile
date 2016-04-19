@@ -34,7 +34,7 @@ standalone/%: ${SRC} inc/*
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ ${@}.work; \
-		sed -e 's|^version="\$$(git describe) (git)"$$|version="'"`git describe`"' (standalone, shell='"$$MY_SHELL"')"|' \
+		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$MY_SHELL))"|' \
 		    -e 's/^	stripped=1$$/	stripped=0/' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    ${@}.work > $@; \
@@ -83,7 +83,7 @@ uninstall:
 	@if [ '${PREFIX}' = '/usr' ] && diff /etc/vimpagerrc vimpagerrc >/dev/null 2>&1; then \
 		echo rm -f /etc/vimpagerrc; \
 		rm -rf /etc/vimpagerrc; \
-	elif diff "${SYSCONFDIR}/vimpagerrc" vimpagerrc >/dev/null 2>&1; then
+	elif diff "${SYSCONFDIR}/vimpagerrc" vimpagerrc >/dev/null 2>&1; then \
 		echo rm -f "${SYSCONFDIR}/vimpagerrc"; \
 		rm -f "${SYSCONFDIR}/vimpagerrc"; \
 	fi
@@ -149,7 +149,7 @@ install: docs vimpager.configured vimcat.configured
 	MY_SHELL="`scripts/find_shell`"; \
 	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
 	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh[ 	]*$$/d' \
-	     -e 's|^version="\$$(git describe) (git)"$$|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
+	     -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
 	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
 	     -e 's!^	configured=0!	configured=1!' $< > $@; \
 	chmod +x $@
