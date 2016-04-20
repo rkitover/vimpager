@@ -15,8 +15,9 @@ For vimcat see [here](markdown/vimcat.md) or 'man vimcat'.
 # RUN-TIME DEPENDENCIES
 
 * vim, version >= 7.3
-* a POSIX conform shell, see [the
+* a POSIX conformant shell, see [the
   standard](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
+  common variants are searched for, bash is fine
 
 # BUILD DEPENDENCIES
 
@@ -41,6 +42,15 @@ git clone git://github.com/rkitover/vimpager
 cd vimpager
 sudo make install
 ```
+
+The following make settings are supported at `make install` time:
+
+| **Variable** | **Purpose**                                         |
+|--------------|-----------------------------------------------------|
+| DESTDIR      | base dir where files will be written, for packaging |
+| PREFIX       | install prefix to configure for, e.g. /usr/local    |
+| prefix       | prefix for writing files, e.g. for GNU stow         |
+| POSIX_SHELL  | POSIX shell to use to run the scripts               |
 
 If you got vimpager from the vim.org scripts section, just put it
 somewhere in your PATH, e.g.:

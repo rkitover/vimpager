@@ -1,5 +1,6 @@
 PREFIX=/usr/local
-SYSCONFDIR=${PREFIX}/etc
+prefix=${PREFIX}
+SYSCONFDIR=${prefix}/etc
 INSTALL=./scripts/install-sh
 MKPATH=${INSTALL} -m 755 -d
 INSTALLBIN=${INSTALL} -m 555
@@ -34,7 +35,7 @@ standalone/%: ${SRC} inc/*
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ ${@}.work; \
-		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$MY_SHELL))"|' \
+		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 		    -e 's/^	stripped=1$$/	stripped=0/' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    ${@}.work > $@; \
@@ -73,12 +74,12 @@ standalone/%: ${SRC} inc/*
 	@chmod +x $@
 
 uninstall:
-	rm -f "${PREFIX}/bin/vimpager"
-	rm -f "${PREFIX}/bin/vimcat"
-	rm -f "${PREFIX}/share/man/man1/vimpager.1"
-	rm -f "${PREFIX}/share/man/man1/vimcat.1"
-	rm -rf "${PREFIX}/share/doc/vimpager"
-	rm -rf "${PREFIX}/share/vimpager"
+	rm -f "${prefix}/bin/vimpager"
+	rm -f "${prefix}/bin/vimcat"
+	rm -f "${prefix}/share/man/man1/vimpager.1"
+	rm -f "${prefix}/share/man/man1/vimcat.1"
+	rm -rf "${prefix}/share/doc/vimpager"
+	rm -rf "${prefix}/share/vimpager"
 	@if [ '${PREFIX}' = '/usr' ] && diff /etc/vimpagerrc vimpagerrc >/dev/null 2>&1; then \
 		echo rm -f /etc/vimpagerrc; \
 		rm -rf /etc/vimpagerrc; \
@@ -89,51 +90,51 @@ uninstall:
 
 install: docs vimpager.configured vimcat.configured
 	@chmod +x ./install-sh 2>/dev/null || true; \
-	${MKPATH} "${DESTDIR}${PREFIX}/bin"; \
-	echo ${INSTALLBIN} vimpager.configured "${DESTDIR}${PREFIX}/bin/vimpager"; \
-	${INSTALLBIN} vimpager.configured "${DESTDIR}${PREFIX}/bin/vimpager"; \
-	echo ${INSTALLBIN} vimcat.configured "${DESTDIR}${PREFIX}/bin/vimcat"; \
-	${INSTALLBIN} vimcat.configured "${DESTDIR}${PREFIX}/bin/vimcat"; \
+	${MKPATH} "${DESTDIR}${prefix}/bin"; \
+	echo ${INSTALLBIN} vimpager.configured "${DESTDIR}${prefix}/bin/vimpager"; \
+	${INSTALLBIN} vimpager.configured "${DESTDIR}${prefix}/bin/vimpager"; \
+	echo ${INSTALLBIN} vimcat.configured "${DESTDIR}${prefix}/bin/vimcat"; \
+	${INSTALLBIN} vimcat.configured "${DESTDIR}${prefix}/bin/vimcat"; \
 	if [ -d man ]; then \
-		${MKPATH} "${DESTDIR}${PREFIX}/share/man/man1"; \
-		echo ${INSTALLMAN} man/vimpager.1 "${DESTDIR}${PREFIX}/share/man/man1/vimpager.1"; \
-		${INSTALLMAN} man/vimpager.1 "${DESTDIR}${PREFIX}/share/man/man1/vimpager.1"; \
-		echo ${INSTALLMAN} man/vimcat.1 "${DESTDIR}${PREFIX}/share/man/man1/vimcat.1"; \
-		${INSTALLMAN} man/vimcat.1 "${DESTDIR}${PREFIX}/share/man/man1/vimcat.1"; \
+		${MKPATH} "${DESTDIR}${prefix}/share/man/man1"; \
+		echo ${INSTALLMAN} man/vimpager.1 "${DESTDIR}${prefix}/share/man/man1/vimpager.1"; \
+		${INSTALLMAN} man/vimpager.1 "${DESTDIR}${prefix}/share/man/man1/vimpager.1"; \
+		echo ${INSTALLMAN} man/vimcat.1 "${DESTDIR}${prefix}/share/man/man1/vimcat.1"; \
+		${INSTALLMAN} man/vimcat.1 "${DESTDIR}${prefix}/share/man/man1/vimcat.1"; \
 	fi; \
-	${MKPATH} "${DESTDIR}${PREFIX}/share/doc/vimpager"; \
-	echo ${INSTALLDOC} markdown_src/vimpager.md "${DESTDIR}${PREFIX}/share/doc/vimpager/vimpager.md"; \
-	${INSTALLDOC} markdown_src/vimpager.md "${DESTDIR}${PREFIX}/share/doc/vimpager/vimpager.md"; \
-	echo ${INSTALLDOC} markdown_src/vimcat.md "${DESTDIR}${PREFIX}/share/doc/vimpager/vimcat.md"; \
-	${INSTALLDOC} markdown_src/vimcat.md "${DESTDIR}${PREFIX}/share/doc/vimpager/vimcat.md"; \
-	echo ${INSTALLDOC} TODO.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/TODO.yml"; \
-	${INSTALLDOC} TODO.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/TODO.yml"; \
-	echo ${INSTALLDOC} DOC_AUTHORS.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/DOC_AUTHORS.yml"; \
-	${INSTALLDOC} DOC_AUTHORS.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/DOC_AUTHORS.yml"; \
-	echo ${INSTALLDOC} ChangeLog_vimpager.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/ChangeLog_vimpager.yml"; \
-	${INSTALLDOC} ChangeLog_vimpager.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/ChangeLog_vimpager.yml"; \
-	echo ${INSTALLDOC} ChangeLog_vimcat.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/ChangeLog_vimcat.yml"; \
-	${INSTALLDOC} ChangeLog_vimcat.yml "${DESTDIR}${PREFIX}/share/doc/vimpager/ChangeLog_vimcat.yml"; \
-	echo ${INSTALLDOC} uganda.txt "${DESTDIR}${PREFIX}/share/doc/vimpager/uganda.txt"; \
-	${INSTALLDOC} uganda.txt "${DESTDIR}${PREFIX}/share/doc/vimpager/uganda.txt"; \
-	echo ${INSTALLDOC} debian/copyright "${DESTDIR}${PREFIX}/share/doc/vimpager/copyright"; \
-	${INSTALLDOC} debian/copyright "${DESTDIR}${PREFIX}/share/doc/vimpager/copyright"; \
+	${MKPATH} "${DESTDIR}${prefix}/share/doc/vimpager"; \
+	echo ${INSTALLDOC} markdown_src/vimpager.md "${DESTDIR}${prefix}/share/doc/vimpager/vimpager.md"; \
+	${INSTALLDOC} markdown_src/vimpager.md "${DESTDIR}${prefix}/share/doc/vimpager/vimpager.md"; \
+	echo ${INSTALLDOC} markdown_src/vimcat.md "${DESTDIR}${prefix}/share/doc/vimpager/vimcat.md"; \
+	${INSTALLDOC} markdown_src/vimcat.md "${DESTDIR}${prefix}/share/doc/vimpager/vimcat.md"; \
+	echo ${INSTALLDOC} TODO.yml "${DESTDIR}${prefix}/share/doc/vimpager/TODO.yml"; \
+	${INSTALLDOC} TODO.yml "${DESTDIR}${prefix}/share/doc/vimpager/TODO.yml"; \
+	echo ${INSTALLDOC} DOC_AUTHORS.yml "${DESTDIR}${prefix}/share/doc/vimpager/DOC_AUTHORS.yml"; \
+	${INSTALLDOC} DOC_AUTHORS.yml "${DESTDIR}${prefix}/share/doc/vimpager/DOC_AUTHORS.yml"; \
+	echo ${INSTALLDOC} ChangeLog_vimpager.yml "${DESTDIR}${prefix}/share/doc/vimpager/ChangeLog_vimpager.yml"; \
+	${INSTALLDOC} ChangeLog_vimpager.yml "${DESTDIR}${prefix}/share/doc/vimpager/ChangeLog_vimpager.yml"; \
+	echo ${INSTALLDOC} ChangeLog_vimcat.yml "${DESTDIR}${prefix}/share/doc/vimpager/ChangeLog_vimcat.yml"; \
+	${INSTALLDOC} ChangeLog_vimcat.yml "${DESTDIR}${prefix}/share/doc/vimpager/ChangeLog_vimcat.yml"; \
+	echo ${INSTALLDOC} uganda.txt "${DESTDIR}${prefix}/share/doc/vimpager/uganda.txt"; \
+	${INSTALLDOC} uganda.txt "${DESTDIR}${prefix}/share/doc/vimpager/uganda.txt"; \
+	echo ${INSTALLDOC} debian/copyright "${DESTDIR}${prefix}/share/doc/vimpager/copyright"; \
+	${INSTALLDOC} debian/copyright "${DESTDIR}${prefix}/share/doc/vimpager/copyright"; \
 	if [ -d html ]; then \
-		${MKPATH} "${DESTDIR}${PREFIX}/share/doc/vimpager/html"; \
-		echo ${INSTALLDOC} html/vimpager.html "${DESTDIR}${PREFIX}/share/doc/vimpager/html/vimpager.html"; \
-		${INSTALLDOC} html/vimpager.html "${DESTDIR}${PREFIX}/share/doc/vimpager/html/vimpager.html"; \
-		echo ${INSTALLDOC} html/vimcat.html "${DESTDIR}${PREFIX}/share/doc/vimpager/html/vimcat.html"; \
-		${INSTALLDOC} html/vimcat.html "${DESTDIR}${PREFIX}/share/doc/vimpager/html/vimcat.html"; \
+		${MKPATH} "${DESTDIR}${prefix}/share/doc/vimpager/html"; \
+		echo ${INSTALLDOC} html/vimpager.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimpager.html"; \
+		${INSTALLDOC} html/vimpager.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimpager.html"; \
+		echo ${INSTALLDOC} html/vimcat.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimcat.html"; \
+		${INSTALLDOC} html/vimcat.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimcat.html"; \
 	fi; \
-	echo ${MKPATH} "${DESTDIR}${PREFIX}/share/vimpager"; \
-	${MKPATH} "${DESTDIR}${PREFIX}/share/vimpager"; \
+	echo ${MKPATH} "${DESTDIR}${prefix}/share/vimpager"; \
+	${MKPATH} "${DESTDIR}${prefix}/share/vimpager"; \
 	for rt_file in ${RUNTIME}; do \
-		if [ ! -d "`dirname "${DESTDIR}${PREFIX}/share/vimpager/$$rt_file"`" ]; then \
-			echo ${MKPATH} "`dirname "${DESTDIR}${PREFIX}/share/vimpager/$$rt_file"`"; \
-			${MKPATH} "`dirname "${DESTDIR}${PREFIX}/share/vimpager/$$rt_file"`"; \
+		if [ ! -d "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`" ]; then \
+			echo ${MKPATH} "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`"; \
+			${MKPATH} "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`"; \
 		fi; \
-		echo ${INSTALLFILE} "$$rt_file" "${DESTDIR}${PREFIX}/share/vimpager/$$rt_file"; \
-		${INSTALLFILE} "$$rt_file" "${DESTDIR}${PREFIX}/share/vimpager/$$rt_file"; \
+		echo ${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
+		${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
 	done; \
 	SYSCONFDIR='${DESTDIR}${SYSCONFDIR}'; \
 	if [ '${PREFIX}' = '/usr' ]; then \
@@ -145,11 +146,11 @@ install: docs vimpager.configured vimcat.configured
 
 %.configured: %
 	@echo configuring $<; \
-	MY_SHELL="`scripts/find_shell`"; \
-	sed  -e '1{ s|.*|#!'"$$MY_SHELL"'|; }' \
-	     -e 's|\$${MY_SHELL}|'"$$MY_SHELL|" \
+	POSIX_SHELL="`scripts/find_shell`"; \
+	sed  -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
+	     -e 's|\$${POSIX_SHELL}|'"$$POSIX_SHELL|" \
 	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
-	     -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$MY_SHELL"')"|' \
+	     -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
 	     -e 's!^	configured=0!	configured=1!' $< > $@; \
 	chmod +x $@

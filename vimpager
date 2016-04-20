@@ -763,7 +763,7 @@ page_files() {
 				cat "${cur_file}"
 				_exit_status="${?}"
 			else
-				"${MY_SHELL}" "${vimcat}" \
+				"${POSIX_SHELL}" "${vimcat}" \
 					-u "${vimrc}" \
 					--cmd "set rtp^=${runtime} | let vimpager={ 'enabled': 1 }" \
 					-c 'silent! source %.vim' \
