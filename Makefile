@@ -21,11 +21,12 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-all: balance-vimcat-stamp standalone/vimpager standalone/vimcat docs
+all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
 
-balance-vimcat-stamp: vimcat
-	@scripts/balance-vimcat
-	@touch balance-vimcat-stamp
+balance-shellvim-stamp: vimcat
+	@chmod +x scripts/balance-shellvim
+	@scripts/balance-shellvim
+	@touch balance-shellvim-stamp
 
 standalone/%: ${SRC} inc/*
 	@echo building $@
@@ -69,7 +70,8 @@ standalone/%: ${SRC} inc/*
 	    -e '}' ${@}.work > $@; \
 	rm -f ${@}.work; \
 	if grep '^: if 0$$' ${@} >/dev/null; then \
-		scripts/balance-vimcat $@; \
+		chmod +x scripts/balance-shellvim; \
+		scripts/balance-shellvim $@; \
 	fi
 	@chmod +x $@
 
