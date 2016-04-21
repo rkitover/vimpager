@@ -400,4 +400,4 @@ your PATH and set the vimpager_use_gvim option as described above.
 You can specify the vimrc to use with the `VIMPAGER_RC` environment variable.
 
 Setting `VIMPAGER_DEBUG` to a non-zero value will disable suppressing vim
-errors on startup.
+errors on startup and when switching to the next file.

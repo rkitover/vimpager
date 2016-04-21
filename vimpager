@@ -461,8 +461,6 @@ main() {
 
 		set_key files "${file_idx}" "${filename}"
 
-		vim_files="${vim_files} $(escape_filename_for_vim "${filename}")"
-
 		file_idx="$((${file_idx} + 1))"
 	done
 
@@ -478,7 +476,7 @@ main() {
 		touch "${tmp}/cat_files"
 	fi
 
-	page_files -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}"
+	page_files "$@"
 
 	quit "${?}"
 }
@@ -718,11 +716,6 @@ BEGIN {
 '
 }
 
-# Escape chars special to vim in file name.
-escape_filename_for_vim() {
-	echo "${@}" | sed -e 's!\([/#%<>|\\ 	]\)!\\\1!g'
-}
-
 # emulate arrays
 set_key() {
 	eval "${1}_${2}=\"${3}\""
@@ -748,11 +741,11 @@ page_files() {
 	fi
 
 	if [ -f "${tmp}/cat_files" ]; then
-		for i in $(seq 1 ${file_count}); do
-			cur_file="$(get_key files "${i}")"
+		i=1
+		for cur_file in "${@}"; do
 			orig_file="$(get_key orig_file_names "${i}")"
 
-			if [ "${file_count}" -gt 1 ]; then
+			if [ "${#}" -gt 1 ]; then
 				if [ "${i}" -gt 1 ]; then
 					printf '\n'
 				fi
@@ -766,26 +759,25 @@ page_files() {
 				"${POSIX_SHELL}" "${vimcat}" \
 					-u "${vimrc}" \
 					--cmd "set rtp^=${runtime} | let vimpager={ 'enabled': 1 }" \
+					--cmd "${extra_cmd:-echo}" \
 					-c 'silent! source %.vim' \
-					"${@}" "${cur_file}" </dev/tty
+					-c "${extra_c:-echo}"  \
+					"${cur_file}" </dev/tty
 				_exit_status="${?}"
 			fi
+			i="$((${i} + 1))"
 		done
 		return "${_exit_status:-0}"
 	fi
 
 	init_opts="'columns': ${cols}, 'tmp_dir': '${tmp}', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}"
 
-	quiet='silent! '
-	if [ -n "${VIMPAGER_DEBUG}" -a "${VIMPAGER_DEBUG}" != 0 ]; then
-		quiet=''
-	fi
-
 	${vim_cmd} -N -i NONE \
 		-u "${vimrc}" \
 		--cmd "set rtp^=${runtime}" \
 		--cmd "call vimpager#Init({ ${init_opts} })" \
-		-c "${quiet}args ${vim_files}" \
+		--cmd "${extra_cmd:-echo}" \
+		-c "${extra_c:-echo}"  \
 		"${@}" </dev/tty
 
 	_vim_exit_status="${?}"

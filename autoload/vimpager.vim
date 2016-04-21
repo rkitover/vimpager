@@ -20,6 +20,10 @@ function! vimpager#Init(opts)
     " any pre-processing necessary is written to .vim files
     autocmd BufReadPost,StdinReadPost * silent! source %.vim
 
+    " hide error messages from invalide modelines
+    autocmd BufWinEnter * if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG
+                \ | silent! redraw! | endif
+
     augroup END
 
     augroup vimpager
@@ -28,9 +32,6 @@ function! vimpager#Init(opts)
     " can't use VimEnter because that fires after first file is read
     autocmd BufReadPre,StdinReadPre * call s:SetOptions()
     autocmd BufReadPre,StdinReadPre * runtime macros/less.vim
-
-    " delete the "[No Name]" buffer since we don't use file args
-    autocmd BufReadPre,StdinReadPre * if bufname(1) ==# '' | bdelete 1 | endif
 
     if has('gui')
         autocmd VimEnter * call s:GUIInit()
