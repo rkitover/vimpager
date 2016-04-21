@@ -725,7 +725,7 @@ page_files() {
 				if [ "${i}" -gt 1 ]; then
 					printf '\n'
 				fi
-				printf '==> '"${orig_file}"' <==\n\n'
+				printf '==> %s <==\n\n' "${orig_file}"
 			fi
 
 			if [ -n "$(get_key ansi_files "${i}")" ]; then
