@@ -478,9 +478,10 @@ main() {
 	file_count="${#}"
 
 	set --
-
-	for i in $(seq 1 "${file_count}"); do
+	i=1
+	while [ "${i}" -le "${file_count}" ]; do
 		set -- "${@}" "$(get_key files "${i}")"
+		i=$((${i} + 1))
 	done
 
 	if [ "${no_pass_thru:-0}" -ne 1 ] && fits_on_screen "${@}"; then
@@ -561,42 +562,6 @@ sed() {
 	fi
 
 	command "${_sed}" "$@"
-}
-
-# Solaris and some other systems have no seq command
-seq() {
-	if [ -z "${_seq}" ]; then
-		if command -v gseq >/dev/null; then
-			_seq=gseq
-		elif command -v seq >/dev/null; then
-			_seq=seq
-		else
-			_seq=awk_seq
-		fi
-	fi
-
-	command "${_seq}" "$@"
-}
-
-# Fallback implementation of seq in oawk
-awk_seq() {
-	echo | awk '
-	    {
-		start = arg1
-		stop  = arg2
-		step  = 1
-
-		if (num_args == 3) {
-		    step = arg2
-		    stop = arg3
-		}
-
-		for (i = start; i != stop + step; i += step)
-		    print i
-
-		exit(0)
-	    }
-	' num_args="$#" arg1="$1" arg2="$2" arg3="$3"
 }
 
 # grep -q is often not available
