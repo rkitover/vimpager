@@ -728,29 +728,11 @@ extract_bundled_scripts() {
 	)
 }
 
-# Adapted from: https://gist.github.com/moyashi/4063894
-# We are escaping only slashes, spaces, and chars special to vim (see :h expand).
+# We are escaping only slashes (because they are special in file paths) and
+# percent (because it is our escape char).  This makes it possible to encode
+# the path to the original file in the basename of the temporary file.
 encode_filename() {
-	echo "$@" | awk '
-BEGIN {
-    for (i = 0; i <= 255; i++) {
-	ord[sprintf("%c", i)] = i
-    }
-}
-
-{
-    len = length($0)
-    res = ""
-    for (i = 1; i <= len; i++) {
-	c = substr($0, i, 1);
-	if (c ~ /[\/#%<>|\\ 	]/)
-	    res = res "%" sprintf("%02X", ord[c])
-	else
-	    res = res c
-    }
-    print res
-}
-'
+	echo "$@" | sed -e 's|%|%25|g' -e 's|/|%2F|g'
 }
 
 # emulate arrays
