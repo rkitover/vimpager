@@ -18,7 +18,8 @@ function! vimpager#Init(opts)
     autocmd BufReadPre,StdinReadPre * call s:SetBufType()
 
     " any pre-processing necessary is written to .vim files
-    autocmd BufReadPost,StdinReadPost * silent! source %.vim
+    autocmd BufReadPost,StdinReadPost * silent! execute
+                \ 'source ' $VIMPAGER_TMP . '/' . (argidx() + 1) . '.vim'
 
     " hide error messages from invalide modelines
     autocmd BufWinEnter * if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG

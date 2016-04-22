@@ -368,60 +368,69 @@ main() {
 
 		set_key orig_file_names "${file_idx}" "${filename}"
 
+		# $file still holds the orginal file name.  $filename will be
+		# the encoded version of $file.  $tempfile is the path under
+		# $tmp if the file is to be opend from there instead of the
+		# original location.  If $tempfile is empty the file is to be
+		# opened as $file.
 		filename="$(encode_filename "${filename}")"
-		filename="${tmp}/${filename}"
+		tempfile=
 
 		case "$(echo "${file}" | tr 'A-Z' 'a-z')" in
 			*.gz)
 				filename=${filename%.??}
-				gunzip -c -- "${file}" > "${filename}"
+				tempfile="${tmp}/${filename}"
+				gunzip -c -- "${file}" > "${tempfile}"
+
 				;;
 			*.bz2)
 				filename=${filename%.??2}
-				bunzip2 -c -- "${file}" > "${filename}"
+				tempfile="${tmp}/${filename}"
+				bunzip2 -c -- "${file}" > "${tempfile}"
 				;;
 			*.xz)
 				filename=${filename%.??}
-				xzcat -c -- "${file}" > "${filename}"
+				tempfile="${tmp}/${filename}"
+				xzcat -c -- "${file}" > "${tempfile}"
 				;;
 			*.z)
 				filename=${filename%.?}
-				uncompress -c -- "${file}" > "${filename}"
+				tempfile="${tmp}/${filename}"
+				uncompress -c -- "${file}" > "${tempfile}"
 				;;
 			*)
-				if [ "${file}" != "-" ]; then
-					cp -- "${file}" "${filename}"
-				else
-					cat -- "${file}" > "${filename}"
+				if [ "${file}" = "-" ]; then
+					tempfile="${tmp}/${filename}"
+					cat -- "${file}" > "${tempfile}"
 				fi
 				;;
 		esac
 
 		# check for ANSI codes and strip if not using ansiesc
-		if head_n 100 "${filename}" | grep_q "${ANSI_RE}"; then
+		if head_n 100 "${tempfile:-"${file}"}" | grep_q "${ANSI_RE}"; then
 			if [ -z "${ansiesc_available}" -o -n "${force_strip_ansi}" ]; then
-				mv -- "${filename}" "${filename}.work"
-				cat -- "${filename}.work" | ansi_filter > "${filename}"
-				rm -f -- "${filename}.work"
+				ansi_filter "${tempfile:-"${file}"}" > "${tmp}/${filename}.work"
+				tempfile="${tmp}/${filename}"
+				mv -f -- "${tempfile}.work" "${tempfile}"
 			else
 				use_ansiesc=1
-				echo 'call vimpager_utils#DoAnsiEsc()' >> "${filename}.vim"
-				set_key ansi_files "${file_idx}" "${filename}"
+				echo 'call vimpager_utils#DoAnsiEsc()' >> "${tmp}/${file_idx}.vim"
+				set_key ansi_files "${file_idx}" yes
 			fi
 		fi
 
 		# squeeze blank lines if option was specified, Ubuntu man with /usr/bin/pager does this
 		if [ "${squeeze_blank_lines}" = "1" ]; then
-				mv -- "${filename}" "${filename}.work"
 				sed -e '/^[ 	]*$/{
 					N
 					/^[ 	]*\n[ 	]*$/D
-				}' -- "${filename}.work" > "${filename}"
-				rm -f -- "${filename}.work"
+				}' -- < "${tempfile:-"${file}"}" > "${tmp}/${filename}.work"
+				tempfile="${tmp}/${filename}"
+				mv -f -- "${tempfile}.work" "${tempfile}"
 		fi
 
 		# dumb man detection when the pstree heuristic fails
-		if [ -z "${is_doc}" ] && head_n 12 "${filename}" | grep_q '^NAME$'; then
+		if [ -z "${is_doc}" ] && head_n 12 "${tempfile:-"${file}"}" | grep_q '^NAME$'; then
 			is_man=1
 		fi
 
@@ -429,24 +438,25 @@ main() {
 		# and write out ft command for vim
 		if [ -n "${is_doc}" ]; then
 			mv -- "${filename}" "${filename}.work"
-			ansi_filter "${filename}.work" | overstrike_filter | awk '
+			ansi_filter "${tempfile:-"${file}"}" | overstrike_filter | awk '
 				BEGIN { skipblank=1 }
 				/^[ 	]*$/ { if (!skipblank) print }
 				/[^ 	]/ { skipblank=0; print }
-			' > "${filename}"
-			rm -f -- "${filename}.work"
+			' > "${tmp}/${filename}.work"
+			tempfile="${tmp}/${filename}"
+			mv -f -- "${tempfile}.work" "${tempfile}"
 
 			if [ -n "${is_man}" ]; then
-				echo 'set ft=man' >> "${filename}.vim"
+				echo 'set ft=man' >> "${tmp}/${file_idx}.vim"
 			elif [ -n "${is_perldoc}" ]; then
-				echo 'set ft=perldoc' >> "${filename}.vim"
+				echo 'set ft=perldoc' >> "${tmp}/${file_idx}.vim"
 			fi
 		fi
 
 		# if file is zero length, or one blank line (cygwin), and is only arg, exit
-		if [ \( ! -s "${filename}" \) \
-			-o \( \( "$(cat "${filename}")" = "" \) \
-			-a \( "$(wc -l < "${filename}")" -eq 1 \) \) ]; then
+		if [ \( ! -s "${tempfile:-"${file}"}" \) \
+			-o \( \( "$(cat "${tempfile:-"${file}"}")" = "" \) \
+			-a \( "$(wc -l < "${tempfile:-"${file}"}")" -eq 1 \) \) ]; then
 
 			if [ "${#}" -eq 1 ]; then
 				quit 0
@@ -457,9 +467,10 @@ main() {
 		# vim just fine as well.
 		if [ -n "${cygwin}" ]; then
 			filename=$(cygpath -w "${filename}" | tr '\\' /)
+			tempfile=${tempfile:+"${tmp}/${filename}"}
 		fi
 
-		set_key files "${file_idx}" "${filename}"
+		set_key files "${file_idx}" "${tempfile:-"${file}"}"
 
 		file_idx="$((${file_idx} + 1))"
 	done
@@ -772,6 +783,7 @@ page_files() {
 
 	init_opts="'columns': ${cols}, 'tmp_dir': '${tmp}', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}"
 
+	VIMPAGER_TMP="${tmp}" \
 	${vim_cmd} -N -i NONE \
 		-u "${vimrc}" \
 		--cmd "set rtp^=${runtime}" \
