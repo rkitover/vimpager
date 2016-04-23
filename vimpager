@@ -485,7 +485,7 @@ main() {
 	done
 
 	if [ "${no_pass_thru:-0}" -ne 1 ] && fits_on_screen "${@}"; then
-		touch "${tmp}/cat_files"
+		cat_files=1
 	fi
 
 	page_files "$@"
@@ -660,7 +660,7 @@ extract_bundled_scripts() {
 		ansi_esc_plugin_vim
 		cecutil_plugin_vim
 
-		if [ -f "${tmp}/cat_files" ]; then
+		if [ -n "${cat_files}" ]; then
 			vimcat_script
 			chmod +x ./bin/vimcat
 		fi
@@ -716,7 +716,7 @@ page_files() {
 		fi
 	fi
 
-	if [ -f "${tmp}/cat_files" ]; then
+	if [ -n "${cat_files}" ]; then
 		i=1
 		for cur_file in "${@}"; do
 			orig_file="$(get_key orig_file_names "${i}")"
