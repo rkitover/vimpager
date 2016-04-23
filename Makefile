@@ -45,6 +45,11 @@ standalone/%: ${SRC} inc/*
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
 		chmod +x ${AWK} 2>/dev/null || true; \
 		for src in $$SRC; do \
+		    case "$$src" in \
+			inc/*) \
+				continue; \
+				;; \
+		    esac; \
 		    mv $@ ${@}.work; \
 		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
 		    ${AWK} '\
@@ -183,8 +188,12 @@ docs: ${GEN_DOCS} docs.tar.gz
 
 docs.tar.gz: ${GEN_DOCS} ${DOC_SRC}
 	@rm -f $@
-	tar cf docs.tar ${GEN_DOCS} ${DOC_SRC}
-	gzip -9 docs.tar
+	@if [ "`ls -1 $? 2>/dev/null | wc -l`" -eq "`echo $? | wc -w`" ]; then \
+		echo tar cf docs.tar $?; \
+		tar cf docs.tar $?; \
+		echo gzip -9 docs.tar; \
+		gzip -9 docs.tar; \
+	fi
 
 # Build markdown with TOCs
 markdown/%.md: markdown_src/%.md
@@ -196,7 +205,7 @@ markdown/%.md: markdown_src/%.md
 	else \
 		if [ ! -r doctoc-warn-stamp ]; then \
 		    echo >&2; \
-		    echo "[1;31mWARNING[0m: doctoc is not available, markdown with Tables Of Contents will not be generated. If you want to generate them, install doctoc with: npm instlal -g doctoc" >&2; \
+		    echo "[1;31mWARNING[0m: doctoc is not available, markdown with Tables Of Contents will not be generated. If you want to generate them, install doctoc with: npm install -g doctoc" >&2; \
 		    echo >&2; \
 		    touch doctoc-warn-stamp; \
 		fi; \
@@ -215,6 +224,8 @@ man/%.1: markdown_src/%.md
 		    touch docs-warn-stamp; \
 		fi; \
 	fi
+
+.SECONDARY: vimpager.md.work vimcat.md.work
 
 # transform markdown links to html links
 %.md.work: markdown_src/%.md
@@ -238,6 +249,4 @@ html/%.html: %.md.work
 realclean distclean clean:
 	rm -rf *.work */*.work *-stamp *.deb *.configured *.uu */*.uu man html standalone
 
-.PHONY: all install uninstall docs gen-TOCs realclean distclean clean
-
-# vim: ft=make :
+.PHONY: all install install-deb uninstall docs realclean distclean clean

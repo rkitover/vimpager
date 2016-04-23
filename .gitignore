@@ -6,6 +6,7 @@
 *-stamp
 *.stripped
 *.configured
+*.sh
 html/
 man/
 standalone/
