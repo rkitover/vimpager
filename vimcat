@@ -95,7 +95,15 @@ start_highlight_job() {
   tmp_file_in="${tmp_dir}/vimcat_in.txt"
   out_fifo="${tmp_dir}/vimcat_out.fifo"
 
-  mkfifo "${out_fifo}"
+  case "$(uname -s)" in
+    SunOS*|CYGWIN*|MINGW*|MSYS*)
+      # the fifo streaming doesn't work on windows and solaris
+      touch "${out_fifo}"
+      ;;
+    *)
+      mkfifo "${out_fifo}"
+      ;;
+  esac
 
   script="$(command -v ${0})"
 
@@ -219,6 +227,11 @@ start_highlight_job() {
         fi
 
         start_highlight_job
+
+        # if it's not a fifo where this doesn't work, tail needs some time to catch up
+        if [ ! -p "${out_fifo}" ]; then
+          vim -Es +'sleep 1100 m' +'q'
+        fi
 
         [ -n "${tail_pid}" ] && kill "${tail_pid}"
       fi
