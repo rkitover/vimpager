@@ -321,6 +321,10 @@ Use alternate .vimrc or .vimpagerrc.
 Squeeze blank lines into a single blank line. GNU man passes this option to
 /usr/bin/pager.
 
+## -x
+
+Enable debugging output for the shell script part of vimpager.
+
 # ANSI ESCAPE SEQUENCES AND OVERSTRIKES
 
 If your source is using ANSI escape codes, the AnsiEsc plugin will be

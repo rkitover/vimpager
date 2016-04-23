@@ -33,7 +33,8 @@ main() {
 		quit 0
 	fi
 
-	# check for -h before main option parsing, this is much faster
+	# check for -h and -v before main option parsing, this is much faster
+	# set xtrace as early as possible, if requested
 	for arg in "${@}"; do
 		case "${arg}" in
 			'-h'|'--help'|'-help'|'--usage'|'-usage')
@@ -43,6 +44,9 @@ main() {
 			'-v'|'--version'|'-version')
 				echo "vimpager $version"
 				quit 0
+				;;
+			'-x')
+				set -x
 				;;
 		esac
 	done
@@ -330,6 +334,10 @@ main() {
 			'--')
 				shift
 				break
+				;;
+			'-x')
+				# xtrace should already be set by the first option parsing
+				shift
 				;;
 			-*)
 				echo "${0}: bad option '${1}', see --help for usage." >&2
