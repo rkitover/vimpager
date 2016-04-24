@@ -13,5 +13,7 @@ echo \
     osx=$osx \
     solaris=$solaris \
     win32=$win32 \
+    AWK=$AWK \
+    SED=$SED \
 
 # vim: sw=4 et tw=0:
