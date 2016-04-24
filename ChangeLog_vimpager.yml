@@ -3,9 +3,8 @@
 # https://github.com/rkitover/vimpager
 
 2.07 UNRELEASED:
-- escape special characters in file names so they can be opened, like '#' and % gh#120
+- pass files as a normal arg list to vim so special chars are not an issue gh#120
 - turn hlsearch on by default, configurable via less.hlsearch, better toggle with <Esc>u gh#121
-- fix extra Scratch buffer by setting nohidden at load and restoring it gh#121
 - allow turning off less mode on start with less.enabled=0, ,v enables it gh#121
 - do not disable modelines by default gh#121
 - set vimpager.enabled=1 when reading the config gh#121
@@ -29,13 +28,13 @@
 - multiple file support
 - better error message for unreadable files
 - display actual file name on the status line
-- allow overriding status line with `g;less.statusfunc`
+- "allow overriding status line with `g:less.statusfunc`"
 - use mapleader for `,v` mapping in less.vim, defaults to `,`
 - use vim's value of $MYVIMRC and $VIM for finding vimrc or vimpagerrc gh#141
 - disable viminfo, viminfo handling to be improved in the future gh#141
 - support VIMPAGER_DEBUG env var to not suppress vim startup errors and when switching to the next file
 - set global and buffer-local options mostly correctly when switching between less-mode and non-less-mode buffers
-- strip bundled scripts and install them to PREFIX/share/vimpager
+- strip bundled scripts and install them to PREFIX/share/vimpager, standalone version with encoded scripts generated for vim.org
 - increase columns in gvim only for docs
 - make vimpager usable from Pathogen and add the Page command with docs
 - add the Less command to less.vim which is the same as, but slightly less powerful than, the Page command
