@@ -15,5 +15,7 @@ echo \
     win32=$win32 \
     AWK=$AWK \
     SED=$SED \
+    SED=$SED \
+    HEAD_SYNTAX=$HEAD_SYNTAX \
 
 # vim: sw=4 et tw=0:

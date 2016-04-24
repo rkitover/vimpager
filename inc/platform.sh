@@ -49,4 +49,25 @@ else
     exit 1
 fi
 
+# Find a suitable head executable.
+if command -v ghead >/dev/null; then
+    HEAD=ghead
+else
+    HEAD=head
+fi
+
+# Check the syntax for head.
+if [ "$HEAD_SYNTAX" = new -o "$HEAD_SYNTAX" = old ]; then
+    :
+else
+    if [ "$(echo xx | "$HEAD" -n 1 2>/dev/null)" = xx ]; then
+        HEAD_SYNTAX=new
+    else
+        if ! "$HEAD" -1 -- "$0" >/dev/null 2>&1; then
+            HEAD_NO_DOUBLE_DASH=1
+        fi
+        HEAD_SYNTAX=old
+    fi
+fi
+
 # vim: sw=4 et tw=0:

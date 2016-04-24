@@ -686,20 +686,6 @@ awk_grep_E_q() {
     ' "$@"
 }
 
-if command -v ghead >/dev/null; then
-    _head=ghead
-else
-    _head=head
-fi
-
-if [ "$(echo xx | head -n 1 2>/dev/null)" = "xx" ]; then
-    _head_syntax=new
-else
-    if ! head -1 -- "$0" >/dev/null 2>&1; then
-        _head_no_double_dash=1
-    fi
-fi
-
 head() {
     _lines=
     case "$1" in
@@ -709,13 +695,13 @@ head() {
     esac
 
     if [ -z "$_lines" ]; then
-        command "$_head" "$@"
-    elif [ "$_head_syntax" = "new" ]; then
-        command "$_head" -n $_lines -- "$@"
-    elif [ -z "$_head_no_double_dash" ]; then
-        command "$_head" -$_lines -- "$@"
+        command "$HEAD" "$@"
+    elif [ "$HEAD_SYNTAX" = "new" ]; then
+        command "$HEAD" -n $_lines -- "$@"
+    elif [ -z "$HEAD_NO_DOUBLE_DASH" ]; then
+        command "$HEAD" -$_lines -- "$@"
     else
-        command "$_head" -$_lines "$@"
+        command "$HEAD" -$_lines "$@"
     fi
 }
 
