@@ -445,7 +445,6 @@ main() {
 		# if it's a man page, remove starting blank lines, or the C syntax highlighting fails
 		# and write out ft command for vim
 		if [ -n "${is_doc}" ]; then
-			mv -- "${filename}" "${filename}.work"
 			ansi_filter "${tempfile:-"${file}"}" | overstrike_filter | awk '
 				BEGIN { skipblank=1 }
 				/^[ 	]*$/ { if (!skipblank) print }
