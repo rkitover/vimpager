@@ -51,7 +51,7 @@ start_highlight_job() {
     set -- "$@" -u "${vimcatrc}"
   fi
 
-  $vim "$@" -- "${file}" </dev/tty >/dev/null 2>&1
+  "$vim" "$@" -- "${file}" </dev/tty >/dev/null 2>&1
 }
 
   # if no args and no stdin, display usage
@@ -230,7 +230,7 @@ start_highlight_job() {
 
         # if it's not a fifo where this doesn't work, tail needs some time to catch up
         if [ ! -p "${out_fifo}" ]; then
-          vim -Es +'sleep 1100 m' +'q' >/dev/null
+          "$vim" -N -u NONE -Es +'sleep 1100 m' +q >/dev/null
         fi
 
         [ -n "${tail_pid}" ] && kill "${tail_pid}"
