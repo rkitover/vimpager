@@ -11,6 +11,18 @@ function! vimpager#Init(opts)
     " can't pass a:opts in autocmd
     let s:opts = a:opts
 
+    augroup vimpager
+    autocmd!
+
+    " some plugin managers like dein overwrite the runtimepath, so we have to
+    " make sure all of our versions of our plugins are loaded explicitly
+
+    call s:DisableOurPlugins()
+
+    autocmd BufReadPre,StdinReadPre * call s:LoadOurPlugins()
+
+    augroup END
+
     augroup vimpager_process
     autocmd!
 
@@ -28,7 +40,6 @@ function! vimpager#Init(opts)
     augroup END
 
     augroup vimpager
-    autocmd!
 
     " can't use VimEnter because that fires after first file is read
     autocmd BufReadPre,StdinReadPre * call s:SetOptions()
@@ -62,6 +73,24 @@ function! s:GUIInit()
     augroup vimpager_finish
         autocmd VimLeave * call writefile([], s:opts.tmp_dir . '/gvim_done')
     augroup END
+endfunction
+
+function! s:DisableOurPlugins()
+    let g:loaded_AnsiEscPlugin = 1
+    let g:loaded_cecutil = 1
+    let g:vimpager_plugin_loaded = 1
+endfunction
+
+function! s:LoadOurPlugins()
+    unlet g:loaded_AnsiEscPlugin
+    unlet g:loaded_cecutil
+    unlet g:vimpager_plugin_loaded
+
+    execute 'set runtimepath^=' . s:opts.runtime
+
+    for plugin in glob(s:opts.runtime . '/plugin/**/*.vim', 0, 1)
+        execute 'source ' . fnameescape(plugin)
+    endfor
 endfunction
 
 function! s:SetOptions()

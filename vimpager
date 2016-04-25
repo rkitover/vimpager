@@ -753,7 +753,7 @@ page_files() {
 		return "${_exit_status:-0}"
 	fi
 
-	init_opts="'columns': ${cols}, 'tmp_dir': '${tmp}', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}"
+	init_opts="'columns': ${cols}, 'tmp_dir': '${tmp}', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}, 'runtime': '${runtime}'"
 
 	VIMPAGER_TMP="${tmp}" \
 	${vim_cmd} -N -i NONE \
