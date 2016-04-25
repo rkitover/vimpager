@@ -2,15 +2,15 @@
 
 . inc/platform.sh
 
-# The backslash has to be put here 8 times: foctor two to get past the initial
+# The backslash has to be put here 4 times: foctor two to get past the initial
 # shell quoting, another factor two because it is used in the replacement
-# string for sed, another factor two because the output of belows echo will be
-# used in the replacement text in the sed call in the makefile.  This yields
-# one backslash that can escape the single quote in the configured vimpager
-# script.
-AWK=$(echo "$AWK" | sed "s/'/'\\\\\\\\''/g")
-SED=$(echo "$SED" | sed "s/'/'\\\\\\\\''/g")
+# string for sed.  This yields one backslash that can escape the single quote
+# in the configured vimpager script.
+AWK=$(echo "$AWK" | sed "s/'/'\\\\''/g")
+SED=$(echo "$SED" | sed "s/'/'\\\\''/g")
 
+# The final sed is used to escape special characters for the sed command in
+# the makefile, where the output will be used.
 echo \
     ${bsd:+bsd=$bsd} \
     ${cygwin:+cygwin=$cygwin} \
@@ -25,5 +25,6 @@ echo \
     "AWK='$AWK'" \
     "SED='$SED'" \
     ${HEAD_SYNTAX:+HEAD_SYNTAX=$HEAD_SYNTAX} \
+    | sed -e 's/\\/\\\\/g' -e 's/|/\|/g'
 
 # vim: sw=4 et tw=0:
