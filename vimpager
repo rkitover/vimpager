@@ -9,9 +9,22 @@ if [ ! -t 1 ]; then
 	exec cat "${@}"
 fi
 
-. "`dirname \"$0\"`/inc/prologue.sh"
+link="$0"
 
-version="$(cd "${0%/*}"; git describe) (git)"
+while true; do
+	ls0="`ls -l \"$link\"`"
+	new_link="`expr \"$ls0\" : '.* -> \(.*\)$'`"
+
+	[ -z "$new_link" ] && break
+
+	link="$new_link"
+done
+
+project_dir="`dirname \"$link\"`"
+
+. "$project_dir""/inc/prologue.sh"
+
+version="$(cd "$project_dir"; git describe) (git)"
 
 case $(uname -s) in
 	Linux) linux=1 ;;
@@ -116,7 +129,7 @@ main() {
 	if [ "${stripped}" -eq 0 ]; then
 		runtime="${tmp}/runtime"
 	elif [ "${configured}" -eq 0 ]; then
-		runtime="${0%/*}"
+		runtime="$project_dir"
 	else
 		runtime="${PREFIX}/share/vimpager"
 	fi
@@ -717,7 +730,7 @@ page_files() {
 		if command -v vimcat > /dev/null; then
 			vimcat="$(command -v vimcat)"
 		elif [ "${configured}" -eq 0 ]; then
-			vimcat="${0%/*}/vimcat"
+			vimcat="${project_dir}/vimcat"
 		else
 			vimcat="${PREFIX}/bin/vimcat"
 		fi
@@ -883,7 +896,7 @@ fits_on_screen() {
 config() {
 	stripped=1
 	configured=0
-	PREFIX="${0%/*}"
+	PREFIX="${project_dir}"
 }
 
 # INCLUDE BUNDLED SCRIPTS HERE

@@ -18,6 +18,7 @@
   - [--cmd cmd](#--cmd-cmd)
   - [-u vimrc](#-u-vimrc)
   - [-s](#-s)
+  - [-x](#-x)
 - [ANSI ESCAPE SEQUENCES AND OVERSTRIKES](#ansi-escape-sequences-and-overstrikes)
 - [PASSTHROUGH MODE](#passthrough-mode)
 - [CYGWIN/MSYS/MSYS2 NOTES](#cygwinmsysmsys2-notes)
@@ -347,6 +348,10 @@ Use alternate .vimrc or .vimpagerrc.
 
 Squeeze blank lines into a single blank line. GNU man passes this option to
 /usr/bin/pager.
+
+## -x
+
+Enable debugging output for the shell script part of vimpager.
 
 # ANSI ESCAPE SEQUENCES AND OVERSTRIKES
 
