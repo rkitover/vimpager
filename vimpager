@@ -756,7 +756,7 @@ page_files() {
 					-u "${vimrc}" \
 					--cmd "set rtp^=${runtime} | let vimpager={ 'enabled': 1 }" \
 					--cmd "${extra_cmd:-echo}" \
-					-c 'silent! source %.vim' \
+					-c 'silent! source '"${tmp}/$i"'.vim' \
 					-c "${extra_c:-echo}"  \
 					"${cur_file}" </dev/tty
 				_exit_status="${?}"
