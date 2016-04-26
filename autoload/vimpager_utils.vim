@@ -14,6 +14,7 @@ function! vimpager_utils#StatusLine(opts)
   " remove tmp dir path
   if exists('a:opts.tmp_dir')
       let pos = substitute(pos, '^/*\V' . a:opts.tmp_dir . '\m/*', '', '')
+      let pos = substitute(pos, '^/*\V' . resolve(a:opts.tmp_dir) . '\m/*', '', '')
   else
       let pos = substitute(pos, '^.*/', '', '')
   endif

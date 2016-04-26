@@ -31,9 +31,9 @@ function! vimpager#Init(opts)
 
     " any pre-processing necessary is written to .vim files
     autocmd BufReadPost,StdinReadPost * silent! execute
-                \ 'source ' $VIMPAGER_TMP . '/' . (argidx() + 1) . '.vim'
+                \ 'source ' . s:opts.tmp_dir . '/' . (argidx() + 1) . '.vim'
 
-    " hide error messages from invalide modelines
+    " hide error messages from invalid modelines
     autocmd BufWinEnter * if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG
                 \ | silent! redraw! | endif
 

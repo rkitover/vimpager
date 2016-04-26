@@ -29,8 +29,8 @@
   fi
 
 quit() {
-  rm -rf "${tmp_dir}"
-  exit "${@}"
+  rm -rf "$tmp_dir"
+  exit "$@"
 }
 
 usage() {
@@ -58,24 +58,24 @@ EOF
 }
 
 start_highlight_job() {
-  set -- -N -E -i NONE -n --cmd "visual | ${extra_cmd}" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source ${script}" -c "set buftype=nowrite | ${extra_c} | call AnsiHighlight(\"${dest_file}\", \"${line_numbers}\") | qa!"
+  set -- -N -E -i NONE -n --cmd "visual | $extra_cmd" -c "set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | silent! source $script" -c "set buftype=nowrite | $extra_c | call AnsiHighlight(\"$dest_file\", \"$line_numbers\") | qa!"
 
-  if [ -n "${vimcatrc}" ]; then
-    set -- "$@" -u "${vimcatrc}"
+  if [ -n "$vimcatrc" ]; then
+    set -- "$@" -u "$vimcatrc"
   fi
 
-  "$vim" "$@" -- "${file}" </dev/tty >/dev/null 2>&1
+  "$vim" "$@" -- "$file" </dev/tty >/dev/null 2>&1
 }
 
   # if no args and no stdin, display usage
-  if [ "${#}" -eq 0 -a -t 0 ]; then
+  if [ $# -eq 0 -a -t 0 ]; then
     usage
     quit 0
   fi
 
   # check for -h before main option parsing, this is much faster
-  for arg in "${@}"; do
-    case "${@}" in
+  for arg in "$@"; do
+    case "$@" in
       "-h"|"--help"|"-help"|"--usage"|"-usage")
         usage
         quit 0
@@ -88,67 +88,67 @@ start_highlight_job() {
 
   case "$(uname -s)" in
     MINGW*|MSYS*)
-      if [ -n "${temp}" ]; then
+      if [ -n "$temp" ]; then
         # MSYS2 is a little tricky, we're gonna stick to the user's private temp
         # the -m mode switch to mkdir doesn't work
-        tmp_dir="$(cygpath --unix "${temp}")"
+        tmp_dir="$(cygpath --unix "$temp")"
         mkdir_options=""
       fi
     ;;
   esac
 
-  tmp_dir="${tmp_dir}/vimcat_${$}"
+  tmp_dir="$tmp_dir/vimcat_${$}"
 
-  if ! mkdir ${mkdir_options} "${tmp_dir}"; then
-    echo "Could not create temporary directory ${tmp_dir}" >&2
+  if ! mkdir $mkdir_options "$tmp_dir"; then
+    echo "Could not create temporary directory $tmp_dir" >&2
     exit 1
   fi
 
-  trap "rm -rf ${tmp_dir}" HUP INT QUIT ILL TRAP KILL BUS TERM
-  tmp_file_in="${tmp_dir}/vimcat_in.txt"
-  out_fifo="${tmp_dir}/vimcat_out.fifo"
+  trap 'rm -rf "$tmp_dir"' HUP INT QUIT ILL TRAP KILL BUS TERM
+  tmp_file_in="$tmp_dir/vimcat_in.txt"
+  out_fifo="$tmp_dir/vimcat_out.fifo"
 
   case "$(uname -s)" in
     SunOS*|CYGWIN*|MINGW*|MSYS*)
       # the fifo streaming doesn't work on windows and solaris
-      touch "${out_fifo}"
+      touch "$out_fifo"
       ;;
     *)
-      mkfifo "${out_fifo}"
+      mkfifo "$out_fifo"
       ;;
   esac
 
-  script="$(command -v ${0})"
+  script="$(command -v $0)"
 
   # check for arguments
-  while [ "${#}" -gt 0 ] ; do
-    case "${1}" in
+  while [ $# -gt 0 ] ; do
+    case "$1" in
       "-c")
         shift
-        if [ -z "${extra_c}" ]; then
-          extra_c="${1}"
+        if [ -z "$extra_c" ]; then
+          extra_c="$1"
         else
-          extra_c="${extra_c} | ${1}"
+          extra_c="$extra_c | $1"
         fi
         shift
         ;;
       "--cmd")
         shift
-        if [ -z "${extra_cmd}" ]; then
-          extra_cmd="${1}"
+        if [ -z "$extra_cmd" ]; then
+          extra_cmd="$1"
         else
-          extra_cmd="${extra_cmd} | ${1}"
+          extra_cmd="$extra_cmd | $1"
         fi
         shift
         ;;
       "-u")
         shift
-        vimcatrc="${1}"
+        vimcatrc="$1"
         shift
         ;;
       "-o")
         shift
-        output_file="${1}"
+        output_file="$1"
         shift
         ;;
       "-s")
@@ -164,7 +164,7 @@ start_highlight_job() {
         break
         ;;
       -*)
-        echo "${0}: bad option '${1}'"
+        echo "$0: bad option '$1'"
         quit 1
         ;;
       *)
@@ -174,13 +174,13 @@ start_highlight_job() {
   done
 
   # Just pass through if not on a tty, unless -o was given
-  if [ -z "${output_file}" ]; then
+  if [ -z "$output_file" ]; then
     if [ ! -t 1 ]; then
-      exec cat "${@}"
+      exec cat "$@"
     fi
   fi
 
-  if [ -z "${vimcatrc}" ]; then
+  if [ -z "$vimcatrc" ]; then
     if [ -f ~/.vimcatrc ]; then
         vimcatrc="~/.vimcatrc"
     else
@@ -188,68 +188,68 @@ start_highlight_job() {
     fi
   fi
 
-  if [ -z "${extra_cmd}" ]; then
+  if [ -z "$extra_cmd" ]; then
     extra_cmd='silent! echo'
   fi
 
-  if [ -z "${extra_c}" ]; then
+  if [ -z "$extra_c" ]; then
     extra_c='silent! echo'
   fi
 
-  if [ -z "${line_numbers}" ]; then
+  if [ -z "$line_numbers" ]; then
     line_numbers=0
   fi
 
-  if [ "${#}" -eq 0 ]; then
+  if [ $# -eq 0 ]; then
     set -- -
   fi
 
   for file in "$@"
   do
-    if [ "${#}" -ge 2 ]; then
-      echo "==> ${file} <=="
+    if [ $# -ge 2 ]; then
+      echo "==> $file <=="
     fi
 
-    if [ "${file}" = "-" ]; then
-      cat - >"${tmp_file_in}"
-      file="${tmp_file_in}"
+    if [ "$file" = "-" ]; then
+      cat - >"$tmp_file_in"
+      file="$tmp_file_in"
     fi
 
-    if [ "${squeeze_blank_lines}" = "1" ]; then
-      cat -- "${file}" > "${tmp_file_in}.work"
+    if [ "$squeeze_blank_lines" = "1" ]; then
+      cat -- "$file" > "$tmp_file_in.work"
       sed -e '/^[ 	]*$/{
 				N
 				/^[ 	]*\n[ 	]*$/D
-      }' -- "${tmp_file_in}.work" > "${tmp_file_in}"
-      rm -f -- "${tmp_file_in}.work"
-      file="${tmp_file_in}"
+      }' -- "$tmp_file_in.work" > "$tmp_file_in"
+      rm -f -- "$tmp_file_in.work"
+      file="$tmp_file_in"
     fi
 
     # Check that the file exists
-    if test -r "${file}" -a -f "${file}"; then
-      if test -s "${file}"; then
-        if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          dest_file="${out_fifo}"
+    if test -r "$file" -a -f "$file"; then
+      if test -s "$file"; then
+        if [ -z "$output_file" -o "$output_file" = "-" ]; then
+          dest_file="$out_fifo"
         else
-          dest_file="${output_file}"
+          dest_file="$output_file"
         fi
 
-        if [ -z "${output_file}" -o "${output_file}" = "-" ]; then
-          tail -f "${out_fifo}" &
-          tail_pid="${!}"
+        if [ -z "$output_file" -o "$output_file" = "-" ]; then
+          tail -f "$out_fifo" &
+          tail_pid=$!
         fi
 
         start_highlight_job
 
         # if it's not a fifo where this doesn't work, tail needs some time to catch up
-        if [ ! -p "${out_fifo}" ]; then
+        if [ ! -p "$out_fifo" ]; then
           "$vim" -N -u NONE -Es +'sleep 1100 m' +q >/dev/null
         fi
 
-        [ -n "${tail_pid}" ] && kill "${tail_pid}"
+        [ -n "$tail_pid" ] && kill $tail_pid
       fi
     else
-      echo "${0}: Cannot read file: ${file}" >&2
+      echo "$0: Cannot read file: $file" >&2
     fi
   done
 
