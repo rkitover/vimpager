@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo apt-get update
+sudo apt-get -y install debian-archive-keyring
 sudo sh -c "echo 'deb-src http://httpredir.debian.org/debian unstable main' > /etc/apt/sources.list.d/debian-src.list"
 sudo apt-get update
 
@@ -10,7 +12,7 @@ mkdir /tmp/lintian_$$
   cd /tmp/lintian_$$
   sudo apt-get -y build-dep lintian
   sudo -E apt-get -b source lintian
-  sudo dpkg -i lintian*.deb
+  sudo dpkg --no-debsig -i lintian*.deb
 )
 
 sudo rm -rf /tmp/lintian_$$
