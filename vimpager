@@ -646,7 +646,7 @@ line_n() {
 	_line="$1"
 	shift
 
-	head_n "$_line" "$@" | tail_n 1 | tr -d '\n'
+	head_n "$_line" "$@" | tail_n 1
 }
 
 read_vim_var() {
