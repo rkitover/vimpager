@@ -3,7 +3,7 @@ Upstream-Name: vimpager
 Upstream-Contact: Rafael Kitover <rkitover@gmail.com>
 Source: http://github.com/rkitover/vimpager
 
-Files: vimpager vimpagerrc *.yml Makefile markdown_src/vimpager.md markdown_src/vimcat.md autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim prototypes/* scripts/awk-sh scripts/balance-vimcat
+Files: vimpager vimpagerrc *.yml .travis.yml Makefile markdown_src/vimpager.md markdown_src/vimcat.md autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim prototypes/* scripts/awk-sh scripts/balance-shellvim scripts/find_shell scripts/pandoc-sh
 Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 

@@ -160,16 +160,16 @@ install-deb:
 	@apt-get update || true
 	@apt-get -y install debhelper devscripts equivs fakeroot gdebi-core
 	@mk-build-deps
-	@yes | gdebi vimpager-build-deps*.deb
+	@echo y | gdebi vimpager-build-deps*.deb
+	@rm -f vimpager-build-deps*.deb
 	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar; \
 		rm -f "$$orig_tar_ball".gz; \
-		tar cf "$$orig_tar_ball" *; \
+		tar cf "$$orig_tar_ball" * .travis.yml; \
 		gzip "$$orig_tar_ball"
 	@dpkg-buildpackage -us -uc -rfakeroot
-	@yes | gdebi `ls -1t ../vimpager*deb | head -1`
+	@echo y | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
 	@apt-get -y autoremove
-	@rm -f vimpager-build-deps*.deb
 	@debian/rules clean
 
 docs: ${GEN_DOCS} docs.tar.gz
