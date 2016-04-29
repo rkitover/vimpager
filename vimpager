@@ -138,9 +138,9 @@ main() {
 	fi
 
 	# determine location of rc file
-	vim_dir="$(read_vim_var '$VIM')"
-
-	user_vimrc="$(read_vim_var '$MYVIMRC')"
+	read_vim_vars '$VIM' '$MYVIMRC'
+	vim_dir=$(get_key vim_vars 1)
+	user_vimrc=$(get_key vim_vars 2)
 
 	user_vimrc_dir="${user_vimrc%/*}"
 
@@ -649,14 +649,22 @@ line_n() {
 	head_n "$_line" "$@" | tail_n 1 | tr -d '\n'
 }
 
-read_vim_var() {
-	vim -N -E -n -R -i NONE -c 'call writefile([ '"$1"' ], "'$tmp'/vimpager_vimvar_'${$}'") | q' </dev/tty >/dev/null 2>&1
-	_var="$(head -n 1 "$tmp/vimpager_vimvar_${$}")"
+read_vim_vars() {
+	for arg in "$@"; do
+		_vars_string="$_vars_string ${_vars_string:+,} $arg"
+	done
+
+	vim -N -E -n -R -i NONE -c "call writefile([ $_vars_string ], '$tmp/vimpager_vimvar_$$') | q" </dev/tty >/dev/null 2>&1
+
+	i=1
+	for arg in "$@"; do
+		set_key vim_vars $i "$(line_n $i "$tmp/vimpager_vimvar_$$")"
+		i=$((i + 1))
+	done
 
 	rm -f "$tmp/vimpager_vimvar_${$}"
 
-	echo "$_var"
-	unset _var
+	unset _vars_string i arg
 
 	return 0
 }
