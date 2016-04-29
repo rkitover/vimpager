@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Add metadata to generated docs.
+# Add metadata to generated docs (if supported)
+if pandoc --help | grep '^ *-M ' >/dev/null; then
 
 # Make section title for man pages.
 title=`echo "$@" | \
@@ -36,5 +37,22 @@ done
 IFS="$OLDIFS"
 
 set -- "$@" -M date="`date +'%B %d, %Y'`"
+
+fi # metadata
+
+# use markdown instead of markdown_github on older versions
+if ! ( pandoc --help | grep markdown_github >/dev/null ); then
+    first_arg=1
+
+    for arg in "$@"; do
+	[ $first_arg -eq 1 ] && set -- && first_arg=0
+
+	if [ "$arg" = markdown_github ]; then
+	    set -- "$@" markdown
+	else
+	    set -- "$@" "$arg"
+	fi
+    done
+fi
 
 pandoc "$@"
