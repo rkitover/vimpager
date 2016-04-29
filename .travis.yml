@@ -4,4 +4,4 @@ script:
     - sudo apt-get update
     - sudo apt-get -y install lintian
     - sudo make install-deb
-    - lintian --profile debian --no-tag-display-limit -i -EvIL +pedantic ../vimpager*.changes
+    - lintian --profile debian -i -EvIL +pedantic ../vimpager*.changes
