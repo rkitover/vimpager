@@ -138,9 +138,12 @@ main() {
 	fi
 
 	# determine location of rc file
-	vim_dir="$(read_vim_var '$VIM')"
+	vim -N -E -n -R -i NONE -c 'call writefile([$VIM, $MYVIMRC], "'"$tmp"'/vimpager_vimvar") | q'
 
-	user_vimrc="$(read_vim_var '$MYVIMRC')"
+	vim_dir=$(line_n 1 "$tmp/vimpager_vimvar")
+	user_vimrc=$(line_n 2 "$tmp/vimpager_vimvar")
+
+	rm -f "$tmp/vimpager_vimvar"
 
 	user_vimrc_dir="${user_vimrc%/*}"
 
@@ -647,18 +650,6 @@ line_n() {
 	shift
 
 	head_n "$_line" "$@" | tail_n 1
-}
-
-read_vim_var() {
-	vim -N -E -n -R -i NONE -c 'call writefile([ '"$1"' ], "'$tmp'/vimpager_vimvar_'${$}'") | q' </dev/tty >/dev/null 2>&1
-	_var="$(head -n 1 "$tmp/vimpager_vimvar_${$}")"
-
-	rm -f "$tmp/vimpager_vimvar_${$}"
-
-	echo "$_var"
-	unset _var
-
-	return 0
 }
 
 extract_bundled_scripts() {
