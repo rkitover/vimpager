@@ -2,8 +2,6 @@
 vimpager binary: shell-script-fails-syntax-check usr/bin/vimcat
 # we'll do that in 2.07
 vimpager binary: new-package-should-close-itp-bug
-# for trusty
-vimpager binary: newer-standards-version
 # also for trusty
 vimpager binary: copyright-should-refer-to-common-license-file-for-gpl
 # for xenial

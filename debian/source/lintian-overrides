@@ -1,4 +1,4 @@
-# If someone wants to scan for new tags with uscan, why not?
-vimpager source: debian-watch-file-in-native-package
+# for trusty
+vimpager source: newer-standards-version
 # Github does not sign releases currently
 vimpager source: debian-watch-may-check-gpg-signature
