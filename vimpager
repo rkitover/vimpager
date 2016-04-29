@@ -138,12 +138,23 @@ main() {
 	fi
 
 	# determine location of rc file
-	vim -N -E -n -R -i NONE -c 'call writefile([$VIM, $MYVIMRC], "'"$tmp"'/vimpager_vimvar") | q'
-
-	vim_dir=$(line_n 1 "$tmp/vimpager_vimvar")
-	user_vimrc=$(line_n 2 "$tmp/vimpager_vimvar")
-
-	rm -f "$tmp/vimpager_vimvar"
+	i=0
+	OLDIFS="$IFS"
+	IFS='
+'
+	for var in $(vim -NEnR -i NONE -T dumb +'echo "\n" . $VIM . "\n" . $MYVIMRC . "\n"' +q </dev/tty); do
+		case $i in
+			1)
+				vim_dir="$var"
+				;;
+			3)
+				user_vimrc="$var"
+				break
+				;;
+		esac
+		i=$((i + 1))
+	done
+	IFS="$OLDIFS"
 
 	user_vimrc_dir="${user_vimrc%/*}"
 
@@ -185,7 +196,11 @@ main() {
 	fi
 
 	# read settings
-	vim -N -u "$vimrc" -E -n -R -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' -c '
+	i=0
+	OLDIFS="$IFS"
+	IFS='
+'
+	for var in $(vim -NEnR -u "$vimrc" -i NONE -T dumb --cmd 'let g:vimpager = { "enabled": 1 }' -c '
 		if !exists("g:vimpager.gvim")
 			if !exists("g:vimpager_use_gvim")
 				let g:vimpager.gvim = 0
@@ -216,19 +231,27 @@ main() {
 			let g:use_ansiesc = 1
 		endif
 
-		call writefile([ g:vimpager.gvim, g:vimpager.X11, g:vimpager.passthrough, g:use_ansiesc ], "'$tmp'/vimpager_opts")
+		echo "\n" . g:vimpager.gvim . "\n" . g:vimpager.X11 . "\n" . g:vimpager.passthrough . "\n" . g:use_ansiesc . "\n"
 		quit
-	' </dev/null
-
-	[ "$(line_n 1 "$tmp/vimpager_opts")" -eq 1 ] && use_gvim=1
-
-	[ "$(line_n 2 "$tmp/vimpager_opts")" -eq 0 ] && disable_x11=1
-
-	[ "$(line_n 3 "$tmp/vimpager_opts")" -eq 0 ] && no_pass_thru=1
-
-	[ "$(line_n 4 "$tmp/vimpager_opts")" -ne 0 ] && ansiesc_available=1
-
-	rm -f "$tmp/vimpager_opts"
+	' </dev/tty); do
+		case $i in
+			1)
+				[ $var -eq 1 ] && use_gvim=1
+				;;
+			3)
+				[ $var -eq 0 ] && disable_x11=1
+				;;
+			5)
+				[ $var -eq 0 ] && no_pass_thru=1
+				;;
+			7)
+				[ $var -ne 0 ] && ansiesc_available=1
+				break
+				;;
+		esac
+		i=$((i + 1))
+	done
+	IFS="$OLDIFS"
 
 	if [ -n "$msys" -o -n "$cygwin" ]; then
 		# msys/cygwin may be using a native vim, and if we're not in a real
@@ -496,7 +519,7 @@ main() {
 
 		set_key files $file_idx "${tempfile:-$file}"
 
-		file_idx=$(($file_idx + 1))
+		file_idx=$((file_idx + 1))
 	done
 
 	file_count=$#
@@ -505,7 +528,7 @@ main() {
 	i=1
 	while [ $i -le $file_count ]; do
 		set -- "$@" "$(get_key files $i)"
-		i=$(($i + 1))
+		i=$((i + 1))
 	done
 
 	if [ "${no_pass_thru:-0}" -ne 1 ] && fits_on_screen "$@"; then
@@ -753,7 +776,7 @@ page_files() {
 					"$cur_file" </dev/tty
 				_exit_status=$?
 			fi
-			i=$(($i + 1))
+			i=$((i + 1))
 		done
 		return "${_exit_status:-0}"
 	fi
