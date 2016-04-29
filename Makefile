@@ -236,6 +236,6 @@ html/%.html: %.md.work
 	fi
 
 realclean distclean clean:
-	rm -rf *.work */*.work *-stamp *.deb *.configured *.uu */*.uu man html standalone
+	rm -rf *.work */*.work *-stamp *.deb *.configured *.uu */*.uu man html standalone */with_meta_*
 
 .PHONY: all install install-deb uninstall docs realclean distclean clean

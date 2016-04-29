@@ -1,46 +1,32 @@
 #!/bin/sh
 
-# Add metadata to generated docs (if supported)
-if pandoc --help | grep '^ *-M ' >/dev/null; then
+# Add metadata to generated docs
 
 # Make section title for man pages.
-title=`echo "$@" | \
-    sed -e 's/.*-o *\([^ ]*\).*/\1/'
-`
+title="`echo "$@" | \
+    sed 's/.*-o *\([^ ]*\).*/\1/'
+`"
 
-title=`basename "$title"`
+title="`basename \"$title\"`"
 
 # Capitalize.
-title=`echo "$title" | tr 'a-z' 'A-Z'`
+title="`echo \"$title\" | tr 'a-z' 'A-Z'`"
 
-title=`echo "$title" | sed \
+# FOO.1 -> FOO(1) Vimpager User Manual
+title="`echo \"$title\" | sed \
     -e 's/\.\([0-9][0-9]*\)/(\1)/' \
     -e 's/\..*//' \
     -e 's/$/ Vimpager User Manual/'
-`
+`"
 
 # Only do this for man pages.
-title=`echo "$title" | \
+title="`echo \"$title\" | \
     sed -e 's/^[^()]*Vimpager User Manual$/Vimpager User Manual/'
-`
+`"
 
-set -- "$@" -M title="$title"
-
-OLDIFS="$IFS"
-IFS='
-'
-
-for author in `sed -ne 's/^- //p' DOC_AUTHORS.yml`; do
-    set -- "$@" -M author="$author"
-done
-
-IFS="$OLDIFS"
-
-set -- "$@" -M date="`date +'%B %d, %Y'`"
-
-fi # metadata
-
-# use markdown instead of markdown_github on older versions
+# use markdown instead of markdown_github and a metadata title block on older
+# versions
+meta_block=0
 if ! ( pandoc --help | grep markdown_github >/dev/null ); then
     first_arg=1
 
@@ -53,6 +39,76 @@ if ! ( pandoc --help | grep markdown_github >/dev/null ); then
 	    set -- "$@" "$arg"
 	fi
     done
+
+    meta_block=1
+fi
+
+# find source file and write out file with meta block
+
+for arg in "$@"; do
+    case "$arg" in
+	*.md)
+	    source_file="$arg"
+	    ;;
+	*.md.*)
+	    source_file="$arg"
+	    ;;
+    esac
+done
+
+meta_file="`dirname \"$source_file\"`"/"with_meta_`basename \"$source_file\"`"
+
+if [ $meta_block -eq 1 ]; then
+    printf '%% %s\n' "$title" >> "$meta_file"
+else
+    set -- "$@" -M "title=$title"
+fi
+
+OLDIFS="$IFS"
+IFS='
+'
+
+first=1
+for author in `sed -ne 's/^- //p' DOC_AUTHORS.yml`; do
+    if [ $meta_block -eq 0 ]; then
+	set -- "$@" -M "author=$author"
+    else
+	if [ $first -eq 1 ]; then
+	    printf '%% %s' "$author" >> "$meta_file"
+	    first=0
+	else
+	    printf '; %s' "$author" >> "$meta_file"
+	fi
+    fi
+done
+
+printf '\n' >> "$meta_file"
+
+IFS="$OLDIFS"
+
+if [ $meta_block -eq 0 ]; then
+    set -- "$@" -M "date=`date +'%B %d, %Y'`"
+else
+    printf '%% %s\n' "`date +'%B %d, %Y'`" >> "$meta_file"
+
+    cat "$source_file" >> "$meta_file"
+
+    # replace source file with created file with meta block in arg list
+    first_arg=1
+    for arg in "$@"; do
+	[ $first_arg -eq 1 ] && set -- && first_arg=0
+
+	if [ "$arg" = "$source_file" ]; then
+	    set -- "$@" "$meta_file"
+	else
+	    set -- "$@" "$arg"
+	fi
+    done
 fi
 
 pandoc "$@"
+exit_status=$?
+
+rm -f -- "$meta_file"
+
+exit $exit_status
