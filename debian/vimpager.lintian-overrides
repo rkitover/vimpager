@@ -1,2 +1,2 @@
-# This is a bug in lintian that I need to fix...
-vimpager binary: copyright-should-refer-to-common-license-file-for-gpl
+vimpager binary: shell-script-fails-syntax-check usr/bin/vimcat
+vimpager binary: new-package-should-close-itp-bug

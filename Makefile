@@ -152,13 +152,13 @@ install: docs vimpager.configured vimcat.configured
 	@chmod +x $@
 
 install-deb:
-	@if [ "`id | cut -d'=' -f2 | cut -d'(' -f1`" -ne "0" ]; then \
+	@if [ "`id | cut -d= -f2 | cut -d'(' -f1`" -ne 0 ]; then \
 	    echo '[1;31mERROR[0m: You must be root, try sudo.' >&2; \
 	    echo >&2; \
 	    exit 1; \
 	fi
 	@apt-get update || true
-	@apt-get -y install debhelper devscripts equivs fakeroot gdebi-core
+	@apt-get -y install debhelper devscripts equivs gdebi-core
 	@mk-build-deps
 	@echo y | gdebi vimpager-build-deps*.deb
 	@rm -f vimpager-build-deps*.deb
@@ -166,7 +166,7 @@ install-deb:
 		rm -f "$$orig_tar_ball".gz; \
 		tar cf "$$orig_tar_ball" * .travis.yml; \
 		gzip "$$orig_tar_ball"
-	@dpkg-buildpackage -us -uc -rfakeroot
+	@dpkg-buildpackage -us -uc
 	@echo y | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
 	@apt-get -y autoremove
@@ -236,6 +236,6 @@ html/%.html: %.md.work
 	fi
 
 realclean distclean clean:
-	rm -rf *.work */*.work *-stamp *.deb *.configured *.uu */*.uu man html standalone */with_meta_*
+	rm -rf *.work */*.work *-stamp *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
 
 .PHONY: all install install-deb uninstall docs realclean distclean clean

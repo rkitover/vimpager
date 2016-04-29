@@ -14,6 +14,8 @@ override_dh_auto_build:
 override_dh_auto_install:
 	touch doctoc-warn-stamp
 	dh_auto_install -- PREFIX=/usr
+	mv debian/vimpager/usr/share/doc/vimpager/ChangeLog_vimpager.yml debian/vimpager/usr/share/doc/vimpager/changelog
 
 override_dh_compress:
+	gzip -n9 debian/vimpager/usr/share/doc/vimpager/changelog
 	dh_compress -X.md -X.yml
