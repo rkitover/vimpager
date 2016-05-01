@@ -96,7 +96,7 @@ main() {
 	trap "cd '$tmp'/..; rm -rf '$tmp' gvim.exe.stackdump" HUP INT QUIT ILL TRAP KILL BUS TERM
 
 	# Prime all util location caches
-	awk >/dev/null 2>&1; sed >/dev/null 2>&1; echo | head_n 1 >/dev/null; echo | tail_n 1 >/dev/null
+	awk >/dev/null 2>&1; sed >/dev/null 2>&1; head_n 1 "$0" >/dev/null; tail_n 1 "$0" >/dev/null
 
 	# Detect terminal size
 	if command -v tput >/dev/null; then
