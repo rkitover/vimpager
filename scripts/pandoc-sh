@@ -24,24 +24,27 @@ title="`echo \"$title\" | \
     sed -e 's/^[^()]*Vimpager User Manual$/Vimpager User Manual/'
 `"
 
-# use markdown instead of markdown_github and a metadata title block on older
-# versions
-meta_block=0
+# use markdown instead of markdown_github on older versions
+# and markdown_github+pandoc_title_block on newer ones
+old_pandoc=0
 if ! ( pandoc --help | grep markdown_github >/dev/null ); then
-    first_arg=1
+    old_pandoc=1
+fi
 
-    for arg in "$@"; do
-	[ $first_arg -eq 1 ] && set -- && first_arg=0
+first_arg=1
+for arg in "$@"; do
+    [ $first_arg -eq 1 ] && set -- && first_arg=0
 
-	if [ "$arg" = markdown_github ]; then
+    if [ "$arg" = markdown_github ]; then
+	if [ $old_pandoc -eq 1 ]; then
 	    set -- "$@" markdown
 	else
-	    set -- "$@" "$arg"
+	    set -- "$@" markdown_github+pandoc_title_block
 	fi
-    done
-
-    meta_block=1
-fi
+    else
+	set -- "$@" "$arg"
+    fi
+done
 
 # find source file and write out file with meta block
 
@@ -58,11 +61,7 @@ done
 
 meta_file="`dirname \"$source_file\"`"/"with_meta_`basename \"$source_file\"`"
 
-if [ $meta_block -eq 1 ]; then
-    printf '%% %s\n' "$title" >> "$meta_file"
-else
-    set -- "$@" -M "title=$title"
-fi
+printf '%% %s\n' "$title" >> "$meta_file"
 
 OLDIFS="$IFS"
 IFS='
@@ -70,15 +69,11 @@ IFS='
 
 first=1
 for author in `sed -ne 's/^- //p' DOC_AUTHORS.yml`; do
-    if [ $meta_block -eq 0 ]; then
-	set -- "$@" -M "author=$author"
+    if [ $first -eq 1 ]; then
+	printf '%% %s' "$author" >> "$meta_file"
+	first=0
     else
-	if [ $first -eq 1 ]; then
-	    printf '%% %s' "$author" >> "$meta_file"
-	    first=0
-	else
-	    printf '; %s' "$author" >> "$meta_file"
-	fi
+	printf '; %s' "$author" >> "$meta_file"
     fi
 done
 
@@ -86,25 +81,21 @@ printf '\n' >> "$meta_file"
 
 IFS="$OLDIFS"
 
-if [ $meta_block -eq 0 ]; then
-    set -- "$@" -M "date=`date +'%B %d, %Y'`"
-else
-    printf '%% %s\n' "`date +'%B %d, %Y'`" >> "$meta_file"
+printf '%% %s\n' "`date +'%B %d, %Y'`" >> "$meta_file"
 
-    cat "$source_file" >> "$meta_file"
+cat "$source_file" >> "$meta_file"
 
-    # replace source file with created file with meta block in arg list
-    first_arg=1
-    for arg in "$@"; do
-	[ $first_arg -eq 1 ] && set -- && first_arg=0
+# replace source file with created file with meta block in arg list
+first_arg=1
+for arg in "$@"; do
+    [ $first_arg -eq 1 ] && set -- && first_arg=0
 
-	if [ "$arg" = "$source_file" ]; then
-	    set -- "$@" "$meta_file"
-	else
-	    set -- "$@" "$arg"
-	fi
-    done
-fi
+    if [ "$arg" = "$source_file" ]; then
+	set -- "$@" "$meta_file"
+    else
+	set -- "$@" "$arg"
+    fi
+done
 
 pandoc "$@"
 exit_status=$?
