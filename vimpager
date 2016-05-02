@@ -142,7 +142,7 @@ main() {
 	OLDIFS="$IFS"
 	IFS='
 '
-	for var in $(vim -NEnR -i NONE +'call writefile([$VIM, $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
+	for var in $(vim -NEsnR -i NONE +'call writefile([$VIM, $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
 		case $i in
 			1)
 				vim_dir="$var"
@@ -200,7 +200,7 @@ main() {
 	OLDIFS="$IFS"
 	IFS='
 '
-	for var in $(vim -NEnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
+	for var in $(vim -NEsnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
 		if !exists("g:vimpager.gvim")
 			if !exists("g:vimpager_use_gvim")
 				let g:vimpager.gvim = 0
