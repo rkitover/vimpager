@@ -143,12 +143,12 @@ install: docs vimpager.configured vimcat.configured
 %.configured: %
 	@echo configuring $<
 	@POSIX_SHELL="`scripts/find_shell`"; \
-	sed  -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
-	     -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
-	     -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
-	     -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
-	     -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
-	     -e 's!^	configured=0!	configured=1!' $< > $@
+	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
+	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
+	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
+	    -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
+	    -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
+	    -e 's!^	configured=0!	configured=1!' $< > $@
 	@chmod +x $@
 
 install-deb:

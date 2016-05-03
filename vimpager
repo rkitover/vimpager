@@ -780,7 +780,7 @@ page_files() {
 					--cmd "set rtp^=$runtime | let vimpager={ 'enabled': 1 }" \
 					--cmd "${extra_cmd:-echo}" \
 					-c 'silent! source '"$tmp/$i"'.vim' \
-					-c "${extra_c:-echo}"  \
+					-c "${extra_c:-echo}" \
 					"$cur_file" </dev/tty
 				_exit_status=$?
 			fi
@@ -797,7 +797,7 @@ page_files() {
 		--cmd "silent! exe 'source ' . fnameescape('$system_vimrc')" \
 		--cmd "${extra_cmd:-echo}" \
 		-u "$vimrc" \
-		-c "${extra_c:-echo}"  \
+		-c "${extra_c:-echo}" \
 		"$@" </dev/tty
 
 	_vim_exit_status=$?
