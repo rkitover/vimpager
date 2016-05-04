@@ -66,19 +66,12 @@ main() {
 
 	mkdir_options="-m 700"
 
-	if [ -n "$msys" -o -n "$cygwin" ]; then
+	if [ -n "$win32" ]; then
 		# Use the real TEMP directory on windows in case we are
-		# using a native vim/gvim...
-		#
-		# NOTE: sometimes TEMP=/tmp, this code handles that case as well
+		# using a native vim/gvim
+		# TEMP can be /tmp sometimes too
 
-		tmp="$TEMP"
-
-		if command -v cygpath >/dev/null; then
-			tmp="$(cygpath -w "$tmp")"
-		fi
-
-		tmp="$(printf "%s\n" "$tmp" | tr '\\' /)"
+		tmp="$(resolve_path "$TEMP")"
 
 		# chmod doesn't work here, even in /tmp sometimes
 		mkdir_options=""
@@ -95,9 +88,6 @@ main() {
 	fi
 	trap "cd '$tmp'/..; rm -rf '$tmp' gvim.exe.stackdump" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-	# Prime all util location caches
-	awk >/dev/null 2>&1; sed >/dev/null 2>&1; head_n 1 "$0" >/dev/null; tail_n 1 "$0" >/dev/null
-
 	# Detect terminal size
 	if command -v tput >/dev/null; then
 	        # this is the only way it works on some versions of Cygwin
@@ -110,7 +100,7 @@ main() {
 		cols=$(cat "$tmp/cols")
 		lines=$(cat "$tmp/lines")
 
-		rm -f "$tmp/cols" "$tmp/lines"
+		rm -f -- "$tmp/cols" "$tmp/lines"
 	fi
 
 	# msys has no tput, this doesn't work on Cygwin by the way
@@ -161,9 +151,9 @@ main() {
 	IFS="$OLDIFS"
 
 	# find system vimrc
-	system_vimrc="$(vim --version | sed -n '/system vimrc/{
+	system_vimrc="$(vim --version | sed -n '/system vimrc file: "/{
 		s|\$VIM|'"$vim_dir"'|
-		s/.*system vimrc file: "\([^"]*\).*/\1/p
+		s/.*: "\([^"]*\).*/\1/p
 		q
 	}')"
 
@@ -428,9 +418,7 @@ main() {
 				quit 1
 			fi
 
-			[ -n "$cygwin" ] && file="$(cygpath -w "$file" | tr '\\' /)"
-
-			filename="$file"
+			filename="$(resolve_path "$file")"
 		fi
 
 
@@ -530,9 +518,7 @@ main() {
 			quit 0
 		fi
 
-		[ -n "$cygwin" -a -n "$tempfile" ] && tempfile="$(cygpath -w "$tempfile" | tr '\\' /)"
-
-		set_key files $file_idx "${tempfile:-$file}"
+		set_key files $file_idx "$(resolve_path "${tempfile:-$file}")"
 
 		file_idx=$((file_idx + 1))
 	done
@@ -553,6 +539,19 @@ main() {
 	page_files "$@"
 
 	quit $?
+}
+
+# special handling to rewrite cygwin/msys paths to windows POSIX paths
+if [ -n "$win32" ] && command -v cygpath >/dev/null; then
+	_have_cygpath=1
+fi
+
+resolve_path() {
+	if [ -n "$_have_cygpath" ]; then
+		cygpath -w "$1" | tr '\\' '/'
+	else
+		echo "$1"
+	fi
 }
 
 quit() {
@@ -588,41 +587,37 @@ Press '[1;35m,h[0m' for a summary of keystrokes in the program.
 EOF
 }
 
-awk() {
-	if [ -z "$_awk" ]; then
-		if command -v gawk >/dev/null; then
-		    _awk=gawk
-		elif command -v nawk >/dev/null; then
-		    _awk=nawk
-		elif command -v mawk >/dev/null; then
-		    _awk=mawk
-		elif [ -x /usr/xpg4/bin/awk ]; then
-		    _awk=/usr/xpg4/bin/awk
-		elif command -v awk >/dev/null; then
-		    _awk=awk
-		else
-		    echo "ERROR: No awk found!" >&2
-		    quit 1
-		fi
-	fi
+if command -v gawk >/dev/null; then
+    _awk=gawk
+elif command -v nawk >/dev/null; then
+    _awk=nawk
+elif command -v mawk >/dev/null; then
+    _awk=mawk
+elif [ -x /usr/xpg4/bin/awk ]; then
+    _awk=/usr/xpg4/bin/awk
+elif command -v awk >/dev/null; then
+    _awk=awk
+else
+    echo "ERROR: No awk found!" >&2
+    quit 1
+fi
 
+awk() {
 	command "$_awk" "$@"
 }
 
-sed() {
-	if [ -z "$_sed" ]; then
-		if command -v gsed >/dev/null; then
-			_sed=gsed
-		elif [ -x /usr/xpg4/bin/sed ]; then
-			_sed=/usr/xpg4/bin/sed
-		elif command -v sed >/dev/null; then
-			_sed=sed
-		else
-			echo "ERROR: No sed found!" >&2
-			quit 1
-		fi
-	fi
+if command -v gsed >/dev/null; then
+	_sed=gsed
+elif [ -x /usr/xpg4/bin/sed ]; then
+	_sed=/usr/xpg4/bin/sed
+elif command -v sed >/dev/null; then
+	_sed=sed
+else
+	echo "ERROR: No sed found!" >&2
+	quit 1
+fi
 
+sed() {
 	command "$_sed" "$@"
 }
 
@@ -637,42 +632,58 @@ grep_q() {
 	' "$@"
 }
 
+if command -v ghead >/dev/null; then
+	_head=ghead
+else
+	_head=head
+fi
+
+head() {
+	"$_head" "$@"
+}
+
+if command -v gtail >/dev/null; then
+	_tail=gtail
+elif [ -x /usr/xpg4/bin/tail ]; then
+	_tail=/usr/xpg4/bin/tail
+fi
+
+tail() {
+	"$_tail" "$@"
+}
+
+if [ "$(echo xx | head -n 1 2>/dev/null)" = "xx" ]; then
+	_head_syntax=new
+else
+	if ! head -1 -- "$0" >/dev/null 2>&1; then
+		_head_no_double_dash=1
+	fi
+fi
+
 head_n() {
 	_lines=$1
 	shift
 
-	if [ -z "$_head_syntax" ]; then
-		_head1_test="$(echo xx | head -n 1 2>/dev/null)"
-		if [ "$_head1_test" = "xx" ]; then
-			_head_syntax=new
-		else
-			_head_syntax=old
-		fi
-	fi
-
 	if [ "$_head_syntax" = "new" ]; then
 		head -n $_lines -- "$@"
-	else
+	elif [ -z "$_head_no_double_dash" ]; then
 		head -$_lines -- "$@"
+	else
+		head -$_lines "$@"
 	fi
 }
+
+if [ "$(echo xx | tail -n 1 2>/dev/null)" = "xx" ]; then
+	_tail_syntax=new
+else
+	if ! tail -1 -- "$0" > /dev/null 2>&1; then
+		_tail_no_double_dash=1
+	fi
+fi
 
 tail_n() {
 	_lines=$1
 	shift
-
-	if [ -z "$_tail_syntax" ]; then
-		_tail1_test="$(echo xx | tail -n 1 2>/dev/null)"
-		if [ "$_tail1_test" = "xx" ]; then
-			_tail_syntax=new
-		else
-			_tail_syntax=old
-
-			if ! tail -1 -- "$0" > /dev/null 2>&1; then
-				_tail_no_double_dash=1
-			fi
-		fi
-	fi
 
 	if [ "$_tail_syntax" = "new" ]; then
 		tail -n "$_lines" -- "$@"
