@@ -160,6 +160,13 @@ main() {
 	done
 	IFS="$OLDIFS"
 
+	# find system vimrc
+	system_vimrc="$(vim --version | sed -n '/system vimrc/{
+		s|\$VIM|'"$vim_dir"'|
+		s/.*system vimrc file: "\([^"]*\).*/\1/p
+		q
+	}')"
+
 	user_vimrc_dir="${user_vimrc%/*}"
 
 	# first check for a user ~/.vimpagerrc
@@ -792,10 +799,11 @@ page_files() {
 	init_opts="'columns': $cols, 'tmp_dir': '$tmp', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}, 'runtime': '$runtime'"
 
 	$vim_cmd -N -i NONE \
-		-u "$vimrc" \
+		--cmd "silent! exe 'source ' . fnameescape('$system_vimrc')" \
 		--cmd "set rtp^=$runtime" \
 		--cmd "call vimpager#Init({ $init_opts })" \
 		--cmd "${extra_cmd:-echo}" \
+		-u "$vimrc" \
 		-c "${extra_c:-echo}"  \
 		"$@" </dev/tty
 
