@@ -639,7 +639,7 @@ else
 fi
 
 head() {
-	"$_head" "$@"
+	command "$_head" "$@"
 }
 
 if command -v gtail >/dev/null; then
@@ -649,7 +649,7 @@ elif [ -x /usr/xpg4/bin/tail ]; then
 fi
 
 tail() {
-	"$_tail" "$@"
+	command "$_tail" "$@"
 }
 
 if [ "$(echo xx | head -n 1 2>/dev/null)" = "xx" ]; then
