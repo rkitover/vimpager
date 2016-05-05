@@ -9,6 +9,7 @@ if [ ! -t 1 ]; then
 	exec cat "$@"
 fi
 
+# FIND REAL PARENT DIRECTORY
 link="$0"
 
 while true; do
@@ -21,6 +22,7 @@ while true; do
 done
 
 project_dir="`dirname \"$link\"`"
+# END OF FIND REAL PARENT DIRECTORY
 
 . "$project_dir""/inc/prologue.sh"
 
