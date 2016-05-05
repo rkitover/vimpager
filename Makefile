@@ -8,7 +8,6 @@ INSTALLFILE=${INSTALL} -m 444
 INSTALLMAN=${INSTALL} -m 444
 INSTALLDOC=${INSTALL} -m 444
 INSTALLCONF=${INSTALL} -m 644
-AWK=./scripts/awk-sh
 PANDOC=./scripts/pandoc-sh
 
 DOC_SRC=markdown_src/vimpager.md markdown_src/vimcat.md
@@ -46,7 +45,6 @@ standalone/%: ${SRC} inc/*
 		cat inc/do_uudecode.sh >> $@; \
 		cat inc/bundled_scripts.sh >> $@; \
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
-		chmod +x ${AWK} 2>/dev/null || true; \
 		for src in $$SRC; do \
 		    case "$$src" in \
 			inc/*) \
@@ -55,19 +53,11 @@ standalone/%: ${SRC} inc/*
 		    esac; \
 		    mv $@ ${@}.work; \
 		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
-		    ${AWK} '\
-			/^begin [0-9]* '"$$src_escaped"'/ { exit } \
-			{ print } \
-		    ' ${@}.work > $@; \
+		    sed -n '/^begin [0-9]* '"$$src_escaped"'/{ q; }; p' $@.work > $@; \
 		    uuencode "$$src" "$$src" > "$${src}.uu"; \
 		    cat "$${src}.uu" >> $@; \
 		    echo EOF >> $@; \
-		    ${AWK} '\
-			BEGIN { skip = 1 } \
-			/^# END OF '"$$src_escaped"'/ { skip = 0 } \
-			skip == 1 { next } \
-			{ print } \
-		    ' ${@}.work >> $@; \
+		    sed -n '/^# END OF '"$$src_escaped"'/,$$p' $@.work >> $@; \
 		    rm -f ${@}.work "$${src}.uu"; \
 		done; \
 	fi
