@@ -119,13 +119,6 @@ main() {
 
 	# determine if this script is stripped/installed or not
 	config
-	if [ "$stripped" -eq 0 ]; then
-		runtime="$tmp/runtime"
-	elif [ "$configured" -eq 0 ]; then
-		runtime="$project_dir"
-	else
-		runtime="$PREFIX/share/vimpager"
-	fi
 
 	# determine location of rc file
 	i=1
@@ -746,17 +739,8 @@ get_key() {
 
 # this actually runs vim or gvim, or vimcat, or just cats the file
 page_files() {
-	if [ "$stripped" -eq 0 ]; then
+	if [ "$standalone" -eq 1 ]; then
 		extract_bundled_scripts
-		vimcat="$runtime/bin/vimcat"
-	else
-		if command -v vimcat > /dev/null; then
-			vimcat="$(command -v vimcat)"
-		elif [ "$configured" -eq 0 ]; then
-			vimcat="$project_dir/vimcat"
-		else
-			vimcat="$PREFIX/bin/vimcat"
-		fi
 	fi
 
 	if [ -n "$cat_files" ]; then
@@ -917,9 +901,9 @@ fits_on_screen() {
 }
 
 config() {
-	stripped=1
-	configured=0
-	PREFIX="$project_dir"
+	standalone=0
+	runtime="$project_dir"
+	vimcat="$project_dir/vimcat"
 }
 
 # INCLUDE BUNDLED SCRIPTS HERE

@@ -37,7 +37,9 @@ standalone/%: ${SRC} inc/*
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ ${@}.work; \
 		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-		    -e 's/^	stripped=1$$/	stripped=0/' \
+		    -e 's/^	standalone=0$$/	standalone=1/' \
+		    -e 's!^	runtime=.*$$!	runtime="\$$tmp/runtime"!' \
+		    -e 's!^	vimcat=.*$$!	vimcat="\$$runtime/bin/vimcat"!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    ${@}.work > $@; \
 		cat inc/do_uudecode.sh >> $@; \
@@ -147,8 +149,9 @@ install: docs vimpager.configured vimcat.configured
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
 	    -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
-	    -e 's!^	PREFIX=.*!	PREFIX=${PREFIX}!' \
-	    -e 's!^	configured=0!	configured=1!' $< > $@
+	    -e 's!^	runtime=.*!	runtime=${PREFIX}/share/vimpager!' \
+	    -e 's!^	vimcat=.*!	vimcat=${PREFIX}/bin/vimcat!' \
+	    $< > $@
 	@chmod +x $@
 
 install-deb:
