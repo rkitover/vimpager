@@ -1,3 +1,30 @@
+extract_bundled_scripts() {
+	mkdir "$runtime"
+
+	(
+		cd "$runtime"
+
+		mkdir macros autoload plugin syntax bin
+
+		# we extract all files in case the user uses :Page or :Page!
+		autoload_vimpager_vim
+		autoload_vimpager_utils_vim
+		plugin_vimpager_vim
+		less_vim
+
+		perldoc_vim
+
+		ansi_esc_vim
+		ansi_esc_plugin_vim
+		cecutil_plugin_vim
+
+		if [ -n "$cat_files" ]; then
+			vimcat_script
+			chmod +x ./bin/vimcat
+		fi
+	)
+}
+
 less_vim() {
 	(cat <<'EOF') | do_uudecode > macros/less.vim
 begin 644 macros/less.vim

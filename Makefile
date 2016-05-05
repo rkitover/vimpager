@@ -38,7 +38,7 @@ standalone/%: ${SRC} inc/*
 		cp $@ ${@}.work; \
 		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 		    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-		    -e 's/^	standalone=0$$/	standalone=1/' \
+		    -e 's/^	# EXTRACT BUNDLED SCRIPTS HERE$$/	extract_bundled_scripts/' \
 		    -e 's!^	runtime=.*$$!	runtime="\$$tmp/runtime"!' \
 		    -e 's!^	vimcat=.*$$!	vimcat="\$$runtime/bin/vimcat"!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
