@@ -34,40 +34,37 @@ standalone/%: ${SRC} inc/*
 	base="`basename $@`"; \
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
-		cp $@ ${@}.work; \
 		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 		    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 		    -e 's/^	# EXTRACT BUNDLED SCRIPTS HERE$$/	extract_bundled_scripts/' \
 		    -e 's!^	runtime=.*$$!	runtime="\$$tmp/runtime"!' \
 		    -e 's!^	vimcat=.*$$!	vimcat="\$$runtime/bin/vimcat"!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
-		    ${@}.work > $@; \
-		cat inc/do_uudecode.sh >> $@; \
-		cat inc/bundled_scripts.sh >> $@; \
-		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
+		    $@ > $@.work; \
+		cat inc/do_uudecode.sh >> $@.work; \
+		cat inc/bundled_scripts.sh >> $@.work; \
+		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@.work; \
 		for src in $$SRC; do \
 		    case "$$src" in \
 			inc/*) \
 				continue; \
 				;; \
 		    esac; \
-		    mv $@ ${@}.work; \
 		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
 		    sed -n '/^begin [0-9]* '"$$src_escaped"'/{ q; }; p' $@.work > $@; \
-		    uuencode "$$src" "$$src" > "$${src}.uu"; \
-		    cat "$${src}.uu" >> $@; \
+		    uuencode "$$src" "$$src" >> $@; \
 		    echo EOF >> $@; \
 		    sed -n '/^# END OF '"$$src_escaped"'/,$$p' $@.work >> $@; \
-		    rm -f ${@}.work "$${src}.uu"; \
+		    rm -f $@.work; \
 		done; \
 	fi
-	@cp $@ ${@}.work
+	@cp $@ $@.work
 	@sed -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
-	    -e '}' ${@}.work > $@
-	@rm -f ${@}.work
-	@if grep '^: if 0$$' ${@} >/dev/null; then \
+	    -e '}' $@.work > $@
+	@rm -f $@.work
+	@if grep '^: if 0$$' $@ >/dev/null; then \
 		chmod +x scripts/balance-shellvim; \
 		scripts/balance-shellvim $@; \
 	fi
@@ -140,7 +137,7 @@ install: docs vimpager.configured vimcat.configured
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
 	    -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
-		    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
+	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^	runtime=.*!	runtime=${PREFIX}/share/vimpager!' \
 	    -e 's!^	vimcat=.*!	vimcat=${PREFIX}/bin/vimcat!' \
 	    $< > $@
