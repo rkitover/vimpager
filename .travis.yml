@@ -1,8 +1,8 @@
 sudo: required
 dist: trusty
-script:
+install:
     - sudo apt-get update
     - sudo apt-get -y install lintian
     - sudo make install-deb
     - scripts/update_lintian
-    - lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
+script: lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
