@@ -9,6 +9,7 @@ if [ ! -t 1 ]; then
 	exec cat "$@"
 fi
 
+# FIND REAL PARENT DIRECTORY
 link="$0"
 
 while true; do
@@ -21,6 +22,7 @@ while true; do
 done
 
 project_dir="`dirname \"$link\"`"
+# END OF FIND REAL PARENT DIRECTORY
 
 . "$project_dir""/inc/prologue.sh"
 
@@ -119,13 +121,6 @@ main() {
 
 	# determine if this script is stripped/installed or not
 	config
-	if [ "$stripped" -eq 0 ]; then
-		runtime="$tmp/runtime"
-	elif [ "$configured" -eq 0 ]; then
-		runtime="$project_dir"
-	else
-		runtime="$PREFIX/share/vimpager"
-	fi
 
 	# determine location of rc file
 	i=1
@@ -701,33 +696,6 @@ line_n() {
 	head_n "$_line" "$@" | tail_n 1
 }
 
-extract_bundled_scripts() {
-	mkdir "$runtime"
-
-	(
-		cd "$runtime"
-
-		mkdir macros autoload plugin syntax bin
-
-		# we extract all files in case the user uses :Page or :Page!
-		autoload_vimpager_vim
-		autoload_vimpager_utils_vim
-		plugin_vimpager_vim
-		less_vim
-
-		perldoc_vim
-
-		ansi_esc_vim
-		ansi_esc_plugin_vim
-		cecutil_plugin_vim
-
-		if [ -n "$cat_files" ]; then
-			vimcat_script
-			chmod +x ./bin/vimcat
-		fi
-	)
-}
-
 # We are escaping only slashes (because they are special in file paths) and
 # percent (because it is our escape char).  This makes it possible to encode
 # the path to the original file in the basename of the temporary file.
@@ -746,18 +714,7 @@ get_key() {
 
 # this actually runs vim or gvim, or vimcat, or just cats the file
 page_files() {
-	if [ "$stripped" -eq 0 ]; then
-		extract_bundled_scripts
-		vimcat="$runtime/bin/vimcat"
-	else
-		if command -v vimcat > /dev/null; then
-			vimcat="$(command -v vimcat)"
-		elif [ "$configured" -eq 0 ]; then
-			vimcat="$project_dir/vimcat"
-		else
-			vimcat="$PREFIX/bin/vimcat"
-		fi
-	fi
+	# EXTRACT BUNDLED SCRIPTS HERE
 
 	if [ -n "$cat_files" ]; then
 		i=1
@@ -780,7 +737,7 @@ page_files() {
 					--cmd "set rtp^=$runtime | let vimpager={ 'enabled': 1 }" \
 					--cmd "${extra_cmd:-echo}" \
 					-c 'silent! source '"$tmp/$i"'.vim' \
-					-c "${extra_c:-echo}"  \
+					-c "${extra_c:-echo}" \
 					"$cur_file" </dev/tty
 				_exit_status=$?
 			fi
@@ -797,7 +754,7 @@ page_files() {
 		--cmd "silent! exe 'source ' . fnameescape('$system_vimrc')" \
 		--cmd "${extra_cmd:-echo}" \
 		-u "$vimrc" \
-		-c "${extra_c:-echo}"  \
+		-c "${extra_c:-echo}" \
 		"$@" </dev/tty
 
 	_vim_exit_status=$?
@@ -917,9 +874,8 @@ fits_on_screen() {
 }
 
 config() {
-	stripped=1
-	configured=0
-	PREFIX="$project_dir"
+	runtime="$project_dir"
+	vimcat="$project_dir/vimcat"
 }
 
 # INCLUDE BUNDLED SCRIPTS HERE
