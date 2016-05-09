@@ -20,6 +20,8 @@
 - add -h | --help | --usage option to display usage
 - preliminary support for neovim gh#133
 - reduce vimscript errors by balancing the shell control statements with ': end*' statements
+- stream input and output gh#172
+- support the '-' file for stdin
 
 2.06 2015-06-28:
 - Solaris compatibility fixes

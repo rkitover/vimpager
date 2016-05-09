@@ -88,7 +88,7 @@ main() {
 	    echo "ERROR: Could not create temporary directory $tmp" >&2
 	    quit 1
 	fi
-	trap "cd '$tmp'/..; rm -rf '$tmp' gvim.exe.stackdump" HUP INT QUIT ILL TRAP KILL BUS TERM
+	trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 
 	# Detect terminal size
 	if command -v tput >/dev/null; then
@@ -380,6 +380,9 @@ main() {
 			'-x')
 				# xtrace should already be set by the first option parsing
 				shift
+				;;
+			-)
+				break
 				;;
 			-*)
 				echo "$0: bad option '$1', see --help for usage." >&2

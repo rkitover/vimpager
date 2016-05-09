@@ -13,6 +13,8 @@
   - [-u vimrc](#-u-vimrc)
   - [-o output_file](#-o-output_file)
   - [-s](#-s)
+- [ENVIRONMENT](#environment)
+  - [VIMCAT_DEBUG](#vimcat_debug)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -87,3 +89,10 @@ option, but will be in normal operation with a terminal.
 ## -s
 
 Squeeze multiple blank lines into one.
+
+# ENVIRONMENT
+
+## VIMCAT_DEBUG
+
+Set to non-zero value to not silence vim when sourcing the viml and running the
+highlighting code. Only useful for developers.

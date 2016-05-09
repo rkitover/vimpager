@@ -69,3 +69,10 @@ option, but will be in normal operation with a terminal.
 ## -s
 
 Squeeze multiple blank lines into one.
+
+# ENVIRONMENT
+
+## VIMCAT_DEBUG
+
+Set to non-zero value to not silence vim when sourcing the viml and running the
+highlighting code. Only useful for developers.
