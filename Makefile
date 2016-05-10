@@ -30,8 +30,7 @@ balance-shellvim-stamp: vimcat
 standalone/%: ${SRC} inc/*
 	@echo building $@
 	@${MKPATH} `dirname $@`
-	@SRC="$?"; \
-	base="`basename $@`"; \
+	@base="`basename $@`"; \
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ $@.work; \
@@ -45,12 +44,7 @@ standalone/%: ${SRC} inc/*
 		cat inc/do_uudecode.sh >> $@; \
 		cat inc/bundled_scripts.sh >> $@; \
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
-		for src in $$SRC; do \
-		    case "$$src" in \
-			inc/*) \
-				continue; \
-				;; \
-		    esac; \
+		for src in ${SRC}; do \
 		    mv $@ $@.work; \
 		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
 		    sed -n '/^begin [0-9]* '"$$src_escaped"'/{ q; }; p' $@.work > $@; \
