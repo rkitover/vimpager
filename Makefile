@@ -34,22 +34,24 @@ standalone/%: ${SRC} inc/*
 	base="`basename $@`"; \
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
+		cp $@ $@.work; \
 		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 		    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 		    -e 's/^	# EXTRACT BUNDLED SCRIPTS HERE$$/	extract_bundled_scripts/' \
 		    -e 's!^	runtime=.*$$!	runtime="\$$tmp/runtime"!' \
 		    -e 's!^	vimcat=.*$$!	vimcat="\$$runtime/bin/vimcat"!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
-		    $@ > $@.work; \
-		cat inc/do_uudecode.sh >> $@.work; \
-		cat inc/bundled_scripts.sh >> $@.work; \
-		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@.work; \
+		    $@.work > $@; \
+		cat inc/do_uudecode.sh >> $@; \
+		cat inc/bundled_scripts.sh >> $@; \
+		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
 		for src in $$SRC; do \
 		    case "$$src" in \
 			inc/*) \
 				continue; \
 				;; \
 		    esac; \
+		    mv $@ $@.work; \
 		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
 		    sed -n '/^begin [0-9]* '"$$src_escaped"'/{ q; }; p' $@.work > $@; \
 		    uuencode "$$src" "$$src" >> $@; \
