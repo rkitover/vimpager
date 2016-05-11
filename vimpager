@@ -467,7 +467,6 @@ main() {
 				tempfile="$tmp/$filename"
 				mv -f -- "$tempfile.work" "$tempfile"
 			else
-				use_ansiesc=1
 				echo 'call vimpager_utils#DoAnsiEsc()' >> "$tmp/$file_idx.vim"
 				set_key ansi_files "$file_idx" yes
 			fi
