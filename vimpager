@@ -61,6 +61,7 @@ main() {
 				quit 0
 				;;
 			'-x')
+				trace=1
 				set -x
 				;;
 		esac
@@ -734,7 +735,7 @@ page_files() {
 				cat "$cur_file"
 				_exit_status=$?
 			else
-				"$POSIX_SHELL" "$vimcat" \
+				"$POSIX_SHELL" ${trace:+-x} "$vimcat" \
 					-u "$vimrc" \
 					--cmd "set rtp^=$runtime | let vimpager={ 'enabled': 1 }" \
 					--cmd "${extra_cmd:-echo}" \
