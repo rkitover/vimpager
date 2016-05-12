@@ -17,9 +17,9 @@ function! vimpager#Init(opts)
     " some plugin managers like dein overwrite the runtimepath, so we have to
     " make sure all of our versions of our plugins are loaded explicitly
 
-    call s:DisableOurPlugins()
+    call s:LoadOurPlugins()
 
-    autocmd BufReadPre,StdinReadPre * call s:LoadOurPlugins()
+    autocmd BufReadPre,StdinReadPre * call s:SetRTP()
 
     augroup END
 
@@ -75,18 +75,12 @@ function! s:GUIInit()
     augroup END
 endfunction
 
-function! s:DisableOurPlugins()
-    let g:loaded_AnsiEscPlugin = 1
-    let g:loaded_cecutil = 1
-    let g:vimpager_plugin_loaded = 1
+function! s:SetRTP()
+    execute 'set runtimepath^=' . s:opts.runtime
 endfunction
 
 function! s:LoadOurPlugins()
-    unlet g:loaded_AnsiEscPlugin
-    unlet g:loaded_cecutil
-    unlet g:vimpager_plugin_loaded
-
-    execute 'set runtimepath^=' . s:opts.runtime
+    call s:SetRTP()
 
     for plugin in glob(s:opts.runtime . '/plugin/**/*.vim', 0, 1)
         execute 'source ' . fnameescape(plugin)
