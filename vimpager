@@ -462,7 +462,7 @@ main() {
 		esac
 
 		# check for ANSI codes and strip if not using ansiesc
-		if head_n 100 "${tempfile:-$file}" | grep_q "$ANSI_RE"; then
+		if head -100 "${tempfile:-$file}" | grep_q "$ANSI_RE"; then
 			if [ -z "$ansiesc_available" -o -n "$force_strip_ansi" ]; then
 				ansi_filter "${tempfile:-$file}" > "$tmp/$filename.work"
 				tempfile="$tmp/$filename"
@@ -484,7 +484,7 @@ main() {
 		fi
 
 		# dumb man detection when the pstree heuristic fails
-		if [ -z "$is_doc" ] && head_n 12 "${tempfile:-$file}" | grep_q '^NAME$'; then
+		if [ -z "$is_doc" ] && head -12 "${tempfile:-$file}" | grep_q '^N(.)?A(.)?M(.)?E(.)?[ \t]*$'; then
 			is_man=1
 			is_doc=1
 		fi
@@ -621,7 +621,7 @@ sed() {
 
 # grep -q is often not available
 grep_q() {
-	_pat="$(echo "$1" | sed -e 's!/!\\/!g')"
+	_pat="$(printf '%s' "$1" | sed -e 's!/!\\/!g')"
 	shift
 	awk '
 		BEGIN { exit_val = 1 }
@@ -636,19 +636,11 @@ else
 	_head=head
 fi
 
-head() {
-	command "$_head" "$@"
-}
-
 if command -v gtail >/dev/null; then
 	_tail=gtail
 elif [ -x /usr/xpg4/bin/tail ]; then
 	_tail=/usr/xpg4/bin/tail
 fi
-
-tail() {
-	command "$_tail" "$@"
-}
 
 if [ "$(echo xx | head -n 1 2>/dev/null)" = "xx" ]; then
 	_head_syntax=new
@@ -658,16 +650,22 @@ else
 	fi
 fi
 
-head_n() {
-	_lines=$1
-	shift
+head() {
+	_lines=
+	case "$1" in
+		-[0-9]*)
+			_lines="${1#-}"
+			shift
+	esac
 
-	if [ "$_head_syntax" = "new" ]; then
-		head -n $_lines -- "$@"
+	if [ -z "$_lines" ]; then
+		command "$_head" "$@"
+	elif [ "$_head_syntax" = "new" ]; then
+		command "$_head" -n $_lines -- "$@"
 	elif [ -z "$_head_no_double_dash" ]; then
-		head -$_lines -- "$@"
+		command "$_head" -$_lines -- "$@"
 	else
-		head -$_lines "$@"
+		command "$_head" -$_lines "$@"
 	fi
 }
 
@@ -679,16 +677,22 @@ else
 	fi
 fi
 
-tail_n() {
-	_lines=$1
-	shift
+tail() {
+	_lines=
+	case "$1" in
+		-[0-9]*)
+			_lines="${1#-}"
+			shift
+	esac
 
-	if [ "$_tail_syntax" = "new" ]; then
-		tail -n "$_lines" -- "$@"
+	if [ -z "$_lines" ]; then
+		command "$_tail" "$@"
+	elif [ "$_tail_syntax" = "new" ]; then
+		command "$_tail" -n "$_lines" -- "$@"
 	elif [ -z "$_tail_no_double_dash" ]; then
-		tail -"$_lines" -- "$@"
+		command "$_tail" -"$_lines" -- "$@"
 	else
-		tail -"$_lines" "$@"
+		command "$_tail" -"$_lines" "$@"
 	fi
 }
 
@@ -696,7 +700,7 @@ line_n() {
 	_line="$1"
 	shift
 
-	head_n "$_line" "$@" | tail_n 1
+	head -"$_line" "$@" | tail -1
 }
 
 # We are escaping only slashes (because they are special in file paths) and
