@@ -539,7 +539,9 @@ function! AnsiHighlight(output_file, line_numbers, pipeline_dir)
     let ln_field_len = len(line('$'))
   endif
 
-  filetype detect
+  if &l:ft == ''
+    filetype detect
+  endif
   syntax enable
   syntax sync minlines=500 maxlines=500
 
