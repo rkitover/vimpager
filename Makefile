@@ -20,7 +20,7 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
+all: balance-shellvim-stamp standalone/vimpager standalone/vimcat vimpager.configured vimcat.configured docs
 
 balance-shellvim-stamp: vimcat
 	@chmod +x scripts/balance-shellvim
