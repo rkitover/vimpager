@@ -1,9 +1,9 @@
 #!/bin/sh
 
-sudo apt-get update
+sudo apt-get update || true
 sudo apt-get -y install debian-archive-keyring
 sudo sh -c "echo 'deb-src http://httpredir.debian.org/debian unstable main' > /etc/apt/sources.list.d/debian-src.list"
-sudo apt-get update
+sudo apt-get update || true
 
 export DEB_BUILD_OPTIONS=nocheck
 
