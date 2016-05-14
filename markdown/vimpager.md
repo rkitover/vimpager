@@ -12,6 +12,7 @@
 - [USING FROM VIM](#using-from-vim)
 - [COMMAND LINE OPTIONS](#command-line-options)
   - [-h | --help | --usage](#-h----help----usage)
+  - [-v | --version](#-v----version)
   - [+ | +G](#--g)
   - [-N | --LINE-NUMBERS](#-n----line-numbers)
   - [-c cmd](#-c-cmd)
@@ -321,6 +322,10 @@ in a new tab.
 ## -h | --help | --usage
 
 Print summary of options.
+
+## -v | --version
+
+Print the version information.
 
 ## + | +G
 

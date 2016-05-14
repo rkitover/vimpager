@@ -7,12 +7,14 @@
 - [DESCRIPTION](#description)
 - [COMMAND LINE OPTIONS](#command-line-options)
   - [-h | --help | --usage](#-h----help----usage)
+  - [-v | --version](#-v----version)
   - [-n](#-n)
   - [-c cmd](#-c-cmd)
   - [--cmd cmd](#--cmd-cmd)
   - [-u vimrc](#-u-vimrc)
   - [-o output_file](#-o-output_file)
   - [-s](#-s)
+  - [-x](#-x)
 - [ENVIRONMENT](#environment)
   - [VIMCAT_DEBUG](#vimcat_debug)
 
@@ -59,6 +61,10 @@ export LESSOPEN='|vimcat -o - %s'
 
 Print summary of options.
 
+## -v | --version
+
+Print the version information.
+
 ## -n
 
 Display line numbers.
@@ -89,6 +95,10 @@ option, but will be in normal operation with a terminal.
 ## -s
 
 Squeeze multiple blank lines into one.
+
+## -x
+
+Enable debugging output for the shell script part of vimcat.
 
 # ENVIRONMENT
 

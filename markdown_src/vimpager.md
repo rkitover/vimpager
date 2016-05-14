@@ -294,6 +294,10 @@ in a new tab.
 
 Print summary of options.
 
+## -v | --version
+
+Print the version information.
+
 ## + | +G
 
 Start at the end of the file, just like less.

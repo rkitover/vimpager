@@ -34,8 +34,7 @@ standalone/%: ${SRC} inc/*
 	cp "$$base" $@; \
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ $@.work; \
-		sed -e 's|^version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-		    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
+		sed -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 		    -e 's/^	# EXTRACT BUNDLED SCRIPTS HERE$$/	extract_bundled_scripts/' \
 		    -e 's!^	runtime=.*$$!	runtime="\$$tmp/runtime"!' \
 		    -e 's!^	vimcat=.*$$!	vimcat="\$$runtime/bin/vimcat"!' \
@@ -55,7 +54,8 @@ standalone/%: ${SRC} inc/*
 		done; \
 	fi
 	@cp $@ $@.work
-	@sed -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/{' \
+	@sed -e 's|^[ 	]*version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' $@.work > $@
@@ -132,7 +132,7 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
-	    -e 's|^version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
+	    -e 's|^[ 	]*version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^	runtime=.*!	runtime=${PREFIX}/share/vimpager!' \
 	    -e 's!^	vimcat=.*!	vimcat=${PREFIX}/bin/vimcat!' \

@@ -39,6 +39,10 @@ export LESSOPEN='|vimcat -o - %s'
 
 Print summary of options.
 
+## -v | --version
+
+Print the version information.
+
 ## -n
 
 Display line numbers.
@@ -69,6 +73,10 @@ option, but will be in normal operation with a terminal.
 ## -s
 
 Squeeze multiple blank lines into one.
+
+## -x
+
+Enable debugging output for the shell script part of vimcat.
 
 # ENVIRONMENT
 

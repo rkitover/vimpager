@@ -574,6 +574,7 @@ With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard 
   [1;37m--cmd [1;35mCOMMAND[0m			Run vim [1;35mCOMMAND[0m before initialization.
   [1;37m-c [1;35mCOMMAND[0m			Run vim [1;35mCOMMAND[0m after initialization.
   [1;37m-u [1;35mFILE[0m			Use [1;35mFILE[0m as the vimrc.
+  [1;37m-x [0m				Give debugging output on stderr.
 
 Examples:
   [32mvimpager [1;35mprogram.py[0m		# view [1;35mprogram.py[0m in the pager
