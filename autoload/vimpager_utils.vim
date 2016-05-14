@@ -4,36 +4,36 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! vimpager_utils#StatusLine(opts)
-  redir => pos
+    redir => pos
     silent! file
-  redir END
-  " remove trailing newline
-  let pos = substitute(pos, '[\r\n]\+', '', 'g')
-  " remove any beginning quotes
-  let pos = substitute(pos, '^"*', '', '')
-  " remove tmp dir path
-  if exists('a:opts.tmp_dir')
-      let pos = substitute(pos, '^/*\V' . a:opts.tmp_dir . '\m/*', '', '')
-      let pos = substitute(pos, '^/*\V' . resolve(a:opts.tmp_dir) . '\m/*', '', '')
-  else
-      let pos = substitute(pos, '^.*/', '', '')
-  endif
-  " remove possible [readonly] tag (edge case)
-  let pos = substitute(pos, '\[readonly\]\s\+', '', '')
-  " remove closing quote
-  let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
-  " urldecode
-  let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
-  " add help message
-  let leader = exists('g:mapleader') ? g:mapleader : '\'
-  let pos .= "  [ Press '".leader."h' for HELP ]"
-  " Trim the status line to fit the window width.
-  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
-  highlight VimpagerStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
-  echohl VimpagerStatusLine
-  redraw
-  unsilent echo pos
-  echohl None
+    redir END
+    " remove trailing newline
+    let pos = substitute(pos, '[\r\n]\+', '', 'g')
+    " remove any beginning quotes
+    let pos = substitute(pos, '^"*', '', '')
+    " remove tmp dir path
+    if exists('a:opts.tmp_dir')
+        let pos = substitute(pos, '^/*\V' . a:opts.tmp_dir . '\m/*', '', '')
+        let pos = substitute(pos, '^/*\V' . resolve(a:opts.tmp_dir) . '\m/*', '', '')
+    else
+        let pos = substitute(pos, '^.*/', '', '')
+    endif
+    " remove possible [readonly] tag (edge case)
+    let pos = substitute(pos, '\[readonly\]\s\+', '', '')
+    " remove closing quote
+    let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
+    " urldecode
+    let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
+    " add help message
+    let leader = exists('g:mapleader') ? g:mapleader : '\'
+    let pos .= "  [ Press '".leader."h' for HELP ]"
+    " Trim the status line to fit the window width.
+    let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
+    highlight VimpagerStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
+    echohl VimpagerStatusLine
+    redraw
+    unsilent echo pos
+    echohl None
 endfunction
 
 function! vimpager_utils#DoAnsiEsc()
@@ -110,4 +110,4 @@ endfunction
 
 let &cpo = s:save_cpo
 
-" vim: set ft=vim sw=4 et:
+" vim: ft=vim sw=4 et:

@@ -142,4 +142,4 @@ endfunction
 
 let &cpo = s:save_cpo
 
-" vim: set ft=vim sw=4 et:
+" vim: ft=vim sw=4 et:
