@@ -20,7 +20,7 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-all: balance-shellvim-stamp standalone/vimpager standalone/vimcat vimpager.configured vimcat.configured docs
+all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
 
 balance-shellvim-stamp: vimcat
 	@chmod +x scripts/balance-shellvim
@@ -35,9 +35,9 @@ standalone/%: ${SRC} inc/*
 	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
 		cp $@ $@.work; \
 		sed -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-		    -e 's/^	# EXTRACT BUNDLED SCRIPTS HERE$$/	extract_bundled_scripts/' \
-		    -e 's!^	runtime=.*$$!	runtime="\$$tmp/runtime"!' \
-		    -e 's!^	vimcat=.*$$!	vimcat="\$$runtime/bin/vimcat"!' \
+		    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
+		    -e 's!^\( *\)runtime=.*$$!\1runtime="\$$tmp/runtime"!' \
+		    -e 's!^\( *\)vimcat=.*$$!\1vimcat="\$$runtime/bin/vimcat"!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    $@.work > $@; \
 		cat inc/do_uudecode.sh >> $@; \
@@ -54,8 +54,8 @@ standalone/%: ${SRC} inc/*
 		done; \
 	fi
 	@cp $@ $@.work
-	@sed -e 's|^[ 	]*version=.*|version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/{' \
+	@sed -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e '/^ *\. .*inc\/prologue.sh.*$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' $@.work > $@
@@ -131,11 +131,11 @@ install: docs vimpager.configured vimcat.configured
 	@POSIX_SHELL="`scripts/find_shell`"; \
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
-	    -e '/^[ 	]*\.[ 	]*.*inc\/prologue.sh.*$$/d' \
-	    -e 's|^[ 	]*version=.*|version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
+	    -e '/^ *\. .*inc\/prologue.sh.*$$/d' \
+	    -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-	    -e 's!^	runtime=.*!	runtime=${PREFIX}/share/vimpager!' \
-	    -e 's!^	vimcat=.*!	vimcat=${PREFIX}/bin/vimcat!' \
+	    -e 's!^\( *\)runtime=.*!\1runtime=${PREFIX}/share/vimpager!' \
+	    -e 's!^\( *\)vimcat=.*!\1vimcat=${PREFIX}/bin/vimcat!' \
 	    $< > $@
 	@chmod +x $@
 
