@@ -20,14 +20,16 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
+PROGRAMS=vimpager vimcat
+
 all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
 
-balance-shellvim-stamp: vimcat
+balance-shellvim-stamp: vimcat Makefile
 	@chmod +x scripts/balance-shellvim
 	@scripts/balance-shellvim
 	@touch balance-shellvim-stamp
 
-standalone/%: ${SRC} inc/*
+standalone/%: ${PROGRAMS} ${SRC} inc/* Makefile
 	@echo building $@
 	@${MKPATH} `dirname $@`
 	@base="`basename $@`"; \
@@ -36,8 +38,8 @@ standalone/%: ${SRC} inc/*
 		cp $@ $@.work; \
 		sed -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 		    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
-		    -e 's!^\( *\)runtime=.*$$!\1runtime="\$$tmp/runtime"!' \
-		    -e 's!^\( *\)vimcat=.*$$!\1vimcat="\$$runtime/bin/vimcat"!' \
+		    -e 's!^runtime=.*$$!runtime='\''\$$tmp/runtime'\''!' \
+		    -e 's!^vimcat=.*$$!vimcat='\''\$$runtime/bin/vimcat'\''!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    $@.work > $@; \
 		cat inc/do_uudecode.sh >> $@; \
@@ -55,7 +57,7 @@ standalone/%: ${SRC} inc/*
 	fi
 	@cp $@ $@.work
 	@sed -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-	    -e '/^ *\. .*inc\/prologue.sh.*$$/{' \
+	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' $@.work > $@
@@ -131,11 +133,11 @@ install: docs vimpager.configured vimcat.configured
 	@POSIX_SHELL="`scripts/find_shell`"; \
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
-	    -e '/^ *\. .*inc\/prologue.sh.*$$/d' \
+	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
 	    -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-	    -e 's!^\( *\)runtime=.*!\1runtime=${PREFIX}/share/vimpager!' \
-	    -e 's!^\( *\)vimcat=.*!\1vimcat=${PREFIX}/bin/vimcat!' \
+	    -e 's!^\( *\)runtime=.*!\1runtime="${PREFIX}/share/vimpager"!' \
+	    -e 's!^\( *\)vimcat=.*!\1vimcat="${PREFIX}/bin/vimcat"!' \
 	    $< > $@
 	@chmod +x $@
 
@@ -160,10 +162,10 @@ install-deb:
 	@apt-get -y autoremove
 	@debian/rules clean
 
-docs: ${GEN_DOCS} docs.tar.gz
+docs: ${GEN_DOCS} docs.tar.gz Makefile
 	@rm -f docs-warn-stamp doctoc-warn-stamp
 
-docs.tar.gz: ${GEN_DOCS} ${DOC_SRC}
+docs.tar.gz: ${GEN_DOCS} ${DOC_SRC} Makefile
 	@rm -f $@
 	@if [ "`ls -1 $? 2>/dev/null | wc -l`" -eq "`echo $? | wc -w`" ]; then \
 		echo tar cf docs.tar $?; \

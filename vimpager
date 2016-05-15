@@ -24,14 +24,16 @@ done
 project_dir="`dirname \"$link\"`"
 # END OF FIND REAL PARENT DIRECTORY
 
-. "$project_dir""/inc/prologue.sh"
+. "$project_dir/inc/prologue.sh"
 
 version="$(cd "$project_dir"; git describe) (git)"
+runtime='$project_dir'
+vimcat='$project_dir/vimcat'
 
-case $(uname -s) in
+case "$(uname -s)" in
     Linux) linux=1 ;;
     SunOS) solaris=1 ;;
-        Darwin) osx=1; bsd=1 ;;
+    Darwin) osx=1; bsd=1 ;;
     CYGWIN*) cygwin=1; win32=1 ;;
     MINGW*) msys=1; win32=1 ;;
     MSYS*) msys=1; win32=1 ;;
@@ -120,8 +122,7 @@ main() {
         no_pass_thru=1 # force loading vimpager
     fi
 
-    # determine if this script is stripped/installed or not
-    config
+    expand_config_vars
 
     # determine location of rc file
     i=1
@@ -539,6 +540,11 @@ main() {
     quit $?
 }
 
+expand_config_vars() {
+    eval runtime=\"$runtime\"
+    eval vimcat=\"$vimcat\"
+}
+
 # special handling to rewrite cygwin/msys paths to windows POSIX paths
 if [ -n "$win32" ] && command -v cygpath >/dev/null; then
     _have_cygpath=1
@@ -879,11 +885,6 @@ fits_on_screen() {
         if (!--lines) exit(1)
     }
     ' num_files=$# total_lines=$lines total_cols=$cols file_sep_lines=3 first_file_sep_lines=2 -
-}
-
-config() {
-    runtime="$project_dir"
-    vimcat="$project_dir/vimcat"
 }
 
 # INCLUDE BUNDLED SCRIPTS HERE
