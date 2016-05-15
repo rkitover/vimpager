@@ -259,7 +259,7 @@ main() {
         # console the native vim will not work, so we have to use gvim.
 
         if [ "x$TERM" != "xdumb" -a "x$TERM" != "xcygwin" -a "x$TERM" != "x" ]; then
-            if command -v vim >/dev/null | grep_q '^/(cygdrive/)?[a-z]/'; then
+            if command -v vim >/dev/null | grep -Eq '^/(cygdrive/)?[a-z]/'; then
                 use_gvim=1
             fi
         fi
@@ -323,11 +323,11 @@ main() {
     ptree="$(do_ptree)"
 
     # Check if called from man, perldoc or pydoc
-    if echo "$ptree" | grep_q '([ \t]+|/)(man|[Pp]y(thon|doc)[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
+    if echo "$ptree" | grep -Eq '([ \t]+|/)(man|[Pp]y(thon|doc)[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
         is_man=1
         is_doc=1
         force_strip_ansi=1
-    elif echo "$ptree" | grep_q '([ \t]+|/)perl(doc)?([0-9.]*)?([ \t]|$)'; then
+    elif echo "$ptree" | grep -Eq '([ \t]+|/)perl(doc)?([0-9.]*)?([ \t]|$)'; then
         is_perldoc=1
         is_doc=1
         force_strip_ansi=1
@@ -462,7 +462,7 @@ main() {
         esac
 
         # check for ANSI codes and strip if not using ansiesc
-        if head -100 "${tempfile:-$file}" | grep_q "$ANSI_RE"; then
+        if head -100 "${tempfile:-$file}" | grep -Eq "$ANSI_RE"; then
             if [ -z "$ansiesc_available" -o -n "$force_strip_ansi" ]; then
                 ansi_filter "${tempfile:-$file}" > "$tmp/$filename.work"
                 tempfile="$tmp/$filename"
@@ -484,7 +484,7 @@ main() {
         fi
 
         # dumb man detection when the pstree heuristic fails
-        if [ -z "$is_doc" ] && head -12 "${tempfile:-$file}" | grep_q '^N(.)?A(.)?M(.)?E(.)?[ \t]*$'; then
+        if [ -z "$is_doc" ] && head -12 "${tempfile:-$file}" | grep -Eq '^N(.)?A(.)?M(.)?E(.)?[ \t]*$'; then
             is_man=1
             is_doc=1
         fi
@@ -620,8 +620,48 @@ sed() {
     command "$_sed" "$@"
 }
 
-# grep -q is often not available
-grep_q() {
+
+if command -v ggrep >/dev/null; then
+    _grep=ggrep
+elif [ -x /usr/xpg4/bin/grep ]; then
+    _grep=/usr/xpg4/bin/grep
+elif command -v grep >/dev/null; then
+    _grep=grep
+else
+    echo "ERROR: No grep found!" >&2
+    quit 1
+fi
+
+# check that grep -Eq works
+if [ -z "$(echo foo | "$_grep" -Eq foo >/dev/null 2>&1)" -a $? -eq 0 ]; then
+    _have_grep_E_q=1
+fi
+
+grep() {
+    case "$1" in
+        -Eq)
+            # we only check for -Eq when it's the only option
+            case "$2" in
+                -*)
+                    command "$_grep" "$@"
+                    ;;
+                *)
+                    if [ "${_have_grep_E_q:-0}" -eq 1 ]; then
+                        command "$_grep" "$@"
+                    else
+                        shift
+                        awk_grep_E_q "$@"
+                    fi
+                    ;;
+            esac
+            ;;
+        *)
+            command "$_grep" "$@"
+            ;;
+    esac
+}
+
+awk_grep_E_q() {
     _pat="$(printf '%s' "$1" | sed -e 's!/!\\/!g')"
     shift
     awk '
@@ -775,7 +815,7 @@ win32_native() {
         return 0
     else
         if [ -n "$msys" -o -n "$cygwin" ]; then
-            if command -v "$1" > /dev/null | grep_q '^/(cygdrive/)?[a-z]/'; then
+            if command -v "$1" > /dev/null | grep -Eq '^/(cygdrive/)?[a-z]/'; then
                 set_key _win32_native "$1" 1
                 return 0
             else
