@@ -20,8 +20,6 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-PROGRAMS=vimpager vimcat
-
 all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
 
 balance-shellvim-stamp: vimcat Makefile
@@ -29,7 +27,7 @@ balance-shellvim-stamp: vimcat Makefile
 	@scripts/balance-shellvim
 	@touch balance-shellvim-stamp
 
-standalone/%: ${PROGRAMS} ${SRC:=.uu} inc/* Makefile
+standalone/%: % ${SRC:=.uu} inc/* Makefile
 	@echo building $@
 	@${MKPATH} `dirname $@`
 	@base="`basename $@`"; \
