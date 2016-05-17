@@ -62,6 +62,8 @@ function! vimpager#Init(opts)
     if !has('nvim') " neovim has its own clipboard support
         set ttymouse=xterm2
         set clipboard=autoselect
+    else
+        set laststatus=1 " neovim defaults to 2
     endif
 endfunction
 

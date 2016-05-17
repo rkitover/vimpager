@@ -508,11 +508,11 @@ endfunction
 
 function! s:CloseBuffer()
   redir => ls_out
-    silent! ls
+    silent! ls!
   redir END
 
   " check if this is the last buffer, if so quit
-  if ls_out =~# '^\n\s\+\d\+\s\+%\S*a[^\n]*$'
+  if ls_out =~# '^\n\s\+\d\+.*%\S*a[^\n]*$'
     quit
   endif
 
