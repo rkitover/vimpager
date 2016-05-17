@@ -78,20 +78,12 @@ main() {
                 ;;
             '-c')
                 shift
-                if [ -z "$extra_c" ]; then
-                    extra_c="$1"
-                else
-                    extra_c="$extra_c | $1"
-                fi
+                extra_c="${extra_c:+$extra_c | }$1"
                 shift
                 ;;
             '--cmd')
                 shift
-                if [ -z "$extra_cmd" ]; then
-                    extra_cmd="$1"
-                else
-                    extra_cmd="$extra_cmd | $1"
-                fi
+                extra_cmd="${extra_cmd:+$extra_cmd | }$1"
                 shift
                 ;;
             '-u')
