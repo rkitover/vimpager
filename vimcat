@@ -541,6 +541,8 @@ endfunction
 function! AnsiHighlight(output_file, line_numbers, pipeline_dir)
     let s:pipeline_dir = a:pipeline_dir
 
+    setlocal modifiable noreadonly buflisted buftype=nowrite
+
     if a:pipeline_dir != ''
         let s:chunk_num     = 1
         let s:chunk_newline = 0
