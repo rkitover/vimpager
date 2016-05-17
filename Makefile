@@ -20,8 +20,6 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-PROGRAMS=vimpager vimcat
-
 all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
 
 balance-shellvim-stamp: vimcat Makefile
@@ -29,7 +27,7 @@ balance-shellvim-stamp: vimcat Makefile
 	@scripts/balance-shellvim
 	@touch balance-shellvim-stamp
 
-standalone/%: ${PROGRAMS} ${SRC} inc/* Makefile
+standalone/%: % ${SRC:=.uu} inc/* Makefile
 	@echo building $@
 	@${MKPATH} `dirname $@`
 	@base="`basename $@`"; \
@@ -45,16 +43,8 @@ standalone/%: ${PROGRAMS} ${SRC} inc/* Makefile
 		    $@.work > $@; \
 		cat inc/do_uudecode.sh >> $@; \
 		cat inc/bundled_scripts.sh >> $@; \
+		cat ${SRC:=.uu} >> $@; \
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
-		for src in ${SRC}; do \
-		    mv $@ $@.work; \
-		    src_escaped=`echo $$src | sed -e 's!/!\\\\/!g'`; \
-		    sed -n '/^begin [0-9]* '"$$src_escaped"'/{ q; }; p' $@.work > $@; \
-		    uuencode "$$src" "$$src" >> $@; \
-		    echo EOF >> $@; \
-		    sed -n '/^# END OF '"$$src_escaped"'/,$$p' $@.work >> $@; \
-		    rm -f $@.work; \
-		done; \
 	fi
 	@cp $@ $@.work
 	@sed -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
@@ -68,6 +58,30 @@ standalone/%: ${PROGRAMS} ${SRC} inc/* Makefile
 		scripts/balance-shellvim $@; \
 	fi
 	@chmod +x $@
+
+vimcat.uu: vimcat
+	@echo uuencoding $<
+	@echo 'vimcat_script() {' > $@
+	@printf "\t(cat <<'EOF') | do_uudecode > bin/vimcat\n" >> $@
+	@sed \
+	    -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e     'r inc/prologue.sh' \
+	    -e     d \
+	    -e '}' \
+	    $< > $@.work
+	@uuencode $@.work $< >> $@
+	@echo EOF >> $@
+	@echo '}' >> $@
+	@rm $@.work
+
+%.uu: %
+	@echo uuencoding $<
+	@echo '$<() {' | sed 's|[/.]|_|g' > $@
+	@printf "\t(cat <<'EOF') | do_uudecode > $<\n" >> $@
+	@uuencode $< $< >> $@
+	@echo EOF >> $@
+	@echo '}' >> $@
 
 uninstall:
 	rm -f "${prefix}/bin/vimpager"
