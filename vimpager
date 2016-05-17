@@ -50,10 +50,16 @@ main() {
         quit 0
     fi
 
-    # check for -h and -v before main option parsing, this is much faster
-    # set xtrace as early as possible, if requested
-    for arg in "$@"; do
-        case "$arg" in
+    # Parse the command line options as early as possible.  These variables might be set because of command line options and are thus initialized.
+    vim_options=
+    vimrc=
+    extra_c=
+    extra_cmd=
+    line_numbers=0
+    # Check for certain parameters to pass on to vim (or conceivably do something else)
+    # Couldn't use getopt or getopts as neither supports options prepended with +
+    while [ $# -gt 0 ] ; do
+        case "$1" in
             '-h'|'--help'|'-help'|'--usage'|'-usage')
                 usage
                 quit 0
@@ -62,11 +68,61 @@ main() {
                 echo "vimpager $version"
                 quit 0
                 ;;
+            '+G'|'+')
+                vim_options="$vim_options +";
+                shift
+                ;;
+            '-N'|'--LINE-NUMBERS')
+                line_numbers=1
+                shift
+                ;;
+            '-c')
+                shift
+                if [ -z "$extra_c" ]; then
+                    extra_c="$1"
+                else
+                    extra_c="$extra_c | $1"
+                fi
+                shift
+                ;;
+            '--cmd')
+                shift
+                if [ -z "$extra_cmd" ]; then
+                    extra_cmd="$1"
+                else
+                    extra_cmd="$extra_cmd | $1"
+                fi
+                shift
+                ;;
+            '-u')
+                shift
+                vimrc="$1"
+                shift
+                ;;
+            '-s') # Ubuntu man passes this option to /usr/bin/pager
+                shift
+                squeeze_blank_lines=1
+                ;;
+            '--')
+                shift
+                break
+                ;;
             '-x')
                 trace=1
+                shift
                 set -x
                 ;;
-        esac
+            -)
+                break
+                ;;
+            -*)
+                echo "$0: bad option '$1', see --help for usage." >&2
+                quit 1
+                ;;
+            *)
+                break
+                ;;
+         esac
     done
 
     mkdir_options="-m 700"
@@ -267,67 +323,7 @@ main() {
         force_strip_ansi=1
     fi
 
-    extra_cmd="let g:vimpager.ptree=[$(echo "$ptree" | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(g:vimpager.ptree, -1) | let g:vimpager_ptree = g:vimpager.ptree"
-
-    # Check for certain parameters to pass on to vim (or conceivably do something else)
-    # Couldn't use getopt or getopts as neither supports options prepended with +
-    while [ $# -gt 0 ] ; do
-        case "$1" in
-            '+G'|'+')
-                vim_cmd="$vim_cmd +";
-                shift
-                ;;
-            '-N'|'--LINE-NUMBERS')
-                line_numbers=1
-                shift
-                ;;
-            '-c')
-                shift
-                if [ -z "$extra_c" ]; then
-                    extra_c="$1"
-                else
-                    extra_c="$extra_c | $1"
-                fi
-                shift
-                ;;
-            '--cmd')
-                shift
-                if [ -z "$extra_cmd" ]; then
-                    extra_cmd="$1"
-                else
-                    extra_cmd="$extra_cmd | $1"
-                fi
-                shift
-                ;;
-            '-u')
-                shift
-                vimrc="$1"
-                shift
-                ;;
-            '-s') # Ubuntu man passes this option to /usr/bin/pager
-                shift
-                squeeze_blank_lines=1
-                ;;
-            '--')
-                shift
-                break
-                ;;
-            '-x')
-                # xtrace should already be set by the first option parsing
-                shift
-                ;;
-            -)
-                break
-                ;;
-            -*)
-                echo "$0: bad option '$1', see --help for usage." >&2
-                quit 1
-                ;;
-            *)
-                break
-                ;;
-         esac
-    done
+    extra_cmd="${extra_cmd:+$extra_cmd | }let g:vimpager.ptree=[$(echo "$ptree" | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(g:vimpager.ptree, -1) | let g:vimpager_ptree = g:vimpager.ptree"
 
     # if no args, assume stdin
     if [ $# -eq 0 ]; then
@@ -769,6 +765,7 @@ page_files() {
     init_opts="'columns': $cols, 'tmp_dir': '$tmp', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}, 'runtime': '$runtime'"
 
     $vim_cmd -N -i NONE \
+        $vim_options \
         --cmd "set rtp^=$runtime" \
         --cmd "call vimpager#Init({ $init_opts })" \
         --cmd "silent! exe 'source ' . fnameescape('$system_vimrc')" \
