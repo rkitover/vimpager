@@ -33,6 +33,9 @@ function! vimpager#Init(opts)
     autocmd BufReadPost,StdinReadPost * silent! execute
                 \ 'source ' . s:opts.tmp_dir . '/' . (argidx() + 1) . '.vim'
 
+    " in case the post-processing does something we don't want
+    autocmd BufReadPost,StdinReadPost * call s:FixBufOpts()
+
     " hide error messages from invalid modelines
     autocmd BufWinEnter * if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG
                 \ | silent! redraw! | endif
@@ -128,6 +131,10 @@ function! s:SetBufType()
     if bufname('%') =~# '^\V' . s:opts.tmp_dir
         setlocal buftype=nowrite modifiable noreadonly viminfo=
     endif
+endfunction
+
+function! s:FixBufOpts()
+    setlocal buflisted " neovim ftplugin/man.vim sets nobuflisted
 endfunction
 
 " 7.3 has no partial funcrefs, and does not allow funcrefs to s:Func()
