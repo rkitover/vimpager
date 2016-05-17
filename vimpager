@@ -477,7 +477,7 @@ find_vimpagerrc_files() {
     OLDIFS="$IFS"
     IFS='
 '
-    for var in $(vim -NEnR -i NONE +'call writefile(["", "VAL:" . $VIM, "VAL:" . $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
+    for var in $(vim -NEnR -i NONE ${vimrc:+-u "$vimrc"} +'call writefile(["", "VAL:" . $VIM, "VAL:" . $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
         case "$var" in
             VAL:*)
                 case $i in
@@ -486,6 +486,7 @@ find_vimpagerrc_files() {
                         ;;
                     2)
                         user_vimrc="${var#VAL:}"
+                        user_vimrc_dir="${user_vimrc%/*}"
                         break
                         ;;
                 esac
@@ -502,10 +503,11 @@ find_vimpagerrc_files() {
         q
     }')"
 
-    user_vimrc_dir="${user_vimrc%/*}"
-
-    # first check for a user ~/.vimpagerrc
-    if [ -n "$VIMPAGER_RC" ]; then
+    # find the users vimpagerrc
+    if [ -n "$vimrc" ]; then
+        # The vimrc file was given on the command line.
+        :
+    elif [ -n "$VIMPAGER_RC" ]; then
         vimrc="$VIMPAGER_RC"
     # check for vimpagerrc in same dir as vimrc in case it is set in VIMINIT
     elif [ -r "$user_vimrc_dir/.vimpagerrc" ]; then
@@ -525,20 +527,16 @@ find_vimpagerrc_files() {
         vimrc=~/vimfiles/vimpagerrc
     elif [ -r "$vim_dir/_vimpagerrc" ]; then
         vimrc="$vim_dir/_vimpagerrc"
-    fi
-
-    # use user's ~/.vimrc
-    [ -z "$vimrc" ] && vimrc="$user_vimrc"
-
-    # if no user vimrc, then check for a global /etc/vimpagerrc and fall back to NORC
-    if [ -z "$vimrc" ]; then
-        if [ -f /usr/local/etc/vimpagerrc ]; then
-            vimrc=/usr/local/etc/vimpagerrc
-        elif [ -f /etc/vimpagerrc ]; then
-            vimrc=/etc/vimpagerrc
-        else
-            vimrc=NORC
-        fi
+    # try the user's ~/.vimrc
+    elif [ -n "$user_vimrc" ]; then
+        vimrc="$user_vimrc"
+    # if no user vimrc, then check for a global /etc/vimpagerrc
+    elif [ -f /usr/local/etc/vimpagerrc ]; then
+        vimrc=/usr/local/etc/vimpagerrc
+    elif [ -f /etc/vimpagerrc ]; then
+        vimrc=/etc/vimpagerrc
+    else # fall back to NORC
+        vimrc=NORC
     fi
 }
 
