@@ -29,6 +29,7 @@ project_dir="`dirname \"$link\"`"
 version="$(cd "$project_dir"; git describe) (git)"
 runtime='$project_dir'
 vimcat='$project_dir/vimcat'
+system_vimpagerrc='$project_dir/vimpagerrc'
 
 case "$(uname -s)" in
     Linux) linux=1 ;;
@@ -522,6 +523,9 @@ find_vimpagerrc_files() {
     elif [ -n "$user_vimrc" ]; then
         vimrc="$user_vimrc"
     # if no user vimrc, then check for a global /etc/vimpagerrc
+    elif [ -n "$system_vimpagerrc" -a -f "$system_vimpagerrc" ]; then
+        vimrc="$system_vimpagerrc"
+    # check a couple of common places for the standalone version
     elif [ -f /usr/local/etc/vimpagerrc ]; then
         vimrc=/usr/local/etc/vimpagerrc
     elif [ -f /etc/vimpagerrc ]; then
@@ -534,6 +538,7 @@ find_vimpagerrc_files() {
 expand_config_vars() {
     eval runtime=\"$runtime\"
     eval vimcat=\"$vimcat\"
+    eval system_vimpagerrc=\"$system_vimpagerrc\"
 }
 
 # special handling to rewrite cygwin/msys paths to windows POSIX paths

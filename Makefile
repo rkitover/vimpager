@@ -38,8 +38,9 @@ standalone/%: ${PROGRAMS} ${SRC} inc/* Makefile
 		cp $@ $@.work; \
 		sed -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 		    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
-		    -e 's!^runtime=.*$$!runtime='\''\$$tmp/runtime'\''!' \
-		    -e 's!^vimcat=.*$$!vimcat='\''\$$runtime/bin/vimcat'\''!' \
+		    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
+		    -e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
+		    -e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
 		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 		    $@.work > $@; \
 		cat inc/do_uudecode.sh >> $@; \
@@ -121,7 +122,7 @@ install: docs vimpager.configured vimcat.configured
 		${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
 	done; \
 	SYSCONFDIR='${DESTDIR}${SYSCONFDIR}'; \
-	if [ '${PREFIX}' = '/usr' ]; then \
+	if [ '${PREFIX}' = /usr ]; then \
 		SYSCONFDIR='${DESTDIR}/etc'; \
 	fi; \
 	${MKPATH} "$${SYSCONFDIR}" 2>/dev/null || true; \
@@ -131,13 +132,19 @@ install: docs vimpager.configured vimcat.configured
 %.configured: %
 	@echo configuring $<
 	@POSIX_SHELL="`scripts/find_shell`"; \
+	if [ '${PREFIX}' = /usr ]; then \
+		vimpagerrc=/etc/vimpagerrc; \
+	else \
+		vimpagerrc='${SYSCONFDIR}/vimpagerrc'; \
+	fi; \
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
 	    -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-	    -e 's!^\( *\)runtime=.*!\1runtime="${PREFIX}/share/vimpager"!' \
-	    -e 's!^\( *\)vimcat=.*!\1vimcat="${PREFIX}/bin/vimcat"!' \
+	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
+	    -e 's!^\( *\)vimcat=.*!\1vimcat='\''${PREFIX}/bin/vimcat'\''!' \
+	    -e 's!^\( *\)system_vimpagerrc=.*!\1system_vimpagerrc='\'"$$vimpagerrc"\''!' \
 	    $< > $@
 	@chmod +x $@
 
