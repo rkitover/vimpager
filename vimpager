@@ -60,46 +60,46 @@ main() {
     # Couldn't use getopt or getopts as neither supports options prepended with +
     while [ $# -gt 0 ] ; do
         case "$1" in
-            '-h'|'--help'|'-help'|'--usage'|'-usage')
+            -h|--help|-help|--usage|-usage)
                 usage
                 quit 0
                 ;;
-            '-v'|'--version'|'-version')
+            -v|--version|-version)
                 echo "vimpager $version"
                 quit 0
                 ;;
-            '+G'|'+')
+            +G|+)
                 vim_options="$vim_options +";
                 shift
                 ;;
-            '-N'|'--LINE-NUMBERS')
+            -N|--LINE-NUMBERS)
                 line_numbers=1
                 shift
                 ;;
-            '-c')
+            -c)
                 shift
                 extra_c="${extra_c:+$extra_c | }$1"
                 shift
                 ;;
-            '--cmd')
+            --cmd)
                 shift
                 extra_cmd="${extra_cmd:+$extra_cmd | }$1"
                 shift
                 ;;
-            '-u')
+            -u)
                 shift
                 vimrc="$1"
                 shift
                 ;;
-            '-s') # Ubuntu man passes this option to /usr/bin/pager
+            -s) # Ubuntu man passes this option to /usr/bin/pager
                 shift
                 squeeze_blank_lines=1
                 ;;
-            '--')
+            --)
                 shift
                 break
                 ;;
-            '-x')
+            -x)
                 trace=1
                 shift
                 set -x
@@ -130,11 +130,11 @@ main() {
         mkdir_options=""
     else
         # ... and /tmp otherwise
-        tmp="/tmp"
+        tmp=/tmp
     fi
 
     # Create a safe directory in which we place all other tempfiles.
-    tmp="$tmp/vimpager_${$}"
+    tmp="$tmp/vimpager_$$"
     if ! mkdir $mkdir_options "$tmp"; then
         echo "ERROR: Could not create temporary directory $tmp" >&2
         quit 1
@@ -176,7 +176,7 @@ main() {
 
     # read settings
     i=1
-    OLDIFS="$IFS"
+    OLDIFS=$IFS
     IFS='
 '
     for var in $(vim -NEnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
@@ -234,7 +234,7 @@ main() {
                 ;;
         esac
     done
-    IFS="$OLDIFS"
+    IFS=$OLDIFS
 
     if [ -n "$msys" -o -n "$cygwin" ]; then
         # msys/cygwin may be using a native vim, and if we're not in a real
@@ -251,49 +251,49 @@ main() {
         # determine if this is an ssh session and/or $DISPLAY is set
         if [ -n "$osx" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
-                vim_cmd="mvim"
+                vim_cmd=mvim
                 gui=1
             else
-                vim_cmd="vim"
+                vim_cmd=vim
             fi
         elif [ -n "$cygwin" ]; then
             if command -v gvim >/dev/null; then
                 if [ -n "$SSH_CONNECTION" ]; then
-                    vim_cmd="vim"
+                    vim_cmd=vim
                 # The Cygwin gvim uses X
                 elif win32_native gvim; then
                     if [ -z "$DISPLAY" ]; then
-                        vim_cmd="vim"
+                        vim_cmd=vim
                     else
-                        vim_cmd='gvim'
+                        vim_cmd=gvim
                         gui=1
                     fi
                 else
-                    vim_cmd='gvim'
+                    vim_cmd=gvim
                     gui=1
                 fi
             else
-                vim_cmd="vim"
+                vim_cmd=vim
             fi
         elif [ -n "$msys" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
-                vim_cmd='gvim'
+                vim_cmd=gvim
                 gui=1
             else
-                vim_cmd="vim"
+                vim_cmd=vim
             fi
         elif [ -z "$DISPLAY" ]; then
-            vim_cmd='vim'
+            vim_cmd=vim
         else
             if command -v gvim >/dev/null; then
-                vim_cmd='gvim'
+                vim_cmd=gvim
                 gui=1
             else
-                vim_cmd="vim"
+                vim_cmd=vim
             fi
         fi
     else
-        vim_cmd='vim'
+        vim_cmd=vim
     fi
 
     rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
@@ -302,7 +302,7 @@ main() {
         vim_cmd="$vim_cmd -X"
     fi
 
-    ptree="$(do_ptree)"
+    ptree=$(do_ptree)
 
     # Check if called from man, perldoc or pydoc
     if echo "$ptree" | grep -Eq '([ \t]+|/)(man|[Pp]y(thon|doc)[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
@@ -322,10 +322,10 @@ main() {
         set -- -
     # turn off man/perldoc support for > 1 arg
     elif [ $# -gt 1 ]; then
-        is_man=''
-        is_perldoc=''
-        is_doc=''
-        force_strip_ansi=''
+        is_man=
+        is_perldoc=
+        is_doc=
+        force_strip_ansi=
     fi
 
     file_idx=1
@@ -342,7 +342,6 @@ main() {
             filename="$(resolve_path "$file")"
         fi
 
-
         set_key orig_file_names $file_idx "$filename"
 
         # $file still holds the orginal file name.  $filename will be
@@ -350,7 +349,7 @@ main() {
         # $tmp if the file is to be opend from there instead of the
         # original location.  If $tempfile is empty the file is to be
         # opened as $file.
-        filename="$(encode_filename "$filename")"
+        filename=$(encode_filename "$filename")
         tempfile=
 
         case "$(echo "$file" | tr 'A-Z' 'a-z')" in
@@ -466,7 +465,7 @@ find_vimpagerrc_files() {
 
     # determine location of rc file
     i=1
-    OLDIFS="$IFS"
+    OLDIFS=$IFS
     IFS='
 '
     for var in $(vim -NEnR -i NONE ${vimrc:+-u "$vimrc"} +'call writefile(["", "VAL:" . $VIM, "VAL:" . $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
@@ -474,11 +473,11 @@ find_vimpagerrc_files() {
             VAL:*)
                 case $i in
                     1)
-                        vim_dir="${var#VAL:}"
+                        vim_dir=${var#VAL:}
                         ;;
                     2)
-                        user_vimrc="${var#VAL:}"
-                        user_vimrc_dir="${user_vimrc%/*}"
+                        user_vimrc=${var#VAL:}
+                        user_vimrc_dir=${user_vimrc%/*}
                         break
                         ;;
                 esac
@@ -489,18 +488,18 @@ find_vimpagerrc_files() {
     IFS="$OLDIFS"
 
     # find system vimrc
-    system_vimrc="$(vim --version | sed -n '/system vimrc file: "/{
+    system_vimrc=$(vim --version | sed -n '/system vimrc file: "/{
         s|\$VIM|'"$vim_dir"'|
         s/.*: "\([^"]*\).*/\1/p
         q
-    }')"
+    }')
 
     # find the users vimpagerrc
     if [ -n "$vimrc" ]; then
         # The vimrc file was given on the command line.
         :
     elif [ -n "$VIMPAGER_RC" ]; then
-        vimrc="$VIMPAGER_RC"
+        vimrc=$VIMPAGER_RC
     # check for vimpagerrc in same dir as vimrc in case it is set in VIMINIT
     elif [ -r "$user_vimrc_dir/.vimpagerrc" ]; then
         vimrc="$user_vimrc_dir/.vimpagerrc"
@@ -660,7 +659,7 @@ grep() {
 }
 
 awk_grep_E_q() {
-    _pat="$(printf '%s' "$1" | sed -e 's!/!\\/!g')"
+    _pat=$(printf '%s' "$1" | sed -e 's!/!\\/!g')
     shift
     awk '
         BEGIN { exit_val = 1 }
@@ -725,7 +724,7 @@ page_files() {
     if [ -n "$cat_files" ]; then
         i=1
         for cur_file in "$@"; do
-            orig_file="$(get_key orig_file_names $i)"
+            orig_file=$(get_key orig_file_names $i)
 
             if [ $# -gt 1 ]; then
                 if [ $i -gt 1 ]; then
@@ -810,7 +809,7 @@ do_ptree() {
 }
 
 win32_native() {
-    if [ "x$(get_key _win32_native "$1")" = "x1" ]; then
+    if [ "x$(get_key _win32_native "$1")" = x1 ]; then
         return 0
     else
         if [ -n "$msys" -o -n "$cygwin" ]; then
