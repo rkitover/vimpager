@@ -80,6 +80,28 @@ standalone/%: % ${SRC:=.uu} inc/* Makefile %-version.txt
 	fi
 	@chmod +x $@
 
+standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile
+	@echo building $@
+	@${MKPATH} ${@D}
+	@sed -e '1 a : if 0' \
+	    -e 's/^\( *\)# INSERT VIMCAT_DEBUG PREPARATION HERE$$/\1if [ "$${VIMCAT_DEBUG:-0}" -eq 0 ]; then silent="silent! "; else silent=; fi/' \
+	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e '/^runtime=.*/d' \
+	    -e '/^ *--cmd "set rtp^=\$$runtime" \\$$/d' \
+	    -e '/call vimcat#Run/ i -c "$$silent source $$0" \\' \
+	    -e 's/vimcat#Run(/Run(/g' \
+	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e     'r inc/prologue.sh' \
+	    -e     d \
+	    -e '}' \
+	    vimcat > $@
+	@awk '/^[ 	]*(if|for|while)/ { print $$1 }' vimcat \
+	  | sed '1!G;h;$$!d' \
+	  | sed -e 's/^/: end/' >> $@
+	@echo ': endif' >> $@
+	@sed -e 's/vimcat#Run(/Run(/g' autoload/vimcat.vim >> $@
+	@chmod +x $@
+
 vimcat.uu: vimcat vimcat-version.txt
 	@echo uuencoding $<
 	@echo 'vimcat_script() {' > $@

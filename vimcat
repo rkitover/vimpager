@@ -19,8 +19,7 @@ project_dir=`dirname "$link"`
 
 . "$project_dir/inc/prologue.sh"
 
-version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" \
-    || version="$version_tag (checkout)"
+version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" || version="$version_tag (checkout)"
 runtime=$project_dir
 
 if command -v vim >/dev/null; then
@@ -100,6 +99,7 @@ start_pipeline() {
 }
 
 start_highlight_job() {
+    # INSERT VIMCAT_DEBUG PREPARATION HERE
     set -- -NE -i NONE -n \
         --cmd "set rtp^=$runtime" \
         --cmd visual \

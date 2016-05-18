@@ -184,7 +184,7 @@ function! s:ReadChunks()
     return 1
 endfunction
 
-function! vimcat#AnsiHighlight(output_file, line_numbers, pipeline_dir)
+function! s:AnsiHighlight(output_file, line_numbers, pipeline_dir)
     let s:pipeline_dir = a:pipeline_dir
 
     setlocal modifiable noreadonly buflisted buftype=nowrite
@@ -301,7 +301,7 @@ function! vimcat#Run(output_file, line_numbers, pipeline_dir, pipeline_start)
     syn enable
     hi Normal ctermbg=NONE
     set buftype=nowrite
-    call vimcat#AnsiHighlight(a:output_file, a:line_numbers, a:pipeline_dir)
+    call s:AnsiHighlight(a:output_file, a:line_numbers, a:pipeline_dir)
     if !exists('$VIMCAT_DEBUG') || $VIMCAT_DEBUG == 0
         quitall!
     endif
