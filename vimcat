@@ -1,6 +1,7 @@
 #!/bin/sh
 version_tag=2.06
 
+# FIND REAL PARENT DIRECTORY
 link=$0
 
 while [ -h "$link" ]; do
@@ -14,6 +15,7 @@ while [ -h "$link" ]; do
 done
 
 project_dir=`dirname "$link"`
+# END OF FIND REAL PARENT DIRECTORY
 
 . "$project_dir/inc/prologue.sh"
 

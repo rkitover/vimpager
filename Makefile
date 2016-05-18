@@ -16,7 +16,7 @@ GEN_DOCS=man/vimpager.1 man/vimcat.1 html/vimpager.html html/vimcat.html markdow
 
 ANSIESC=autoload/AnsiEsc.vim plugin/AnsiEscPlugin.vim plugin/cecutil.vim
 
-RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim macros/less.vim syntax/perldoc.vim ${ANSIESC}
+RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim autoload/vimcat.vim plugin/vimpager.vim macros/less.vim syntax/perldoc.vim ${ANSIESC}
 
 SRC=vimcat ${RUNTIME}
 
