@@ -98,23 +98,12 @@ start_pipeline() {
 }
 
 start_highlight_job() {
-    _quit='qa!' _silent='silent!'
-    if [ "${VIMCAT_DEBUG:-0}" -ne 0 ]; then
-        _quit=echo _silent=
-    fi
-
     set -- -NE -i NONE -n \
         --cmd "set rtp^=$runtime" \
         --cmd visual \
         --cmd "${extra_cmd:-echo}" \
-        -c "silent! execute 'file ' . fnameescape('$pipeline_start')" \
-        -c "set bg=dark fdl=9999" \
-        -c "syn enable" \
-        -c "hi Normal ctermbg=NONE" \
-        -c "set buftype=nowrite" \
         -c "${extra_c:-echo}" \
-        -c "call vimcat#AnsiHighlight(\"$dest_file\", ${line_numbers:-0}, \"$chunks_dir\")" \
-        -c "$_quit"
+        -c "call vimcat#Run(\"$dest_file\", ${line_numbers:-0}, \"$chunks_dir\", \"$pipeline_start\")"
 
     [ -n "$vimcatrc" ] && set -- "$@" -u "$vimcatrc"
 

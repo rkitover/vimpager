@@ -295,6 +295,18 @@ function! vimcat#AnsiHighlight(output_file, line_numbers, pipeline_dir)
     return 1
 endfunction
 
+function! vimcat#Run(output_file, line_numbers, pipeline_dir, pipeline_start)
+    silent! execute 'file ' . fnameescape(a:pipeline_start)
+    set bg=dark fdl=9999
+    syn enable
+    hi Normal ctermbg=NONE
+    set buftype=nowrite
+    call vimcat#AnsiHighlight(a:output_file, a:line_numbers, a:pipeline_dir)
+    if !exists('$VIMCAT_DEBUG') || $VIMCAT_DEBUG == 0
+        quitall!
+    endif
+endfunction
+
 " See copyright in the vim script above (for the vim script) and in
 " vimcat.md for the whole script.
 "
