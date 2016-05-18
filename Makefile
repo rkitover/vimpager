@@ -22,7 +22,7 @@ SRC=vimcat ${RUNTIME}
 
 PROGRAMS=vimpager vimcat
 
-all: ${PROGRAMS:=-vertag-stamp} balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
+all: ${PROGRAMS:=-vertag-stamp} standalone/vimpager standalone/vimcat docs
 
 # set tag from git or ChangeLog
 %-vertag-stamp: %
@@ -41,12 +41,6 @@ all: ${PROGRAMS:=-vertag-stamp} balance-shellvim-stamp standalone/vimpager stand
 	@echo building $@
 	@git describe >$<-version.txt 2>/dev/null \
 	|| sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml >$<-version.txt
-
-balance-shellvim-stamp: vimcat Makefile
-	@echo balanceing vimcat
-	@chmod +x scripts/balance-shellvim
-	@scripts/balance-shellvim
-	@touch balance-shellvim-stamp
 
 standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	@echo building $@
