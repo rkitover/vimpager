@@ -134,6 +134,7 @@ function! s:SetBufType()
 endfunction
 
 function! s:FixBufOpts()
+    call s:SetBufType() " reset these again in case the ftplugin or whatever changed them
     setlocal buflisted " neovim ftplugin/man.vim sets nobuflisted
 endfunction
 
