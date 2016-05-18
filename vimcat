@@ -108,11 +108,12 @@ start_highlight_job() {
     [ -n "$vimcatrc" ] && set -- "$@" -u "$vimcatrc"
 
     if [ "${VIMCAT_DEBUG:-0}" -eq 0 ]; then
-        "$vim" "$@" </dev/tty >/dev/null 2>&1 &
+        ("$vim" "$@" </dev/tty >/dev/null 2>&1; touch "$tmp_dir/vim_done") &
+        vim_pid=$!
     else
         "$vim" "$@" </dev/tty
+        touch "$tmp_dir/vim_done"
     fi
-    vim_pid=$!
 }
 
 squeeze_blank_lines() {
@@ -310,7 +311,9 @@ squeeze_blank_lines() {
 
         start_highlight_job
         start_pipeline
-        wait $vim_pid
+        while [ ! -f "$tmp_dir/vim_done" ]; do
+            do_sleep 50
+        done
 
         if [ -n "$tail_pid" ]; then
             # if it's not a fifo where this doesn't work, tail needs some time to catch up
