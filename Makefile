@@ -48,36 +48,25 @@ balance-shellvim-stamp: vimcat Makefile
 	@scripts/balance-shellvim
 	@touch balance-shellvim-stamp
 
-standalone/%: % ${SRC:=.uu} inc/* Makefile %-version.txt
+standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	@echo building $@
-	@${MKPATH} `dirname $@`
-	@base="`basename $@`"; \
-	cp "$$base" $@; \
-	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
-	    cp $@ $@.work; \
-	    sed -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-		-e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
-		-e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
-		-e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
-		-e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
-		-e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
-		$@.work > $@; \
-	    cat inc/do_uudecode.sh >> $@; \
-	    cat inc/bundled_scripts.sh >> $@; \
-	    cat ${SRC:=.uu} >> $@; \
-	    sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
-	fi
-	@cp $@ $@.work
-	@sed -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat $<-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
+	@${MKPATH} ${@D}
+	@sed \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
-	    -e '}' $@.work > $@
-	@rm -f $@.work
-	@if grep '^: if 0$$' $@ >/dev/null; then \
-	    chmod +x scripts/balance-shellvim; \
-	    scripts/balance-shellvim $@; \
-	fi
+	    -e '}' \
+	    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
+	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
+	    -e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
+	    -e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
+	    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
+	    vimpager > $@
+	@cat inc/do_uudecode.sh >> $@
+	@cat inc/bundled_scripts.sh >> $@
+	@cat ${SRC:=.uu} >> $@
+	@sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> $@
 	@chmod +x $@
 
 standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile

@@ -29,8 +29,7 @@ project_dir=`dirname "$link"`
 
 . "$project_dir/inc/prologue.sh"
 
-version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" \
-    || version="$version_tag (checkout)"
+version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" || version="$version_tag (checkout)"
 runtime='$project_dir'
 vimcat='$project_dir/vimcat'
 system_vimpagerrc='$project_dir/vimpagerrc'

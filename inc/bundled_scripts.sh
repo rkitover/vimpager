@@ -9,6 +9,7 @@ extract_bundled_scripts() {
 		# we extract all files in case the user uses :Page or :Page!
 		autoload_vimpager_vim
 		autoload_vimpager_utils_vim
+		autoload_vimcat_vim
 		plugin_vimpager_vim
 		macros_less_vim
 
