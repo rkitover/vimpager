@@ -101,8 +101,8 @@ start_highlight_job() {
     set -- -NE -i NONE -n \
         --cmd "set rtp^=$runtime" \
         --cmd visual \
-        --cmd "${extra_cmd:-echo}" \
-        -c "${extra_c:-echo}" \
+        ${extra_cmd:+--cmd "$extra_cmd"} \
+        ${extra_c:+-c "$extra_c"} \
         -c "call vimcat#Run(\"$dest_file\", ${line_numbers:-0}, \"$chunks_dir\", \"$pipeline_start\")"
 
     [ -n "$vimcatrc" ] && set -- "$@" -u "$vimcatrc"

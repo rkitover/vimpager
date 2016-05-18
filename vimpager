@@ -797,9 +797,9 @@ page_files() {
                 "$POSIX_SHELL" ${trace:+-x} "$vimcat" \
                     -u "$vimrc" \
                     --cmd "set rtp^=$runtime | let vimpager={ 'enabled': 1 }" \
-                    --cmd "${extra_cmd:-echo}" \
+                    ${extra_cmd:+--cmd "$extra_cmd"} \
                     -c 'silent! source '"$tmp/$i"'.vim' \
-                    -c "${extra_c:-echo}" \
+                    ${extra_c:+-c "$extra_c"} \
                     "$cur_file" </dev/tty
                 _exit_status=$?
             fi
@@ -815,9 +815,9 @@ page_files() {
         --cmd "set rtp^=$runtime" \
         --cmd "call vimpager#Init({ $init_opts })" \
         --cmd "silent! exe 'source ' . fnameescape('$system_vimrc')" \
-        --cmd "${extra_cmd:-echo}" \
+        ${extra_cmd:+--cmd "$extra_cmd"} \
         -u "$vimrc" \
-        -c "${extra_c:-echo}" \
+        ${extra_c:+-c "$extra_c"} \
         "$@" </dev/tty
 
     _vim_exit_status=$?
