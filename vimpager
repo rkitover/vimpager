@@ -10,18 +10,18 @@ if [ ! -t 1 ]; then
 fi
 
 # FIND REAL PARENT DIRECTORY
-link="$0"
+link=$0
 
 while true; do
-    ls0="`ls -l \"$link\"`"
-    new_link="`expr \"$ls0\" : '.* -> \(.*\)$'`"
+    ls0=`ls -l "$link"`
+    new_link=`expr "$ls0" : '.* -> \(.*\)$'`
 
     [ -z "$new_link" ] && break
 
-    link="$new_link"
+    link=$new_link
 done
 
-project_dir="`dirname \"$link\"`"
+project_dir=`dirname "$link"`
 # END OF FIND REAL PARENT DIRECTORY
 
 . "$project_dir/inc/prologue.sh"
@@ -89,7 +89,7 @@ main() {
                 ;;
             -u)
                 shift
-                vimrc="$1"
+                vimrc=$1
                 shift
                 ;;
             -s) # Ubuntu man passes this option to /usr/bin/pager
@@ -156,7 +156,7 @@ main() {
                 quit 1
             fi
 
-            filename="$(resolve_path "$file")"
+            filename=$(resolve_path "$file")
         fi
 
         set_key orig_file_names $file_idx "$filename"
@@ -172,28 +172,28 @@ main() {
         case "$(echo "$file" | tr 'A-Z' 'a-z')" in
             *.gz)
                 filename=${filename%.??}
-                tempfile="$tmp/$filename"
+                tempfile=$tmp/$filename
                 gunzip -c -- "$file" > "$tempfile"
 
                 ;;
             *.bz2)
                 filename=${filename%.??2}
-                tempfile="$tmp/$filename"
+                tempfile=$tmp/$filename
                 bunzip2 -c -- "$file" > "$tempfile"
                 ;;
             *.xz)
                 filename=${filename%.??}
-                tempfile="$tmp/$filename"
+                tempfile=$tmp/$filename
                 xzcat -c -- "$file" > "$tempfile"
                 ;;
             *.z)
                 filename=${filename%.?}
-                tempfile="$tmp/$filename"
+                tempfile=$tmp/$filename
                 uncompress -c -- "$file" > "$tempfile"
                 ;;
             *)
                 if [ "$file" = - ]; then
-                    tempfile="$tmp/$filename"
+                    tempfile=$tmp/$filename
                     cat -- "$file" > "$tempfile"
                 fi
                 ;;
@@ -203,7 +203,7 @@ main() {
         if head -100 "${tempfile:-$file}" | grep -Eq "$ANSI_RE"; then
             if [ -z "$ansiesc_available" -o -n "$force_strip_ansi" ]; then
                 ansi_filter "${tempfile:-$file}" > "$tmp/$filename.work"
-                tempfile="$tmp/$filename"
+                tempfile=$tmp/$filename
                 mv -f -- "$tempfile.work" "$tempfile"
             else
                 echo 'call vimpager_utils#DoAnsiEsc()' >> "$tmp/$file_idx.vim"
@@ -217,7 +217,7 @@ main() {
                     N
                     /^[ 	]*\n[ 	]*$/D
                 }' < "${tempfile:-$file}" > "$tmp/$filename.work"
-                tempfile="$tmp/$filename"
+                tempfile=$tmp/$filename
                 mv -f -- "$tempfile.work" "$tempfile"
         fi
 
@@ -235,7 +235,7 @@ main() {
                 /^[ 	]*$/ { if (!skipblank) print }
                 /[^ 	]/ { skipblank=0; print }
             ' > "$tmp/$filename.work"
-            tempfile="$tmp/$filename"
+            tempfile=$tmp/$filename
             mv -f -- "$tempfile.work" "$tempfile"
 
             if [ -n "$is_man" ]; then
@@ -286,17 +286,17 @@ find_tmp_directory() {
         # using a native vim/gvim
         # TEMP can be /tmp sometimes too
 
-        tmp="$(resolve_path "$TEMP")"
+        tmp=$(resolve_path "$TEMP")
 
         # chmod doesn't work here, even in /tmp sometimes
-        mkdir_options=""
+        mkdir_options=
     else
         # ... and /tmp otherwise
         tmp=/tmp
     fi
 
     # Create a safe directory in which we place all other tempfiles.
-    tmp="$tmp/vimpager_$$"
+    tmp=$tmp/vimpager_$$
     if ! mkdir $mkdir_options "$tmp"; then
         echo "ERROR: Could not create temporary directory $tmp" >&2
         quit 1
@@ -359,7 +359,7 @@ find_vimpagerrc_files() {
                 ;;
         esac
     done
-    IFS="$OLDIFS"
+    IFS=$OLDIFS
 
     # find system vimrc
     system_vimrc=$(vim --version | sed -n '/system vimrc file: "/{
@@ -376,11 +376,11 @@ find_vimpagerrc_files() {
         vimrc=$VIMPAGER_RC
     # check for vimpagerrc in same dir as vimrc in case it is set in VIMINIT
     elif [ -r "$user_vimrc_dir/.vimpagerrc" ]; then
-        vimrc="$user_vimrc_dir/.vimpagerrc"
+        vimrc=$user_vimrc_dir/.vimpagerrc
     elif [ -r "$user_vimrc_dir/_vimpagerrc" ]; then
-        vimrc="$user_vimrc_dir/_vimpagerrc"
+        vimrc=$user_vimrc_dir/_vimpagerrc
     elif [ -r "$user_vimrc_dir/vimpagerrc" ]; then
-        vimrc="$user_vimrc_dir/vimpagerrc"
+        vimrc=$user_vimrc_dir/vimpagerrc
     # check standard paths, according to :h initialization
     elif [ -r ~/.vimpagerrc ]; then
         vimrc=~/.vimpagerrc
@@ -391,13 +391,13 @@ find_vimpagerrc_files() {
     elif [ -r ~/vimfiles/vimpagerrc ]; then
         vimrc=~/vimfiles/vimpagerrc
     elif [ -r "$vim_dir/_vimpagerrc" ]; then
-        vimrc="$vim_dir/_vimpagerrc"
+        vimrc=$vim_dir/_vimpagerrc
     # try the user's ~/.vimrc
     elif [ -n "$user_vimrc" ]; then
-        vimrc="$user_vimrc"
+        vimrc=$user_vimrc
     # if no user vimrc, then check for a global /etc/vimpagerrc
     elif [ -n "$system_vimpagerrc" -a -f "$system_vimpagerrc" ]; then
-        vimrc="$system_vimpagerrc"
+        vimrc=$system_vimpagerrc
     # check a couple of common places for the standalone version
     elif [ -f /usr/local/etc/vimpagerrc ]; then
         vimrc=/usr/local/etc/vimpagerrc
@@ -715,7 +715,7 @@ head() {
     _lines=
     case "$1" in
         -[0-9]*)
-            _lines="${1#-}"
+            _lines=${1#-}
             shift
     esac
 
