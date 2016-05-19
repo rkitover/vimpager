@@ -118,28 +118,8 @@ main() {
          esac
     done
 
-    mkdir_options="-m 700"
+    find_tmp_directory
 
-    if [ -n "$win32" ]; then
-        # Use the real TEMP directory on windows in case we are
-        # using a native vim/gvim
-        # TEMP can be /tmp sometimes too
-
-        tmp="$(resolve_path "$TEMP")"
-
-        # chmod doesn't work here, even in /tmp sometimes
-        mkdir_options=""
-    else
-        # ... and /tmp otherwise
-        tmp=/tmp
-    fi
-
-    # Create a safe directory in which we place all other tempfiles.
-    tmp="$tmp/vimpager_$$"
-    if ! mkdir $mkdir_options "$tmp"; then
-        echo "ERROR: Could not create temporary directory $tmp" >&2
-        quit 1
-    fi
     trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 
     # Detect terminal size
@@ -459,6 +439,32 @@ main() {
     page_files "$@"
 
     quit $?
+}
+
+find_tmp_directory() {
+    # Find and create the temporary directory used by vimpager.  Set the $tmp variable.
+    mkdir_options="-m 700"
+
+    if [ -n "$win32" ]; then
+        # Use the real TEMP directory on windows in case we are
+        # using a native vim/gvim
+        # TEMP can be /tmp sometimes too
+
+        tmp="$(resolve_path "$TEMP")"
+
+        # chmod doesn't work here, even in /tmp sometimes
+        mkdir_options=""
+    else
+        # ... and /tmp otherwise
+        tmp=/tmp
+    fi
+
+    # Create a safe directory in which we place all other tempfiles.
+    tmp="$tmp/vimpager_$$"
+    if ! mkdir $mkdir_options "$tmp"; then
+        echo "ERROR: Could not create temporary directory $tmp" >&2
+        quit 1
+    fi
 }
 
 find_vimpagerrc_files() {
