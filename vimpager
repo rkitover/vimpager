@@ -130,86 +130,9 @@ main() {
 
     read_vim_settings
 
-    if [ -n "$msys" -o -n "$cygwin" ]; then
-        # msys/cygwin may be using a native vim, and if we're not in a real
-        # console the native vim will not work, so we have to use gvim.
+    find_vim_executable
 
-        if [ "x$TERM" != "xdumb" -a "x$TERM" != "xcygwin" -a "x$TERM" != "x" ]; then
-            if command -v vim >/dev/null | grep -Eq '^/(cygdrive/)?[a-z]/'; then
-                use_gvim=1
-            fi
-        fi
-    fi
-
-    if [ -n "$use_gvim" ]; then
-        # determine if this is an ssh session and/or $DISPLAY is set
-        if [ -n "$osx" ]; then
-            if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
-                vim_cmd=mvim
-                gui=1
-            else
-                vim_cmd=vim
-            fi
-        elif [ -n "$cygwin" ]; then
-            if command -v gvim >/dev/null; then
-                if [ -n "$SSH_CONNECTION" ]; then
-                    vim_cmd=vim
-                # The Cygwin gvim uses X
-                elif win32_native gvim; then
-                    if [ -z "$DISPLAY" ]; then
-                        vim_cmd=vim
-                    else
-                        vim_cmd=gvim
-                        gui=1
-                    fi
-                else
-                    vim_cmd=gvim
-                    gui=1
-                fi
-            else
-                vim_cmd=vim
-            fi
-        elif [ -n "$msys" ]; then
-            if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
-                vim_cmd=gvim
-                gui=1
-            else
-                vim_cmd=vim
-            fi
-        elif [ -z "$DISPLAY" ]; then
-            vim_cmd=vim
-        else
-            if command -v gvim >/dev/null; then
-                vim_cmd=gvim
-                gui=1
-            else
-                vim_cmd=vim
-            fi
-        fi
-    else
-        vim_cmd=vim
-    fi
-
-    rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
-
-    if [ ! -n "$gui" -a -n "$disable_x11" ]; then
-        vim_cmd="$vim_cmd -X"
-    fi
-
-    ptree=$(do_ptree)
-
-    # Check if called from man, perldoc or pydoc
-    if echo "$ptree" | grep -Eq '([ \t]+|/)(man|[Pp]y(thon|doc)[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
-        is_man=1
-        is_doc=1
-        force_strip_ansi=1
-    elif echo "$ptree" | grep -Eq '([ \t]+|/)perl(doc)?([0-9.]*)?([ \t]|$)'; then
-        is_perldoc=1
-        is_doc=1
-        force_strip_ansi=1
-    fi
-
-    extra_cmd="${extra_cmd:+$extra_cmd | }let g:vimpager.ptree=[$(echo "$ptree" | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(g:vimpager.ptree, -1) | let g:vimpager_ptree = g:vimpager.ptree"
+    parse_pstree
 
     # if no args, assume stdin
     if [ $# -eq 0 ]; then
@@ -547,6 +470,93 @@ read_vim_settings() {
         esac
     done
     IFS=$OLDIFS
+}
+
+find_vim_executable() {
+    # Find the vim executable to use.  Set $vim_cmd and $gui.
+    if [ -n "$msys" -o -n "$cygwin" ]; then
+        # msys/cygwin may be using a native vim, and if we're not in a real
+        # console the native vim will not work, so we have to use gvim.
+
+        if [ "x$TERM" != "xdumb" -a "x$TERM" != "xcygwin" -a "x$TERM" != "x" ]; then
+            if command -v vim >/dev/null | grep -Eq '^/(cygdrive/)?[a-z]/'; then
+                use_gvim=1
+            fi
+        fi
+    fi
+
+    if [ -n "$use_gvim" ]; then
+        # determine if this is an ssh session and/or $DISPLAY is set
+        if [ -n "$osx" ]; then
+            if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
+                vim_cmd=mvim
+                gui=1
+            else
+                vim_cmd=vim
+            fi
+        elif [ -n "$cygwin" ]; then
+            if command -v gvim >/dev/null; then
+                if [ -n "$SSH_CONNECTION" ]; then
+                    vim_cmd=vim
+                # The Cygwin gvim uses X
+                elif win32_native gvim; then
+                    if [ -z "$DISPLAY" ]; then
+                        vim_cmd=vim
+                    else
+                        vim_cmd=gvim
+                        gui=1
+                    fi
+                else
+                    vim_cmd=gvim
+                    gui=1
+                fi
+            else
+                vim_cmd=vim
+            fi
+        elif [ -n "$msys" ]; then
+            if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
+                vim_cmd=gvim
+                gui=1
+            else
+                vim_cmd=vim
+            fi
+        elif [ -z "$DISPLAY" ]; then
+            vim_cmd=vim
+        else
+            if command -v gvim >/dev/null; then
+                vim_cmd=gvim
+                gui=1
+            else
+                vim_cmd=vim
+            fi
+        fi
+    else
+        vim_cmd=vim
+    fi
+
+    rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
+
+    if [ ! -n "$gui" -a -n "$disable_x11" ]; then
+        vim_cmd="$vim_cmd -X"
+    fi
+}
+
+parse_pstree() {
+    # Parse the process tree and set $is_man, $is_doc, $is_perldoc, $force_strip_ansi and $extra_cmd.
+    ptree=$(do_ptree)
+
+    # Check if called from man, perldoc or pydoc
+    if echo "$ptree" | grep -Eq '([ \t]+|/)(man|[Pp]y(thon|doc)[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
+        is_man=1
+        is_doc=1
+        force_strip_ansi=1
+    elif echo "$ptree" | grep -Eq '([ \t]+|/)perl(doc)?([0-9.]*)?([ \t]|$)'; then
+        is_perldoc=1
+        is_doc=1
+        force_strip_ansi=1
+    fi
+
+    extra_cmd="${extra_cmd:+$extra_cmd | }let g:vimpager.ptree=[$(echo "$ptree" | awk '{ print "\"" $2 "\"" }' | tr '\n' ',')] | call remove(g:vimpager.ptree, -1) | let g:vimpager_ptree = g:vimpager.ptree"
 }
 
 expand_config_vars() {
