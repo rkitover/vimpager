@@ -128,67 +128,7 @@ main() {
 
     find_vimpagerrc_files
 
-    # read settings
-    i=1
-    OLDIFS=$IFS
-    IFS='
-'
-    for var in $(vim -NEnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
-        if !exists("g:vimpager.gvim")
-            if !exists("g:vimpager_use_gvim")
-                let g:vimpager.gvim = 0
-            else
-                let g:vimpager.gvim = g:vimpager_use_gvim
-            endif
-        endif
-
-        if !exists("g:vimpager.X11")
-            if !exists("g:vimpager_disable_x11")
-                let g:vimpager.X11 = 1
-            else
-                let g:vimpager.X11 = !g:vimpager_disable_x11
-            endif
-        endif
-
-        if !exists("g:vimpager.passthrough")
-            if !exists("g:vimpager_passthrough")
-                let g:vimpager.passthrough = 1
-            else
-                let g:vimpager.passthrough = g:vimpager_passthrough
-            endif
-        endif
-
-        let g:use_ansiesc = 0
-
-        if has("conceal") && (!exists("g:vimpager.ansiesc") || g:vimpager.ansiesc == 1) && (!exists("g:vimpager_disable_ansiesc") || g:vimpager_disable_ansiesc == 0)
-            let g:use_ansiesc = 1
-        endif
-
-        call writefile([""] + map([g:vimpager.gvim, g:vimpager.X11, g:vimpager.passthrough, g:use_ansiesc], "\"VAL:\".v:val"), "/dev/stderr")
-        quit
-    ' </dev/tty 2>&1 >/dev/null); do
-        case "$var" in
-            VAL:*)
-                case $i in
-                    1)
-                        [ "${var#VAL:}" -eq 1 ] && use_gvim=1
-                        ;;
-                    2)
-                        [ "${var#VAL:}" -eq 0 ] && disable_x11=1
-                        ;;
-                    3)
-                        [ "${var#VAL:}" -eq 0 ] && no_pass_thru=1
-                        ;;
-                    4)
-                        [ "${var#VAL:}" -ne 0 ] && ansiesc_available=1
-                        break
-                        ;;
-                esac
-                i=$((i + 1))
-                ;;
-        esac
-    done
-    IFS=$OLDIFS
+    read_vim_settings
 
     if [ -n "$msys" -o -n "$cygwin" ]; then
         # msys/cygwin may be using a native vim, and if we're not in a real
@@ -543,6 +483,70 @@ find_vimpagerrc_files() {
     else # fall back to NORC
         vimrc=NORC
     fi
+}
+
+read_vim_settings() {
+    # Read settings from the vimpagerrc file and possibly set $use_gvim, $ansiesc_available, $disable_x11 and $no_pass_thru.
+    i=1
+    OLDIFS=$IFS
+    IFS='
+'
+    for var in $(vim -NEnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
+        if !exists("g:vimpager.gvim")
+            if !exists("g:vimpager_use_gvim")
+                let g:vimpager.gvim = 0
+            else
+                let g:vimpager.gvim = g:vimpager_use_gvim
+            endif
+        endif
+
+        if !exists("g:vimpager.X11")
+            if !exists("g:vimpager_disable_x11")
+                let g:vimpager.X11 = 1
+            else
+                let g:vimpager.X11 = !g:vimpager_disable_x11
+            endif
+        endif
+
+        if !exists("g:vimpager.passthrough")
+            if !exists("g:vimpager_passthrough")
+                let g:vimpager.passthrough = 1
+            else
+                let g:vimpager.passthrough = g:vimpager_passthrough
+            endif
+        endif
+
+        let g:use_ansiesc = 0
+
+        if has("conceal") && (!exists("g:vimpager.ansiesc") || g:vimpager.ansiesc == 1) && (!exists("g:vimpager_disable_ansiesc") || g:vimpager_disable_ansiesc == 0)
+            let g:use_ansiesc = 1
+        endif
+
+        call writefile([""] + map([g:vimpager.gvim, g:vimpager.X11, g:vimpager.passthrough, g:use_ansiesc], "\"VAL:\".v:val"), "/dev/stderr")
+        quit
+    ' </dev/tty 2>&1 >/dev/null); do
+        case "$var" in
+            VAL:*)
+                case $i in
+                    1)
+                        [ "${var#VAL:}" -eq 1 ] && use_gvim=1
+                        ;;
+                    2)
+                        [ "${var#VAL:}" -eq 0 ] && disable_x11=1
+                        ;;
+                    3)
+                        [ "${var#VAL:}" -eq 0 ] && no_pass_thru=1
+                        ;;
+                    4)
+                        [ "${var#VAL:}" -ne 0 ] && ansiesc_available=1
+                        break
+                        ;;
+                esac
+                i=$((i + 1))
+                ;;
+        esac
+    done
+    IFS=$OLDIFS
 }
 
 expand_config_vars() {
