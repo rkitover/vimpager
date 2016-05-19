@@ -122,34 +122,7 @@ main() {
 
     trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 
-    # Detect terminal size
-    if command -v tput >/dev/null; then
-        # this is the only way it works on some versions of Cygwin
-
-        # 2>/dev/null makes tput not work, so don't do that
-        # we are just going to hope that tput errors don't happen
-        tput cols  > "$tmp/cols"
-        tput lines > "$tmp/lines"
-
-        cols=$(cat "$tmp/cols")
-        lines=$(cat "$tmp/lines")
-
-        rm -f -- "$tmp/cols" "$tmp/lines"
-    fi
-
-    # msys has no tput, this doesn't work on Cygwin by the way
-    if [ -z "$cols" ] && command -v bash >/dev/null; then
-        cols=$(bash -i -c 'echo $COLUMNS')
-        lines=$(bash -i -c 'echo $LINES')
-    fi
-
-    # If we are unable to detect lines/columns, maximize
-    # the window.
-    if [ -z "$cols" ]; then
-        cols=999
-        lines=999
-        no_pass_thru=1 # force loading vimpager
-    fi
+    detect_term_size
 
     expand_config_vars
 
@@ -464,6 +437,37 @@ find_tmp_directory() {
     if ! mkdir $mkdir_options "$tmp"; then
         echo "ERROR: Could not create temporary directory $tmp" >&2
         quit 1
+    fi
+}
+
+detect_term_size() {
+    # Detect the terminal size and set the variables $cols and $lines.  If necessary $no_pass_thru is set.
+    if command -v tput >/dev/null; then
+        # this is the only way it works on some versions of Cygwin
+
+        # 2>/dev/null makes tput not work, so don't do that
+        # we are just going to hope that tput errors don't happen
+        tput cols  > "$tmp/cols"
+        tput lines > "$tmp/lines"
+
+        cols=$(cat "$tmp/cols")
+        lines=$(cat "$tmp/lines")
+
+        rm -f -- "$tmp/cols" "$tmp/lines"
+    fi
+
+    # msys has no tput, this doesn't work on Cygwin by the way
+    if [ -z "$cols" ] && command -v bash >/dev/null; then
+        cols=$(bash -i -c 'echo $COLUMNS')
+        lines=$(bash -i -c 'echo $LINES')
+    fi
+
+    # If we are unable to detect lines/columns, maximize
+    # the window.
+    if [ -z "$cols" ]; then
+        cols=999
+        lines=999
+        no_pass_thru=1 # force loading vimpager
     fi
 }
 
