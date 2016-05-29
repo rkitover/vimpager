@@ -474,7 +474,7 @@ read_vim_settings() {
 
 find_vim_executable() {
     # Find the vim executable to use.  Set $vim_cmd and $gui.
-    if [ -n "$msys" -o -n "$cygwin" ]; then
+    if [ -n "$win32" ]; then
         # msys/cygwin may be using a native vim, and if we're not in a real
         # console the native vim will not work, so we have to use gvim.
 
@@ -485,7 +485,25 @@ find_vim_executable() {
         fi
     fi
 
-    if [ -n "$use_gvim" ]; then
+    if [ -n "$EDITOR" -a -z "$VIMPAGER_VIM" ]; then
+        case "${EDITOR##*/}" in
+            *vim*)
+                export VIMPAGER_VIM=$EDITOR
+                ;;
+        esac
+    fi
+
+    if [ -n "$VIMPAGER_VIM" ]; then
+        case "${VIMPAGER_VIM##*/}" in
+            gvim*|mvim*)
+                use_gvim=1
+                gui=1
+                ;;
+        esac
+        vim_cmd=$VIMPAGER_VIM
+    fi
+
+    if [ -z "$vim_cmd" -a -n "$use_gvim" ]; then
         # determine if this is an ssh session and/or $DISPLAY is set
         if [ -n "$osx" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
@@ -531,10 +549,8 @@ find_vim_executable() {
             fi
         fi
     else
-        vim_cmd=vim
+        vim_cmd=${vim_cmd:-vim}
     fi
-
-    rm -f gvim.exe.stackdump # for cygwin gvim, which can be part of vim
 
     if [ ! -n "$gui" -a -n "$disable_x11" ]; then
         vim_cmd="$vim_cmd -X"
