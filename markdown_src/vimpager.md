@@ -405,6 +405,10 @@ your PATH and set the vimpager_use_gvim option as described above.
 
 # ENVIRONMENT
 
+`VIMPAGER_VIM` can be set to the vim binary you want to use, if it starts with
+gvim or mvim then gui mode will be used. Will fall back to `EDITOR` if it
+contains vim.
+
 You can specify the vimrc to use with the `VIMPAGER_RC` environment variable.
 
 Setting `VIMPAGER_DEBUG` to a non-zero value will disable suppressing vim

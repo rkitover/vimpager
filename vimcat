@@ -328,6 +328,7 @@ squeeze_blank_lines() {
     quit $exit_code
 
 : endif
+: endwhile
 : endif
 : endif
 : endif
