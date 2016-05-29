@@ -485,6 +485,8 @@ find_vim_executable() {
         fi
     fi
 
+    tvim=vim
+
     if [ -n "$EDITOR" -a -z "$VIMPAGER_VIM" ]; then
         case "${EDITOR##*/}" in
             *vim*)
@@ -495,31 +497,35 @@ find_vim_executable() {
 
     if [ -n "$VIMPAGER_VIM" ]; then
         case "${VIMPAGER_VIM##*/}" in
+            vim*)
+                tvim=$VIMPAGER_VIM
+                ;;
+            nvim*)
+                tvim=$VIMPAGER_VIM
+                ;;
             gvim*|mvim*)
                 use_gvim=1
-                gui=1
                 ;;
         esac
-        vim_cmd=$VIMPAGER_VIM
     fi
 
-    if [ -z "$vim_cmd" -a -n "$use_gvim" ]; then
+    if [ -n "$use_gvim" ]; then
         # determine if this is an ssh session and/or $DISPLAY is set
         if [ -n "$osx" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
                 vim_cmd=mvim
                 gui=1
             else
-                vim_cmd=vim
+                vim_cmd=$tvim
             fi
         elif [ -n "$cygwin" ]; then
             if command -v gvim >/dev/null; then
                 if [ -n "$SSH_CONNECTION" ]; then
-                    vim_cmd=vim
+                    vim_cmd=$tvim
                 # The Cygwin gvim uses X
                 elif win32_native gvim; then
                     if [ -z "$DISPLAY" ]; then
-                        vim_cmd=vim
+                        vim_cmd=$tvim
                     else
                         vim_cmd=gvim
                         gui=1
@@ -529,27 +535,27 @@ find_vim_executable() {
                     gui=1
                 fi
             else
-                vim_cmd=vim
+                vim_cmd=$tvim
             fi
         elif [ -n "$msys" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
                 vim_cmd=gvim
                 gui=1
             else
-                vim_cmd=vim
+                vim_cmd=$tvim
             fi
         elif [ -z "$DISPLAY" ]; then
-            vim_cmd=vim
+            vim_cmd=$tvim
         else
             if command -v gvim >/dev/null; then
                 vim_cmd=gvim
                 gui=1
             else
-                vim_cmd=vim
+                vim_cmd=$tvim
             fi
         fi
     else
-        vim_cmd=${vim_cmd:-vim}
+        vim_cmd=${vim_cmd:-${tvim:-vim}}
     fi
 
     if [ ! -n "$gui" -a -n "$disable_x11" ]; then
