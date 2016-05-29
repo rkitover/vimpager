@@ -8,9 +8,9 @@ while [ -h "$link" ]; do
     ls0=`ls -l "$link"`
     new_link=`expr "$ls0" : '.* -> \(.*\)$'`
     if expr "$new_link" : '/.*' > /dev/null; then
-        link="$new_link"
+        link=$new_link
     else
-        link=`dirname "$link"`/"$new_link"
+        link=`dirname "$link"`/$new_link
     fi
 done
 
@@ -51,7 +51,7 @@ quit() {
 }
 
 do_sleep() {
-    _ms="${1:-100}"
+    _ms=${1:-100}
     "$vim" -NEsnR -i NONE -u NONE +"sleep $_ms m" +q >/dev/null 2>&1
 }
 
@@ -95,7 +95,7 @@ start_pipeline() {
         pipeline=write_chunks
     fi
     cat -- "$pipeline_start" | (eval "$pipeline" <&3 & echo $! > "$tmp_dir/pipeline_pid") 3<&0
-    pipeline_pid="$(cat "$tmp_dir/pipeline_pid")"
+    pipeline_pid=$(cat "$tmp_dir/pipeline_pid")
 }
 
 start_highlight_job() {
@@ -156,13 +156,13 @@ case "$(uname -s)" in
         if [ -n "$temp" ]; then
             # MSYS2 is a little tricky, we're gonna stick to the user's private temp
             # the -m mode switch to mkdir doesn't work
-            tmp_dir="$(cygpath --unix "$temp")"
-            mkdir_options=""
+            tmp_dir=$(cygpath --unix "$temp")
+            mkdir_options=
         fi
         ;;
 esac
 
-tmp_dir="$tmp_dir/vimcat_${$}"
+tmp_dir=$tmp_dir/vimcat_$$
 
 if ! mkdir $mkdir_options "$tmp_dir"; then
     echo "Could not create temporary directory $tmp_dir" >&2
@@ -170,10 +170,10 @@ if ! mkdir $mkdir_options "$tmp_dir"; then
 fi
 
 trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
-tmp_file_in="$tmp_dir/vimcat_in.txt"
-out_fifo="$tmp_dir/vimcat_out.fifo"
+tmp_file_in=$tmp_dir/vimcat_in.txt
+out_fifo=$tmp_dir/vimcat_out.fifo
 
-case "$(uname -s)" in
+case $(uname -s) in
     SunOS*|CYGWIN*|MINGW*|MSYS*)
         # the fifo streaming doesn't work on windows and solaris
         touch "$out_fifo"
@@ -189,7 +189,7 @@ while [ $# -gt 0 ] ; do
         "-c")
             shift
             if [ -z "$extra_c" ]; then
-                extra_c="$1"
+                extra_c=$1
             else
                 extra_c="$extra_c | $1"
             fi
@@ -198,7 +198,7 @@ while [ $# -gt 0 ] ; do
         "--cmd")
             shift
             if [ -z "$extra_cmd" ]; then
-                extra_cmd="$1"
+                extra_cmd=$1
             else
                 extra_cmd="$extra_cmd | $1"
             fi
@@ -206,12 +206,12 @@ while [ $# -gt 0 ] ; do
             ;;
         "-u")
             shift
-            vimcatrc="$1"
+            vimcatrc=$1
             shift
             ;;
         "-o")
             shift
-            output_file="$1"
+            output_file=$1
             shift
             ;;
         "-s")
@@ -252,9 +252,9 @@ fi
 
 if [ -z "$vimcatrc" ]; then
     if [ -f ~/.vimcatrc ]; then
-        vimcatrc="~/.vimcatrc"
+        vimcatrc=~/.vimcatrc
     else
-        vimcatrc=""
+        vimcatrc=
     fi
 fi
 
@@ -267,7 +267,7 @@ if [ -n "$output_file" -a $# -gt 1 ]; then
     quit 1
 fi
 
-chunks_dir="$tmp_dir/chunks"
+chunks_dir=$tmp_dir/chunks
 mkdir "$chunks_dir"
 
 i=1
@@ -281,10 +281,10 @@ do
     fi
 
     pipeline=
-    pipeline_start="$file"
+    pipeline_start=$file
 
     if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
-        pipeline="squeeze_blank_lines"
+        pipeline=squeeze_blank_lines
     fi
 
     exit_code=0
@@ -300,12 +300,12 @@ do
     fi
 
     if [ -z "$output_file" -o "$output_file" = "-" ]; then
-        dest_file="$out_fifo"
+        dest_file=$out_fifo
 
         tail -f "$out_fifo" &
         tail_pid=$!
     else
-        dest_file="$output_file"
+        dest_file=$output_file
         printf '' > "$dest_file"
     fi
 
