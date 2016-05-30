@@ -505,6 +505,7 @@ find_vim_executable() {
                 ;;
             gvim*|mvim*)
                 use_gvim=1
+                gvim=$VIMPAGER_VIM
                 ;;
         esac
     fi
@@ -513,7 +514,7 @@ find_vim_executable() {
         # determine if this is an ssh session and/or $DISPLAY is set
         if [ -n "$osx" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v mvim >/dev/null; then
-                vim_cmd=mvim
+                vim_cmd=${gvim:-mvim}
                 gui=1
             else
                 vim_cmd=$tvim
@@ -527,11 +528,11 @@ find_vim_executable() {
                     if [ -z "$DISPLAY" ]; then
                         vim_cmd=$tvim
                     else
-                        vim_cmd=gvim
+                        vim_cmd=${gvim:-gvim}
                         gui=1
                     fi
                 else
-                    vim_cmd=gvim
+                    vim_cmd=${gvim:-gvim}
                     gui=1
                 fi
             else
@@ -539,7 +540,7 @@ find_vim_executable() {
             fi
         elif [ -n "$msys" ]; then
             if [ -z "$SSH_CONNECTION" ] && command -v gvim >/dev/null; then
-                vim_cmd=gvim
+                vim_cmd=${gvim:-gvim}
                 gui=1
             else
                 vim_cmd=$tvim
@@ -548,7 +549,7 @@ find_vim_executable() {
             vim_cmd=$tvim
         else
             if command -v gvim >/dev/null; then
-                vim_cmd=gvim
+                vim_cmd=${gvim:-gvim}
                 gui=1
             else
                 vim_cmd=$tvim
