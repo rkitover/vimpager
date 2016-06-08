@@ -12,16 +12,17 @@ fi
 # FIND REAL PARENT DIRECTORY
 link=$0
 
-while true; do
-    ls0=`ls -l "$link"`
-    new_link=`expr "$ls0" : '.* -> \(.*\)$'`
-
-    [ -z "$new_link" ] && break
-
-    link=$new_link
+while [ -h "$link" ]; do
+    ls0="`ls -l \"$link\"`"
+    new_link="`expr \"$ls0\" : '.* -> \(.*\)$'`"
+    if expr "$new_link" : '/.*' > /dev/null; then
+        link="$new_link"
+    else
+        link="$(dirname $link)/$new_link"
+    fi
 done
 
-project_dir=`dirname "$link"`
+project_dir="`dirname \"$link\"`"
 # END OF FIND REAL PARENT DIRECTORY
 
 . "$project_dir/inc/prologue.sh"
