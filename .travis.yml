@@ -3,4 +3,7 @@ dist: trusty
 install:
     - sudo make install-deb
     - scripts/update_lintian
-script: lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
+    - sudo apt-get install bats
+script:
+    - lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
+    - make test

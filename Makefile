@@ -279,6 +279,8 @@ html/%.html: %.md.work
 realclean distclean clean:
 	rm -rf *.work */*.work *-stamp *-version.txt *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
 
-.PHONY: all install install-deb uninstall docs realclean distclean clean
+test:
+	bats test
 
+.PHONY: all install install-deb uninstall docs realclean distclean clean test
 # vim: sw=4
