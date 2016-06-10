@@ -279,7 +279,7 @@ html/%.html: %.md.work
 realclean distclean clean:
 	rm -rf *.work */*.work *-stamp *-version.txt *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
 
-test:
+test: standalone/vimpager standalone/vimcat
 	bats test
 
 .PHONY: all install install-deb uninstall docs realclean distclean clean test
