@@ -67,6 +67,7 @@ standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile
 	@echo building $@
 	@${MKPATH} ${@D}
 	@sed -e '1 a : if 0' \
+	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's/^\( *\)# INSERT VIMCAT_DEBUG PREPARATION HERE$$/\1if [ "$${VIMCAT_DEBUG:-0}" -eq 0 ]; then silent="silent! "; else silent=; fi/' \
 	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 	    -e '/^runtime=.*/d' \
