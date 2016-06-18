@@ -36,7 +36,7 @@
 
     # Check if version was set correctly from git
     case "$version" in
-        [0-9]*)
+        [0-9].*)
             ;;
         *)
             # use the version from the comment at the top of the file instead
