@@ -1,5 +1,7 @@
 #!/bin/sh
-
+#
+# vimpager 2.06
+#
 # Script for using ViM as a PAGER.
 # Based on Bram's less.sh.
 # git://github.com/rkitover/vimpager.git
@@ -27,7 +29,7 @@ project_dir=`dirname "$link"`
 
 . "$project_dir/inc/prologue.sh"
 
-version="$(cd "$project_dir"; git describe) (git)"
+version="$(cd "$project_dir"; git describe 2>/dev/null) (git)"
 runtime='$project_dir'
 vimcat='$project_dir/vimcat'
 system_vimpagerrc='$project_dir/vimpagerrc'
@@ -58,6 +60,9 @@ main() {
     extra_c=
     extra_cmd=
     line_numbers=0
+
+    check_version
+
     # Check for certain parameters to pass on to vim (or conceivably do something else)
     # Couldn't use getopt or getopts as neither supports options prepended with +
     while [ $# -gt 0 ] ; do
@@ -930,6 +935,27 @@ fits_on_screen() {
         if (!--lines) exit(1)
     }
     ' num_files=$# total_lines=$lines total_cols=$cols file_sep_lines=3 first_file_sep_lines=2 -
+}
+
+check_version() {
+    # Check if version was set correctly from git
+    case "$version" in
+        [0-9]*)
+            ;;
+        *)
+            # use the version from the comment at the top of the file instead
+            i=3
+            while true; do
+                if [ $i -eq 1 ]; then
+                    read _hash _progname version
+                    break
+                else
+                    read _line
+                fi
+                i=$((i-1))
+            done < "$0"
+            ;;
+    esac
 }
 
 # INCLUDE BUNDLED SCRIPTS HERE

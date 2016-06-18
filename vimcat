@@ -1,5 +1,8 @@
 #!/bin/sh
 #!/usr/bin/env vim
+#!
+#! vimcat 2.06
+#!
 #! This is a bash script that executes itself as a vimscript to do its work
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
@@ -20,7 +23,7 @@
 
     . "$project_dir""/inc/prologue.sh"
 
-    version="$(cd "$project_dir"; git describe) (git)"
+    version="$(cd "$project_dir"; git describe 2>/dev/null) (git)"
 
     if command -v vim >/dev/null; then
         vim=vim
@@ -30,6 +33,25 @@
         echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
         exit 1
     fi
+
+    # Check if version was set correctly from git
+    case "$version" in
+        [0-9]*)
+            ;;
+        *)
+            # use the version from the comment at the top of the file instead
+            i=4
+            while true; do
+                if [ $i -eq 1 ]; then
+                    read _hash _progname version
+                    break
+                else
+                    read _line
+                fi
+                i=$((i-1))
+            done < "$0"
+            ;;
+    esac
 
 quit() {
     (
