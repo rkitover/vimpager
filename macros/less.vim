@@ -509,49 +509,56 @@ function! s:LessMode()
   silent! cunmap <buffer> <CR>
 
   " Quitting
-  call s:Map('noremap <silent> <buffer> q :<C-u>call <SID>CloseBuffer()<CR>')
+  call s:Map('nnoremap <silent> <buffer> q :<C-u>silent call <SID>CloseBuffer()<CR>')
 
   " Switch to editing (switch off less mode) with v (,v is global)
   call s:Map('map <silent> <buffer> v :call <SID>ToggleLess()<CR>')
 endfunction
 
 function! s:CloseBuffer()
-  redir => ls_out
-    silent! ls!
-  redir END
+  try
+    redir => ls_out
+      silent! ls!
+    redir END
 
-  " check if this is the last buffer, if so quit
-  if ls_out =~# '^\n\s\+\d\+.*%\S*a[^\n]*$'
-    quit
-  endif
+    " check if this is the last buffer, if so quit
+    if count(split(ls_out, '\zs'), "\n") == 1
+      quit
+      return
+    endif
 
-  " if modifiable buffer was modified, force error message
-  if &l:buftype !~? '^no\%(write\|file\)$' && &l:modified
-    unsilent bdelete " this will error out
-    return
-  endif
+    " if modifiable buffer was modified, force error message
+    if &l:buftype !~? '^no\%(write\|file\)$' && &l:modified
+      bwipeout " this will error out
+      return
+    endif
 
-  " check if there are unopened args and we are on an arg
-  if argc() > 1 && argv(argidx()) ==# bufname('%') && ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
-    let cur_buf = bufnr('%')
+    " check if there are unopened args and we are on an arg
+    if argc() > 1 && argv(argidx()) ==# bufname('%') && ls_out =~# '\n\s\+\d\+\s\+".*"\s\+line 0\>'
+      let cur_buf = bufnr('%')
 
-    unsilent execute (argidx() + 1) . 'argdelete'
+      execute (argidx() + 1) . 'argdelete'
 
-    unsilent execute 'argument ' . (argidx() + 1)
+      execute 'argument ' . (argidx() + 1)
 
-    unsilent execute 'bdelete ' . cur_buf
+      execute 'bwipeout ' . cur_buf
 
-    return
-  endif
+      return
+    endif
 
-  " otherwise try to delete the buffer
+    " otherwise try to delete the buffer
 
-  " if current buffer is the current arg, delete from arg list
-  if argv(argidx()) ==# bufname('%')
-    unsilent execute (argidx() + 1) . 'argdelete'
-  endif
+    " if current buffer is the current arg, delete from arg list
+    if argv(argidx()) ==# bufname('%')
+      execute (argidx() + 1) . 'argdelete'
+    endif
 
-  unsilent bdelete
+    bwipeout
+  catch
+    echohl Error
+    unsilent echo v:exception[stridx(v:exception, ':')+1 : -1]
+    echohl None
+  endtry
 endfunction
 
 function! s:NextPage()
