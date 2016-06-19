@@ -357,6 +357,12 @@ function! s:LessMode()
     let g:less.statusfunc = function('s:StatusLine')
   endif
 
+  " turn off extra status lines (especially in neovim)
+  call s:SaveSetOpt('laststatus', 1)
+
+  " turn off cursor line highlighting
+  call s:SaveSetOpt('cursorline', 0)
+
   " Inhibit screen updates while searching
   call s:SaveSetOpt('lazyredraw', 1)
 
