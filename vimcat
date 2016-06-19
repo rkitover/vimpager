@@ -378,6 +378,9 @@ squeeze_blank_lines() {
 : endif
 : endwhile
 : endif
+: endif
+: endwhile
+: endif
 
 " AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
 " the syntax changes colors, for easy, faithful reproduction.
