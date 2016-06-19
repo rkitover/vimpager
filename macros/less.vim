@@ -200,7 +200,7 @@ function! s:StatusLine()
   let leader = exists('g:mapleader') ? g:mapleader : '\'
   let pos .= "  [ Press '".leader."h' for HELP ]"
   " Trim the status line to fit the window width.
-  let pos = len(pos) >= &columns ? '<' . pos[-&columns+2:-1] : pos
+  let pos = len(pos) > &columns - 12 ? '<' . pos[-&columns+13:-1] : pos
   highlight LessStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
   echohl LessStatusLine
   redraw
