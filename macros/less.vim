@@ -200,7 +200,7 @@ function! s:StatusLine()
   let leader = exists('g:mapleader') ? g:mapleader : '\'
   let pos .= "  [ Press '".leader."h' for HELP ]"
   " Trim the status line to fit the window width.
-  let pos = len(pos) > &columns - 12 ? '<' . pos[-&columns+13:-1] : pos
+  let pos = len(pos) > &columns - 1 ? '<' . pos[-&columns+2:-1] : pos
   highlight LessStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
   echohl LessStatusLine
   redraw
@@ -362,6 +362,9 @@ function! s:LessMode()
 
   " turn off cursor line highlighting
   call s:SaveSetOpt('cursorline', 0)
+
+  " turn off ruler, it interferes with the status line, and we have our own
+  call s:SaveSetOpt('ruler', 0)
 
   " Inhibit screen updates while searching
   call s:SaveSetOpt('lazyredraw', 1)
