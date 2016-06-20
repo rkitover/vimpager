@@ -1,9 +1,29 @@
 sudo: required
 dist: trusty
+
 install:
-    - sudo make install-deb
     - scripts/update_lintian
-    - sudo apt-get install bats
+    # apt-get update was already run by the update_lintian script.
+    - sudo apt-get install sharutils
+    # Install the test suite manually as there is no package for it on trusty.
+    - ( git clone https://github.com/sstephenson/bats.git && cd bats && sudo ./install.sh /usr/local )
+
+before_script:
+    # The version output of vimpager depends of the tags in the repository so
+    # we need to fetch them before running the tests.  Currently all tags are
+    # fetched.  TODO: Only fetch the latest tag.
+    - git fetch --unshallow --tags
+    # The bats directory is only needed during the manual installation above.
+    # It would be reported by lintian otherwise.
+    - rm -fr bats
+
+
 script:
-    - lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
+    - make all
     - make test
+    # The target install-deb also runs the tests (via dpkg-buildpackage) so it
+    # sould not be run during the travis "install" step.
+    - sudo make install-deb
+    - lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
+
+# vim: sw=4
