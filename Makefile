@@ -20,14 +20,32 @@ RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim ma
 
 SRC=vimcat ${RUNTIME}
 
-all: balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
+PROGRAMS=vimpager vimcat
+
+all: ${PROGRAMS:=-vertag-stamp} balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
+
+# set tag from git or ChangeLog
+%-vertag-stamp: %
+	@tag=`git tag 2>/dev/null | tail -1`; \
+	[ -z "$$tag" ] && tag=`grep '^[0-9][0-9.]* [0-9-]*:$$' ChangeLog_${<}.yml | head -1 | awk '{ print $$1 }'`; \
+	if [ -n "$$tag" ]; then \
+		sed -e 's/^\( *version_tag=\).*/\1'"$$tag"'/' $< > ${<}.work; \
+		mv ${<}.work $<; \
+	fi
+	@chmod +x $<
+	@touch $@
+
+# other recipes need the version, get it from git describe or ChangeLog
+%-version.txt: %
+	@git describe >${<}-version.txt 2>/dev/null \
+	|| grep '^[0-9][0-9.]* [0-9-]*:$$' ChangeLog_${<}.yml | head -1 | awk '{ print $$1 }' >${<}-version.txt
 
 balance-shellvim-stamp: vimcat Makefile
 	@chmod +x scripts/balance-shellvim
 	@scripts/balance-shellvim
 	@touch balance-shellvim-stamp
 
-standalone/%: % ${SRC:=.uu} inc/* Makefile
+standalone/%: % ${SRC:=.uu} inc/* Makefile %-version.txt
 	@echo building $@
 	@${MKPATH} `dirname $@`
 	@base="`basename $@`"; \
@@ -47,7 +65,7 @@ standalone/%: % ${SRC:=.uu} inc/* Makefile
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
 	fi
 	@cp $@ $@.work
-	@sed -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	@sed -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat ${<}-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
@@ -59,12 +77,12 @@ standalone/%: % ${SRC:=.uu} inc/* Makefile
 	fi
 	@chmod +x $@
 
-vimcat.uu: vimcat
+vimcat.uu: vimcat vimcat-version.txt
 	@echo uuencoding $<
 	@echo 'vimcat_script() {' > $@
 	@printf "\t(cat <<'EOF') | do_uudecode > bin/vimcat\n" >> $@
 	@sed \
-	    -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat vimcat-version.txt`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
@@ -143,7 +161,7 @@ install: docs vimpager.configured vimcat.configured
 	echo ${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"; \
 	${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"
 
-%.configured: %
+%.configured: % %-version.txt
 	@echo configuring $<
 	@POSIX_SHELL="`scripts/find_shell`"; \
 	if [ '${PREFIX}' = /usr ]; then \
@@ -154,7 +172,7 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
-	    -e 's|^\( *\)version=.*|\1version="'"`git describe`"' (configured, shell='"$$POSIX_SHELL"')"|' \
+	    -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat ${<}-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"\2|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
 	    -e 's!^\( *\)vimcat=.*!\1vimcat='\''${PREFIX}/bin/vimcat'\''!' \
@@ -247,6 +265,6 @@ html/%.html: %.md.work
 	fi
 
 realclean distclean clean:
-	rm -rf *.work */*.work *-stamp *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
+	rm -rf *.work */*.work *-stamp *-version.txt *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
 
 .PHONY: all install install-deb uninstall docs realclean distclean clean

@@ -4,6 +4,8 @@
 # Based on Bram's less.sh.
 # git://github.com/rkitover/vimpager.git
 
+version_tag=2.06
+
 # Just pass through if not on a tty
 if [ ! -t 1 ]; then
     exec cat "$@"
@@ -27,8 +29,8 @@ project_dir=`dirname "$link"`
 
 . "$project_dir/inc/prologue.sh"
 
-fallback_version='2.06 (fallback)'
-if ! version="$(cd "$project_dir" && git describe 2>/dev/null) (git)"; then version=$fallback_version; fi
+version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" \
+    || version="$version_tag (checkout)"
 runtime='$project_dir'
 vimcat='$project_dir/vimcat'
 system_vimpagerrc='$project_dir/vimpagerrc'

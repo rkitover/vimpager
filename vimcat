@@ -5,6 +5,8 @@
 #! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
 
 : if 0
+    version_tag=2.06
+
     link=$0
 
     while [ -h "$link" ]; do
@@ -21,8 +23,8 @@
 
     . "$project_dir""/inc/prologue.sh"
 
-    fallback_version='2.06 (fallback)'
-    if ! version="$(cd "$project_dir" && git describe 2>/dev/null) (git)"; then version=$fallback_version; fi
+    version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" \
+        || version="$version_tag (checkout)"
 
     if command -v vim >/dev/null; then
         vim=vim
@@ -356,7 +358,6 @@ squeeze_blank_lines() {
 : endif
 : endif
 : endif
-: endwhile
 : endif
 : endif
 : endwhile
