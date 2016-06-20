@@ -3,7 +3,7 @@ Upstream-Name: vimpager
 Upstream-Contact: Rafael Kitover <rkitover@gmail.com>
 Source: http://github.com/rkitover/vimpager
 
-Files: vimpager vimpagerrc *.yml .travis.yml Makefile markdown_src/*.md markdown/*.md autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim prototypes/* prototypes/*/* scripts/* inc/*
+Files: vimpager vimcat vimpagerrc *.yml .travis.yml Makefile markdown_src/*.md markdown/*.md autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim prototypes/* prototypes/*/* scripts/* inc/*
 Copyright: 2016 Rafael Kitover <rkitover@gmail.com>
 License: BSD-2-Clause
 
@@ -11,7 +11,7 @@ Files: scripts/install-sh
 Copyright: 1994 X Consortium <xorg@freedesktop.org>
 License: MIT-4-Clause
 
-Files: vimcat
+Files: autoload/vimcat.vim
 Copyright: 2015 Matthew Wozniski <mjw@drexel.edu>
 License: BSD-2-Clause
 
