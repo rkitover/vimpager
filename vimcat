@@ -359,7 +359,6 @@ squeeze_blank_lines() {
 : endif
 : endif
 : endif
-: endif
 : endwhile
 : endif
 

@@ -26,21 +26,24 @@ all: ${PROGRAMS:=-vertag-stamp} balance-shellvim-stamp standalone/vimpager stand
 
 # set tag from git or ChangeLog
 %-vertag-stamp: %
+	@echo updating version tag in $<
 	@tag=`git tag 2>/dev/null | tail -1`; \
-	[ -z "$$tag" ] && tag=`grep '^[0-9][0-9.]* [0-9-]*:$$' ChangeLog_${<}.yml | head -1 | awk '{ print $$1 }'`; \
+	[ -z "$$tag" ] && tag=`sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml`; \
 	if [ -n "$$tag" ]; then \
-		sed -e 's/^\( *version_tag=\).*/\1'"$$tag"'/' $< > ${<}.work; \
-		mv ${<}.work $<; \
+		sed -e 's/^\( *version_tag=\).*/\1'"$$tag"'/' $< > $<.work; \
+		mv $<.work $<; \
 	fi
 	@chmod +x $<
 	@touch $@
 
 # other recipes need the version, get it from git describe or ChangeLog
 %-version.txt: %
-	@git describe >${<}-version.txt 2>/dev/null \
-	|| grep '^[0-9][0-9.]* [0-9-]*:$$' ChangeLog_${<}.yml | head -1 | awk '{ print $$1 }' >${<}-version.txt
+	@echo building $@
+	@git describe >$<-version.txt 2>/dev/null \
+	|| sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml >$<-version.txt
 
 balance-shellvim-stamp: vimcat Makefile
+	@echo balanceing vimcat
 	@chmod +x scripts/balance-shellvim
 	@scripts/balance-shellvim
 	@touch balance-shellvim-stamp
@@ -65,7 +68,7 @@ standalone/%: % ${SRC:=.uu} inc/* Makefile %-version.txt
 		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
 	fi
 	@cp $@ $@.work
-	@sed -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat ${<}-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
+	@sed -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat $<-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
@@ -172,7 +175,7 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
-	    -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat ${<}-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"\2|' \
+	    -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat $<-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"\2|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
 	    -e 's!^\( *\)vimcat=.*!\1vimcat='\''${PREFIX}/bin/vimcat'\''!' \
