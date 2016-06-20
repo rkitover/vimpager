@@ -1,39 +1,35 @@
 #!/bin/sh
-#!/usr/bin/env vim
-#!
-#! This is a bash script that executes itself as a vimscript to do its work
-#! Based on _v by Magnus Woldrich: https://github.com/trapd00r/utils/blob/master/_v
+version_tag=2.06
 
-: if 0
-    version_tag=2.06
+# FIND REAL PARENT DIRECTORY
+link=$0
 
-    link=$0
-
-    while [ -h "$link" ]; do
-        ls0=`ls -l "$link"`
-        new_link=`expr "$ls0" : '.* -> \(.*\)$'`
-        if expr "$new_link" : '/.*' > /dev/null; then
-            link="$new_link"
-        else
-            link=`dirname "$link"`/"$new_link"
-        fi
-    done
-
-    project_dir=`dirname "$link"`
-
-    . "$project_dir""/inc/prologue.sh"
-
-    version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" \
-        || version="$version_tag (checkout)"
-
-    if command -v vim >/dev/null; then
-        vim=vim
-    elif command -v nvim >/dev/null; then
-        vim=nvim
+while [ -h "$link" ]; do
+    ls0=`ls -l "$link"`
+    new_link=`expr "$ls0" : '.* -> \(.*\)$'`
+    if expr "$new_link" : '/.*' > /dev/null; then
+        link=$new_link
     else
-        echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
-        exit 1
+        link=`dirname "$link"`/$new_link
     fi
+done
+
+project_dir=`dirname "$link"`
+# END OF FIND REAL PARENT DIRECTORY
+
+. "$project_dir/inc/prologue.sh"
+
+version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" || version="$version_tag (checkout)"
+runtime=$project_dir
+
+if command -v vim >/dev/null; then
+    vim=vim
+elif command -v nvim >/dev/null; then
+    vim=nvim
+else
+    echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
+    exit 1
+fi
 
 quit() {
     (
@@ -55,12 +51,12 @@ quit() {
 }
 
 do_sleep() {
-    _ms="${1:-100}"
+    _ms=${1:-100}
     "$vim" -NEsnR -i NONE -u NONE +"sleep $_ms m" +q >/dev/null 2>&1
 }
 
 usage() {
-        cat <<'EOF'
+    cat <<'EOF'
 Usage: [32mvimcat [1;34m[[1;35mOPTION[1;34m][0m... [1;34m[[1;35mFILE [1;37m| [1;35m-[1;34m][0m...
 Display [1;35mFILE[0m(s) in the terminal with vim syntax highlighting using ANSI escape codes.
 
@@ -99,16 +95,17 @@ start_pipeline() {
         pipeline=write_chunks
     fi
     cat -- "$pipeline_start" | (eval "$pipeline" <&3 & echo $! > "$tmp_dir/pipeline_pid") 3<&0
-    pipeline_pid="$(cat "$tmp_dir/pipeline_pid")"
+    pipeline_pid=$(cat "$tmp_dir/pipeline_pid")
 }
 
 start_highlight_job() {
-    _quit='qa!' _silent='silent!'
-    if [ "${VIMCAT_DEBUG:-0}" -ne 0 ]; then
-        _quit=echo _silent=
-    fi
-
-    set -- -NE -i NONE -n --cmd "visual | ${extra_cmd:-echo}" -c "silent! execute 'file ' . fnameescape('$pipeline_start') | set bg=dark fdl=9999 | syn enable | hi Normal ctermbg=NONE | $_silent source $script" -c "set buftype=nowrite | ${extra_c:-echo} | call AnsiHighlight(\"$dest_file\", ${line_numbers:-0}, \"$chunks_dir\") | $_quit"
+    # INSERT VIMCAT_DEBUG PREPARATION HERE
+    set -- -NE -i NONE -n \
+        --cmd "set rtp^=$runtime" \
+        --cmd visual \
+        ${extra_cmd:+--cmd "$extra_cmd"} \
+        ${extra_c:+-c "$extra_c"} \
+        -c "call vimcat#Run(\"$dest_file\", ${line_numbers:-0}, \"$chunks_dir\", \"$pipeline_start\")"
 
     [ -n "$vimcatrc" ] && set -- "$@" -u "$vimcatrc"
 
@@ -128,541 +125,206 @@ squeeze_blank_lines() {
     }'
 }
 
-    # if no args and no stdin, display usage
-    if [ $# -eq 0 -a -t 0 ]; then
-        usage
-        quit 0
-    fi
+# if no args and no stdin, display usage
+if [ $# -eq 0 -a -t 0 ]; then
+    usage
+    quit 0
+fi
 
-    # check for -h before main option parsing, this is much faster
-    for arg in "$@"; do
-        case "$arg" in
-            "-h"|"--help"|"-help"|"--usage"|"-usage")
-                usage
-                quit 0
-                ;;
-            "-v"|"--version"|"-version")
-                echo "vimcat $version"
-                quit 0
-                ;;
-            "-x")
-                set -x
-                ;;
-        esac
-    done
-
-    tmp_dir=/tmp
-    mkdir_options="-m 700"
-
-    case "$(uname -s)" in
-        MINGW*|MSYS*)
-            if [ -n "$temp" ]; then
-                # MSYS2 is a little tricky, we're gonna stick to the user's private temp
-                # the -m mode switch to mkdir doesn't work
-                tmp_dir="$(cygpath --unix "$temp")"
-                mkdir_options=""
-            fi
-        ;;
+# check for -h before main option parsing, this is much faster
+for arg in "$@"; do
+    case "$arg" in
+        "-h"|"--help"|"-help"|"--usage"|"-usage")
+            usage
+            quit 0
+            ;;
+        "-v"|"--version"|"-version")
+            echo "vimcat $version"
+            quit 0
+            ;;
+        "-x")
+            set -x
+            ;;
     esac
+done
 
-    tmp_dir="$tmp_dir/vimcat_${$}"
+tmp_dir=/tmp
+mkdir_options="-m 700"
 
-    if ! mkdir $mkdir_options "$tmp_dir"; then
-        echo "Could not create temporary directory $tmp_dir" >&2
-        exit 1
-    fi
+case "$(uname -s)" in
+    MINGW*|MSYS*)
+        if [ -n "$temp" ]; then
+            # MSYS2 is a little tricky, we're gonna stick to the user's private temp
+            # the -m mode switch to mkdir doesn't work
+            tmp_dir=$(cygpath --unix "$temp")
+            mkdir_options=
+        fi
+        ;;
+esac
 
-    trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
-    tmp_file_in="$tmp_dir/vimcat_in.txt"
-    out_fifo="$tmp_dir/vimcat_out.fifo"
+tmp_dir=$tmp_dir/vimcat_$$
 
-    case "$(uname -s)" in
-        SunOS*|CYGWIN*|MINGW*|MSYS*)
-            # the fifo streaming doesn't work on windows and solaris
-            touch "$out_fifo"
+if ! mkdir $mkdir_options "$tmp_dir"; then
+    echo "Could not create temporary directory $tmp_dir" >&2
+    exit 1
+fi
+
+trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
+tmp_file_in=$tmp_dir/vimcat_in.txt
+out_fifo=$tmp_dir/vimcat_out.fifo
+
+case $(uname -s) in
+    SunOS*|CYGWIN*|MINGW*|MSYS*)
+        # the fifo streaming doesn't work on windows and solaris
+        touch "$out_fifo"
+        ;;
+    *)
+        mkfifo "$out_fifo"
+        ;;
+esac
+
+# check for arguments
+while [ $# -gt 0 ] ; do
+    case "$1" in
+        "-c")
+            shift
+            if [ -z "$extra_c" ]; then
+                extra_c=$1
+            else
+                extra_c="$extra_c | $1"
+            fi
+            shift
+            ;;
+        "--cmd")
+            shift
+            if [ -z "$extra_cmd" ]; then
+                extra_cmd=$1
+            else
+                extra_cmd="$extra_cmd | $1"
+            fi
+            shift
+            ;;
+        "-u")
+            shift
+            vimcatrc=$1
+            shift
+            ;;
+        "-o")
+            shift
+            output_file=$1
+            shift
+            ;;
+        "-s")
+            shift
+            squeeze_blank_lines=1
+            ;;
+        "-n")
+            shift
+            line_numbers=1
+            ;;
+        "-x")
+            # xtrace should already be set by the first option parsing
+            shift
+            ;;
+        "--")
+            shift
+            break
+            ;;
+        -)
+            break
+            ;;
+        -*)
+            echo "$0: bad option '$1', see --help for usage." >&2
+            quit 1
             ;;
         *)
-            mkfifo "$out_fifo"
+            break
             ;;
     esac
+done
 
-    script="$(command -v $0)"
+# Just pass through if not on a tty, unless -o was given
+if [ -z "$output_file" ]; then
+    if [ ! -t 1 ]; then
+        exec cat "$@"
+    fi
+fi
 
-    # check for arguments
-    while [ $# -gt 0 ] ; do
-        case "$1" in
-            "-c")
-                shift
-                if [ -z "$extra_c" ]; then
-                    extra_c="$1"
-                else
-                    extra_c="$extra_c | $1"
-                fi
-                shift
-                ;;
-            "--cmd")
-                shift
-                if [ -z "$extra_cmd" ]; then
-                    extra_cmd="$1"
-                else
-                    extra_cmd="$extra_cmd | $1"
-                fi
-                shift
-                ;;
-            "-u")
-                shift
-                vimcatrc="$1"
-                shift
-                ;;
-            "-o")
-                shift
-                output_file="$1"
-                shift
-                ;;
-            "-s")
-                shift
-                squeeze_blank_lines=1
-                ;;
-            "-n")
-                shift
-                line_numbers=1
-                ;;
-            "-x")
-                # xtrace should already be set by the first option parsing
-                shift
-                ;;
-            "--")
-                shift
-                break
-                ;;
-            -)
-                break
-                ;;
-            -*)
-                echo "$0: bad option '$1', see --help for usage." >&2
-                quit 1
-                ;;
-            *)
-                break
-                ;;
-        esac
+if [ -z "$vimcatrc" ]; then
+    if [ -f ~/.vimcatrc ]; then
+        vimcatrc=~/.vimcatrc
+    else
+        vimcatrc=
+    fi
+fi
+
+if [ $# -eq 0 ]; then
+    set -- -
+fi
+
+if [ -n "$output_file" -a $# -gt 1 ]; then
+    echo "$0: -o can only be used with one input file or stdin." >&2
+    quit 1
+fi
+
+chunks_dir=$tmp_dir/chunks
+mkdir "$chunks_dir"
+
+i=1
+for file in "$@"
+do
+    if [ $# -ge 2 ]; then
+        if [ $i -gt 1 ]; then
+            printf '\n'
+        fi
+        printf "==> %s <==\n\n" "$file"
+    fi
+
+    pipeline=
+    pipeline_start=$file
+
+    if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
+        pipeline=squeeze_blank_lines
+    fi
+
+    exit_code=0
+
+    # Check that the file is readable
+    if [ "$file" != - ]; then
+        if [ ! -r "$file" ]; then
+            echo "$0: Cannot read file: $file" >&2
+            exit_code=1
+        fi
+
+        [ ! -s "$file" ] && continue
+    fi
+
+    if [ -z "$output_file" -o "$output_file" = "-" ]; then
+        dest_file=$out_fifo
+
+        tail -f "$out_fifo" &
+        tail_pid=$!
+    else
+        dest_file=$output_file
+        printf '' > "$dest_file"
+    fi
+
+    start_highlight_job
+    start_pipeline
+    while [ ! -f "$tmp_dir/vim_done" ]; do
+        do_sleep 50
     done
 
-    # Just pass through if not on a tty, unless -o was given
-    if [ -z "$output_file" ]; then
-        if [ ! -t 1 ]; then
-            exec cat "$@"
-        fi
+    if [ -n "$tail_pid" ]; then
+        # if it's not a fifo where this doesn't work, tail needs some time to catch up
+        [ ! -p "$out_fifo" ] && do_sleep 1100
+
+        kill $tail_pid >/dev/null 2>&1
     fi
 
-    if [ -z "$vimcatrc" ]; then
-        if [ -f ~/.vimcatrc ]; then
-                vimcatrc="~/.vimcatrc"
-        else
-                vimcatrc=""
-        fi
-    fi
+    i=$((i + 1))
+done
 
-    if [ $# -eq 0 ]; then
-        set -- -
-    fi
+quit $exit_code
 
-    if [ -n "$output_file" -a $# -gt 1 ]; then
-        echo "$0: -o can only be used with one input file or stdin." >&2
-        quit 1
-    fi
-
-    chunks_dir="$tmp_dir/chunks"
-    mkdir "$chunks_dir"
-
-    i=1
-    for file in "$@"
-    do
-        if [ $# -ge 2 ]; then
-            if [ $i -gt 1 ]; then
-                printf '\n'
-            fi
-            printf "==> %s <==\n\n" "$file"
-        fi
-
-        pipeline=
-        pipeline_start="$file"
-
-        if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
-            pipeline="squeeze_blank_lines"
-        fi
-
-        exit_code=0
-
-        # Check that the file is readable
-        if [ "$file" != - ]; then
-            if [ ! -r "$file" ]; then
-                echo "$0: Cannot read file: $file" >&2
-                exit_code=1
-            fi
-
-            [ ! -s "$file" ] && continue
-        fi
-
-        if [ -z "$output_file" -o "$output_file" = "-" ]; then
-            dest_file="$out_fifo"
-
-            tail -f "$out_fifo" &
-            tail_pid=$!
-        else
-            dest_file="$output_file"
-            printf '' > "$dest_file"
-        fi
-
-        start_highlight_job
-        start_pipeline
-        while [ ! -f "$tmp_dir/vim_done" ]; do
-            do_sleep 50
-        done
-
-        if [ -n "$tail_pid" ]; then
-            # if it's not a fifo where this doesn't work, tail needs some time to catch up
-            [ ! -p "$out_fifo" ] && do_sleep 1100
-
-            kill $tail_pid >/dev/null 2>&1
-        fi
-
-        i=$((i + 1))
-    done
-
-    quit $exit_code
-
-: endif
-: endwhile
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endfor
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endwhile
-: endif
-: endif
-: endfor
-: endif
-: endif
-: endif
-: endif
-: endif
-: endif
-: endwhile
-: endif
-
-" AnsiHighlight: Allows for marking up a file, using ANSI color escapes when
-" the syntax changes colors, for easy, faithful reproduction.
-" Author: Matthew Wozniski (mjw@drexel.edu)
-" Date: Fri, 01 Aug 2008 05:22:55 -0400
-" Version: 1.0 FIXME
-" History: FIXME see :help marklines-history
-" License: BSD. Completely open source, but I would like to be
-" credited if you use some of this code elsewhere.
-
-" Copyright (c) 2015, Matthew J. Wozniski {{{1
-"
-" Redistribution and use in source and binary forms, with or without
-" modification, are permitted provided that the following conditions are met:
-" * Redistributions of source code must retain the above copyright
-" notice, this list of conditions and the following disclaimer.
-" * Redistributions in binary form must reproduce the above copyright
-" notice, this list of conditions and the following disclaimer in the
-" documentation and/or other materials provided with the distribution.
-"
-" THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER ``AS IS'' AND ANY
-" EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-" DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-" DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-" (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-" LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-" ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-" (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-" SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-" Turn off vi-compatible mode, unless it's already off {{{1
-if &cp
-    set nocp
-endif
-
-let s:type = 'cterm'
-if &t_Co == 0
-    let s:type = 'term'
-endif
-
-" Converts info for a highlight group to a string of ANSI color escapes {{{1
-function! s:GroupToAnsi(groupnum)
-    if ! exists("s:ansicache")
-        let s:ansicache = {}
-    endif
-
-    let groupnum = a:groupnum
-
-    if groupnum == 0
-        let groupnum = hlID('Normal')
-    endif
-
-    if has_key(s:ansicache, groupnum)
-        return s:ansicache[groupnum]
-    endif
-
-    let fg = synIDattr(groupnum, 'fg', s:type)
-    let bg = synIDattr(groupnum, 'bg', s:type)
-    let rv = synIDattr(groupnum, 'reverse', s:type)
-    let bd = synIDattr(groupnum, 'bold', s:type)
-
-    " FIXME other attributes?
-
-    if rv == "" || rv == -1
-        let rv = 0
-    endif
-
-    if bd == "" || bd == -1
-        let bd = 0
-    endif
-
-    if rv
-        let temp = bg
-        let bg = fg
-        let fg = temp
-    endif
-
-    if fg == "" || fg == -1
-        unlet fg
-    endif
-
-    if !exists('fg') && groupnum != hlID('Normal')
-        let fg = synIDattr(hlID('Normal'), 'fg', s:type)
-        if fg == "" || fg == -1
-            unlet fg
-        endif
-    endif
-
-    if bg == "" || bg == -1
-        unlet bg
-    endif
-
-    if !exists('bg')
-        let bg = synIDattr(hlID('Normal'), 'bg', s:type)
-        if bg == "" || bg == -1
-            unlet bg
-        endif
-    endif
-
-    let retv = "\<Esc>[22;24;25;27;28"
-
-    if bd
-        let retv .= ";1"
-    endif
-
-    if exists('fg') && fg < 8
-        let retv .= ";3" . fg
-    elseif exists('fg')  && fg < 16    "use aixterm codes
-        let retv .= ";9" . (fg - 8)
-    elseif exists('fg')                "use xterm256 codes
-        let retv .= ";38;5;" . fg
-    else
-        let retv .= ";39"
-    endif
-
-    if exists('bg') && bg < 8
-        let retv .= ";4" . bg
-    elseif exists('bg') && bg < 16     "use aixterm codes
-        let retv .= ";10" . (bg - 8)
-    elseif exists('bg')                "use xterm256 codes
-        let retv .= ";48;5;" . bg
-    else
-        let retv .= ";49"
-    endif
-
-    let retv .= "m"
-
-    let s:ansicache[groupnum] = retv
-
-    return retv
-endfunction
-
-function! s:ReadChunks()
-    let chunk_files = filter(glob(s:pipeline_dir . '/*', 1, 1), 'getfsize(v:val) > 0')
-
-    if !len(chunk_files)
-        return 0
-    endif
-
-    call sort(chunk_files)
-
-    for chunk_file in chunk_files
-        let block = readfile(chunk_file, 'b')
-
-        let chunk_newline = 0
-
-        if block[-1] == ''
-            let chunk_newline = 1
-            call remove(block, -1)
-        endif
-
-        let lines = []
-
-        if line('$') == 1 && getline(1) == ''
-            let append_to = 0
-        else
-            if !s:chunk_newline
-                let lines = [ getline(line('$')) . remove(block, 0) ]
-                $d
-            endif
-
-            let append_to = line('$')
-        endif
-
-        let lines += block
-
-        call append(append_to, lines)
-
-        if append_to == 0
-            $d
-        endif
-
-        if s:chunk_num > 20
-            normal '0ggd/\_.\{4096}/e'
-        endif
-
-        let s:chunk_newline = chunk_newline
-
-        let s:chunk_num += 1
-    endfor
-
-    call map(chunk_files, 'delete(v:val)')
-
-    return 1
-endfunction
-
-function! AnsiHighlight(output_file, line_numbers, pipeline_dir)
-    let s:pipeline_dir = a:pipeline_dir
-
-    setlocal modifiable noreadonly buflisted buftype=nowrite
-
-    if a:pipeline_dir != ''
-        let s:chunk_num     = 1
-        let s:chunk_newline = 0
-
-        while !s:ReadChunks()
-            sleep 100 m
-        endwhile
-
-        let ln_field_len = 7
-    else
-        let ln_field_len = len(line('$'))
-    endif
-
-    if &l:ft == ''
-        filetype detect
-    endif
-    syntax enable
-    syntax sync minlines=500 maxlines=500
-
-    let done = 0
-    let lnum = 1
-
-    while !done
-        let last = hlID('Normal')
-        let output = s:GroupToAnsi(last) . "\<Esc>[K" " Clear to right
-
-        " Hopefully fix highlighting sync issues
-        exe "norm! " . lnum . "G$"
-
-        let line = getline(lnum)
-        let cnum = 1
-
-        while cnum <=# col('.')
-            " skip ansi codes in the file
-            if cnum <=# col('.') - 1 && line[cnum-1] ==# "\e" && line[cnum] ==# '['
-                let cnum += 2
-                while match(line[cnum-1], '[A-Za-z]') ==# -1
-                    let cnum += 1
-                endwhile
-
-                let cnum += 1
-                continue
-            endif
-
-            let concealed = synconcealed(lnum, cnum)
-
-            if empty(concealed) " no conceal feature
-                let concealed = [0]
-            endif
-
-            if concealed[0] !=# 1 && synIDtrans(synID(lnum, cnum, 1)) != last
-                let last = synIDtrans(synID(lnum, cnum, 1))
-                let output .= s:GroupToAnsi(last)
-            endif
-
-            if concealed[0] ==# 1 && &conceallevel !=# 0
-                if &conceallevel ==# 1 || &conceallevel ==# 2
-                    let output .= concealed[1]
-                endif
-            else
-                let output .= line[cnum-1]
-            endif
-            "let line = substitute(line, '.', '', '')
-                        "let line = matchstr(line, '^\@<!.*')
-            let cnum += 1
-        endwhile
-
-        if a:line_numbers
-            let output = printf("\<Esc>[0m\<Esc>[37;1m%" . ln_field_len . "d ", lnum) . output
-        endif
-
-        call writefile([output . "\<Esc>[0m\r"], a:output_file, 'a')
-
-        let lnum += 1
-
-        if a:pipeline_dir == ''
-            if lnum > line('$')
-                let done = 1
-            endif
-        else
-            if lnum % 30 == 0
-                call s:ReadChunks()
-            endif
-
-            if lnum > line('$')
-                let stream_underrun = 1
-
-                while stream_underrun
-                    let stream_underrun = !s:ReadChunks()
-
-                    if stream_underrun
-                        if filereadable(a:pipeline_dir . '/PIPELINE_DONE')
-                            let done = 1
-                            break
-                        endif
-
-                        sleep 100 m
-                    endif
-                endwhile
-            endif
-        endif
-    endwhile
-
-    return 1
-endfunction
-
-" See copyright in the vim script above (for the vim script) and in
-" vimcat.md for the whole script.
-"
-" The list of contributors is at the bottom of the vimpager script in this
-" project.
-"
-" vim: sw=4 et ft=vim:
+# vim: sw=4 et

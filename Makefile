@@ -16,13 +16,13 @@ GEN_DOCS=man/vimpager.1 man/vimcat.1 html/vimpager.html html/vimcat.html markdow
 
 ANSIESC=autoload/AnsiEsc.vim plugin/AnsiEscPlugin.vim plugin/cecutil.vim
 
-RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim plugin/vimpager.vim macros/less.vim syntax/perldoc.vim ${ANSIESC}
+RUNTIME=autoload/vimpager.vim autoload/vimpager_utils.vim autoload/vimcat.vim plugin/vimpager.vim macros/less.vim syntax/perldoc.vim ${ANSIESC}
 
 SRC=vimcat ${RUNTIME}
 
 PROGRAMS=vimpager vimcat
 
-all: ${PROGRAMS:=-vertag-stamp} balance-shellvim-stamp standalone/vimpager standalone/vimcat docs
+all: ${PROGRAMS:=-vertag-stamp} standalone/vimpager standalone/vimcat docs
 
 # set tag from git or ChangeLog
 %-vertag-stamp: %
@@ -42,42 +42,47 @@ all: ${PROGRAMS:=-vertag-stamp} balance-shellvim-stamp standalone/vimpager stand
 	@git describe >$<-version.txt 2>/dev/null \
 	|| sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml >$<-version.txt
 
-balance-shellvim-stamp: vimcat Makefile
-	@echo balanceing vimcat
-	@chmod +x scripts/balance-shellvim
-	@scripts/balance-shellvim
-	@touch balance-shellvim-stamp
-
-standalone/%: % ${SRC:=.uu} inc/* Makefile %-version.txt
+standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	@echo building $@
-	@${MKPATH} `dirname $@`
-	@base="`basename $@`"; \
-	cp "$$base" $@; \
-	if grep '^# INCLUDE BUNDLED SCRIPTS' "$$base" >/dev/null; then \
-		cp $@ $@.work; \
-		sed -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-		    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
-		    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
-		    -e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
-		    -e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
-		    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
-		    $@.work > $@; \
-		cat inc/do_uudecode.sh >> $@; \
-		cat inc/bundled_scripts.sh >> $@; \
-		cat ${SRC:=.uu} >> $@; \
-		sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' "$$base" >> $@; \
-	fi
-	@cp $@ $@.work
-	@sed -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat $<-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
+	@${MKPATH} ${@D}
+	@sed \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
-	    -e '}' $@.work > $@
-	@rm -f $@.work
-	@if grep '^: if 0$$' $@ >/dev/null; then \
-		chmod +x scripts/balance-shellvim; \
-		scripts/balance-shellvim $@; \
-	fi
+	    -e '}' \
+	    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
+	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
+	    -e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
+	    -e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
+	    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
+	    vimpager > $@
+	@cat inc/do_uudecode.sh >> $@
+	@cat inc/bundled_scripts.sh >> $@
+	@cat ${SRC:=.uu} >> $@
+	@sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> $@
+	@chmod +x $@
+
+standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile
+	@echo building $@
+	@${MKPATH} ${@D}
+	@sed -e '1 a : if 0' \
+	    -e 's/^\( *\)# INSERT VIMCAT_DEBUG PREPARATION HERE$$/\1if [ "$${VIMCAT_DEBUG:-0}" -eq 0 ]; then silent="silent! "; else silent=; fi/' \
+	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e '/^runtime=.*/d' \
+	    -e '/^ *--cmd "set rtp^=\$$runtime" \\$$/d' \
+	    -e '/call vimcat#Run/ i -c "$$silent source $$0" \\' \
+	    -e 's/vimcat#Run(/Run(/g' \
+	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e     'r inc/prologue.sh' \
+	    -e     d \
+	    -e '}' \
+	    vimcat > $@
+	@awk '/^[ 	]*(if|for|while)/ { print $$1 }' vimcat \
+	  | sed '1!G;h;$$!d' \
+	  | sed -e 's/^/: end/' >> $@
+	@echo ': endif' >> $@
+	@sed -e 's/vimcat#Run(/Run(/g' autoload/vimcat.vim >> $@
 	@chmod +x $@
 
 vimcat.uu: vimcat vimcat-version.txt
@@ -112,11 +117,11 @@ uninstall:
 	rm -rf "${prefix}/share/doc/vimpager"
 	rm -rf "${prefix}/share/vimpager"
 	@if [ '${PREFIX}' = '/usr' ] && diff /etc/vimpagerrc vimpagerrc >/dev/null 2>&1; then \
-		echo rm -f /etc/vimpagerrc; \
-		rm -rf /etc/vimpagerrc; \
+	    echo rm -f /etc/vimpagerrc; \
+	    rm -rf /etc/vimpagerrc; \
 	elif diff "${SYSCONFDIR}/vimpagerrc" vimpagerrc >/dev/null 2>&1; then \
-		echo rm -f "${SYSCONFDIR}/vimpagerrc"; \
-		rm -f "${SYSCONFDIR}/vimpagerrc"; \
+	    echo rm -f "${SYSCONFDIR}/vimpagerrc"; \
+	    rm -f "${SYSCONFDIR}/vimpagerrc"; \
 	fi
 
 install: docs vimpager.configured vimcat.configured
@@ -125,11 +130,11 @@ install: docs vimpager.configured vimcat.configured
 	${INSTALLBIN} vimpager.configured "${DESTDIR}${prefix}/bin/vimpager"
 	${INSTALLBIN} vimcat.configured "${DESTDIR}${prefix}/bin/vimcat"
 	@if [ -d man ]; then \
-		${MKPATH} "${DESTDIR}${prefix}/share/man/man1"; \
-		echo ${INSTALLMAN} man/vimpager.1 "${DESTDIR}${prefix}/share/man/man1/vimpager.1"; \
-		${INSTALLMAN} man/vimpager.1 "${DESTDIR}${prefix}/share/man/man1/vimpager.1"; \
-		echo ${INSTALLMAN} man/vimcat.1 "${DESTDIR}${prefix}/share/man/man1/vimcat.1"; \
-		${INSTALLMAN} man/vimcat.1 "${DESTDIR}${prefix}/share/man/man1/vimcat.1"; \
+	    ${MKPATH} "${DESTDIR}${prefix}/share/man/man1"; \
+	    echo ${INSTALLMAN} man/vimpager.1 "${DESTDIR}${prefix}/share/man/man1/vimpager.1"; \
+	    ${INSTALLMAN} man/vimpager.1 "${DESTDIR}${prefix}/share/man/man1/vimpager.1"; \
+	    echo ${INSTALLMAN} man/vimcat.1 "${DESTDIR}${prefix}/share/man/man1/vimcat.1"; \
+	    ${INSTALLMAN} man/vimcat.1 "${DESTDIR}${prefix}/share/man/man1/vimcat.1"; \
 	fi
 	@${MKPATH} "${DESTDIR}${prefix}/share/doc/vimpager"
 	${INSTALLDOC} markdown_src/vimpager.md "${DESTDIR}${prefix}/share/doc/vimpager/vimpager.md"
@@ -140,25 +145,25 @@ install: docs vimpager.configured vimcat.configured
 	${INSTALLDOC} ChangeLog_vimcat.yml "${DESTDIR}${prefix}/share/doc/vimpager/ChangeLog_vimcat.yml"
 	${INSTALLDOC} uganda.txt "${DESTDIR}${prefix}/share/doc/vimpager/uganda.txt"
 	${INSTALLDOC} debian/copyright "${DESTDIR}${prefix}/share/doc/vimpager/copyright"
-	if [ -d html ]; then \
-		${MKPATH} "${DESTDIR}${prefix}/share/doc/vimpager/html"; \
-		echo ${INSTALLDOC} html/vimpager.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimpager.html"; \
-		${INSTALLDOC} html/vimpager.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimpager.html"; \
-		echo ${INSTALLDOC} html/vimcat.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimcat.html"; \
-		${INSTALLDOC} html/vimcat.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimcat.html"; \
+	@if [ -d html ]; then \
+	    ${MKPATH} "${DESTDIR}${prefix}/share/doc/vimpager/html"; \
+	    echo ${INSTALLDOC} html/vimpager.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimpager.html"; \
+	    ${INSTALLDOC} html/vimpager.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimpager.html"; \
+	    echo ${INSTALLDOC} html/vimcat.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimcat.html"; \
+	    ${INSTALLDOC} html/vimcat.html "${DESTDIR}${prefix}/share/doc/vimpager/html/vimcat.html"; \
 	fi
 	${MKPATH} "${DESTDIR}${prefix}/share/vimpager"
-	for rt_file in ${RUNTIME}; do \
-		if [ ! -d "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`" ]; then \
-			echo ${MKPATH} "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`"; \
-			${MKPATH} "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`"; \
-		fi; \
-		echo ${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
-		${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
-	done; \
-	SYSCONFDIR='${DESTDIR}${SYSCONFDIR}'; \
+	@for rt_file in ${RUNTIME}; do \
+	    if [ ! -d "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`" ]; then \
+		echo ${MKPATH} "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`"; \
+		${MKPATH} "`dirname "${DESTDIR}${prefix}/share/vimpager/$$rt_file"`"; \
+	    fi; \
+	    echo ${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
+	    ${INSTALLFILE} "$$rt_file" "${DESTDIR}${prefix}/share/vimpager/$$rt_file"; \
+	done
+	@SYSCONFDIR='${DESTDIR}${SYSCONFDIR}'; \
 	if [ '${PREFIX}' = /usr ]; then \
-		SYSCONFDIR='${DESTDIR}/etc'; \
+	    SYSCONFDIR='${DESTDIR}/etc'; \
 	fi; \
 	${MKPATH} "$${SYSCONFDIR}" 2>/dev/null || true; \
 	echo ${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"; \
@@ -168,9 +173,9 @@ install: docs vimpager.configured vimcat.configured
 	@echo configuring $<
 	@POSIX_SHELL="`scripts/find_shell`"; \
 	if [ '${PREFIX}' = /usr ]; then \
-		vimpagerrc=/etc/vimpagerrc; \
+	    vimpagerrc=/etc/vimpagerrc; \
 	else \
-		vimpagerrc='${SYSCONFDIR}/vimpagerrc'; \
+	    vimpagerrc='${SYSCONFDIR}/vimpagerrc'; \
 	fi; \
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
@@ -195,9 +200,9 @@ install-deb:
 	@echo y | gdebi vimpager-build-deps*.deb
 	@rm -f vimpager-build-deps*.deb
 	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar; \
-		rm -f "$$orig_tar_ball".gz; \
-		tar cf "$$orig_tar_ball" * .travis.yml; \
-		gzip "$$orig_tar_ball"
+	    rm -f "$$orig_tar_ball".gz; \
+	    tar cf "$$orig_tar_ball" * .travis.yml; \
+	    gzip "$$orig_tar_ball"
 	@dpkg-buildpackage -us -uc
 	@echo y | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
@@ -210,40 +215,40 @@ docs: ${GEN_DOCS} docs.tar.gz Makefile
 docs.tar.gz: ${GEN_DOCS} ${DOC_SRC} Makefile
 	@rm -f $@
 	@if [ "`ls -1 $? 2>/dev/null | wc -l`" -eq "`echo $? | wc -w`" ]; then \
-		echo tar cf docs.tar $?; \
-		tar cf docs.tar $?; \
-		echo gzip -9 docs.tar; \
-		gzip -9 docs.tar; \
+	    echo tar cf docs.tar $?; \
+	    tar cf docs.tar $?; \
+	    echo gzip -9 docs.tar; \
+	    gzip -9 docs.tar; \
 	fi
 
 # Build markdown with TOCs
 markdown/%.md: markdown_src/%.md
 	@if command -v doctoc >/dev/null; then \
-		echo 'generating $@'; \
-		${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-		cp $< $@; \
-		doctoc --title '### Vimpager User Manual' $@ >/dev/null; \
+	    echo 'generating $@'; \
+	    ${MKPATH} `dirname '$@'` 2>/dev/null || true; \
+	    cp $< $@; \
+	    doctoc --title '### Vimpager User Manual' $@ >/dev/null; \
 	else \
-		if [ ! -r doctoc-warn-stamp ]; then \
-		    echo >&2; \
-		    echo "[1;31mWARNING[0m: doctoc is not available, markdown with Tables Of Contents will not be generated. If you want to generate them, install doctoc with: npm install -g doctoc" >&2; \
-		    echo >&2; \
-		    touch doctoc-warn-stamp; \
-		fi; \
+	    if [ ! -r doctoc-warn-stamp ]; then \
+		echo >&2; \
+		echo "[1;31mWARNING[0m: doctoc is not available, markdown with Tables Of Contents will not be generated. If you want to generate them, install doctoc with: npm install -g doctoc" >&2; \
+		echo >&2; \
+		touch doctoc-warn-stamp; \
+	    fi; \
 	fi
 
 man/%.1: markdown_src/%.md
 	@if command -v pandoc >/dev/null; then \
-		echo 'generating $@'; \
-		${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-		${PANDOC} -Ss -f markdown_github $< -o $@; \
+	    echo 'generating $@'; \
+	    ${MKPATH} `dirname '$@'` 2>/dev/null || true; \
+	    ${PANDOC} -Ss -f markdown_github $< -o $@; \
 	else \
-		if [ ! -r docs-warn-stamp ]; then \
-		    echo >&2; \
-		    echo "[1;31mWARNING[0m: pandoc is not available, man pages and html will not be generated. If you want to install the man pages and html, install pandoc and re-run make." >&2; \
-		    echo >&2; \
-		    touch docs-warn-stamp; \
-		fi; \
+	    if [ ! -r docs-warn-stamp ]; then \
+		echo >&2; \
+		echo "[1;31mWARNING[0m: pandoc is not available, man pages and html will not be generated. If you want to install the man pages and html, install pandoc and re-run make." >&2; \
+		echo >&2; \
+		touch docs-warn-stamp; \
+	    fi; \
 	fi
 
 .SECONDARY: vimpager.md.work vimcat.md.work
@@ -254,20 +259,22 @@ man/%.1: markdown_src/%.md
 
 html/%.html: %.md.work
 	@if command -v pandoc >/dev/null; then \
-		echo 'generating $@'; \
-		${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-		${PANDOC} -Ss --toc -f markdown_github $< -o $@; \
-		rm -f $<; \
+	    echo 'generating $@'; \
+	    ${MKPATH} `dirname '$@'` 2>/dev/null || true; \
+	    ${PANDOC} -Ss --toc -f markdown_github $< -o $@; \
+	    rm -f $<; \
 	else \
-		if [ ! -r docs-warn-stamp ]; then \
-		    echo >&2; \
-		    echo "[1;31mWARNING[0m: pandoc is not available, man pages and html will not be generated. If you want to install the man pages and html, install pandoc and re-run make." >&2; \
-		    echo >&2; \
-		    touch docs-warn-stamp; \
-		fi; \
+	    if [ ! -r docs-warn-stamp ]; then \
+		echo >&2; \
+		echo "[1;31mWARNING[0m: pandoc is not available, man pages and html will not be generated. If you want to install the man pages and html, install pandoc and re-run make." >&2; \
+		echo >&2; \
+		touch docs-warn-stamp; \
+	    fi; \
 	fi
 
 realclean distclean clean:
 	rm -rf *.work */*.work *-stamp *-version.txt *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
 
 .PHONY: all install install-deb uninstall docs realclean distclean clean
+
+# vim: sw=4
