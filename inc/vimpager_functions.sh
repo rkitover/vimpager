@@ -171,10 +171,7 @@ main() {
 
         # squeeze blank lines if option was specified, Ubuntu man with /usr/bin/pager does this
         if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
-                sed -e '/^[ 	]*$/{
-                    N
-                    /^[ 	]*\n[ 	]*$/D
-                }' < "${tempfile:-$file}" > "$tmp/$filename.work"
+                squeeze_blank_lines < "${tempfile:-$file}" > "$tmp/$filename.work"
                 tempfile=$tmp/$filename
                 mv -f -- "$tempfile.work" "$tempfile"
         fi

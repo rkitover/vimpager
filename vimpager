@@ -114,6 +114,7 @@ fi
 ANSI_RE='\[[;?]*[0-9.;]*[A-Za-z]'
 
 . "$project_dir/inc/vimpager_functions.sh"
+. "$project_dir/inc/common_functions.sh"
 # INCLUDE BUNDLED SCRIPTS HERE
 # END OF BUNDLED SCRIPTS
 

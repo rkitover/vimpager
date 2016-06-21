@@ -34,6 +34,7 @@ else
 fi
 
 . "$project_dir/inc/vimcat_functions.sh"
+. "$project_dir/inc/common_functions.sh"
 
 # if no args and stdin is on a terminal, pretend we're cat and wait on stdin.
 if [ $# -eq 0 -a -t 0 ]; then
