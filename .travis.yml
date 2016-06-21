@@ -1,6 +1,13 @@
 sudo: required
 dist: trusty
 
+addons:
+    apt:
+        packages:
+            # The sharutils package contains uuencode.
+            - sharutils
+            - lintian
+
 install:
     # Update to a new version of lintian as the one on trusty is quite old.
     # This also runs apt-get update.
