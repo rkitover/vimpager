@@ -30,7 +30,7 @@ all: ${PROGRAMS:=-vertag-stamp} standalone/vimpager standalone/vimcat docs
 	@tag=`git tag 2>/dev/null | tail -1`; \
 	[ -z "$$tag" ] && tag=`sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml`; \
 	if [ -n "$$tag" ]; then \
-		sed -e 's/^\( *version_tag=\).*/\1'"$$tag"'/' $< > $<.work; \
+		sed -e 's/^version_tag=.*/version_tag='"$$tag"'/' $< > $<.work; \
 		mv $<.work $<; \
 	fi
 	@chmod +x $<
@@ -90,7 +90,7 @@ vimcat.uu: vimcat vimcat-version.txt
 	@echo 'vimcat_script() {' > $@
 	@printf "\t(cat <<'EOF') | do_uudecode > bin/vimcat\n" >> $@
 	@sed \
-	    -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat vimcat-version.txt`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"\2|' \
+	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
@@ -180,7 +180,7 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
-	    -e 's|^\( *\)version=.* (git)"\( *\\*\)$$|\1version="'"`cat $<-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"\2|' \
+	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
 	    -e 's!^\( *\)vimcat=.*!\1vimcat='\''${PREFIX}/bin/vimcat'\''!' \
