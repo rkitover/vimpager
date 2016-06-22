@@ -31,7 +31,7 @@ all: ${PROGRAMS:=-vertag-stamp} standalone/vimpager standalone/vimcat docs
 	[ -z "$$tag" ] && tag=`sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml`; \
 	if [ -n "$$tag" ]; then \
 		sed -e 's/^version_tag=.*/version_tag='"$$tag"'/' $< > $<.work; \
-		mv $<.work $<; \
+		mv -f $<.work $<; \
 	fi
 	@chmod +x $<
 	@touch $@
@@ -66,22 +66,25 @@ standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile
 	@echo building $@
 	@${MKPATH} ${@D}
-	@sed -e '1 a : if 0' \
+	@nlinit=`echo 'nl="'; echo '"'`; eval "$$nlinit"; \
+	sed -e '1a\'"$$nl"': if 0' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's/^\( *\)# INSERT VIMCAT_DEBUG PREPARATION HERE$$/\1if [ "$${VIMCAT_DEBUG:-0}" -eq 0 ]; then silent="silent! "; else silent=; fi/' \
 	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 	    -e '/^runtime=.*/d' \
 	    -e '/^ *--cmd "set rtp^=\$$runtime" \\$$/d' \
-	    -e '/call vimcat#Run/ i -c "$$silent source $$0" \\' \
+	    -e '/call vimcat#Run/i\'"$$nl"'-c "$$silent source $$0" \\' \
 	    -e 's/vimcat#Run(/Run(/g' \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
 	    vimcat > $@
-	@awk '/^[ 	]*(if|for|while)/ { print $$1 }' vimcat \
+	@cp $@ $@.work
+	@awk '/^[ 	]*(if|for|while)/ { print $$1 }' $@ \
 	  | sed '1!G;h;$$!d' \
-	  | sed -e 's/^/: end/' >> $@
+	  | sed -e 's/^/: end/' >> $@.work
+	@mv -f $@.work $@
 	@echo ': endif' >> $@
 	@sed -e 's/vimcat#Run(/Run(/g' autoload/vimcat.vim >> $@
 	@chmod +x $@
@@ -213,7 +216,7 @@ install-deb:
 docs: ${GEN_DOCS} docs.tar.gz Makefile
 	@rm -f docs-warn-stamp doctoc-warn-stamp
 
-docs.tar.gz: ${GEN_DOCS} ${DOC_SRC} Makefile
+docs.tar.gz: ${GEN_DOCS} ${DOC_SRC}
 	@rm -f $@
 	@if [ "`ls -1 $? 2>/dev/null | wc -l`" -eq "`echo $? | wc -w`" ]; then \
 	    echo tar cf docs.tar $?; \
