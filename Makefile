@@ -51,7 +51,7 @@ standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	    -e     d \
 	    -e '}' \
 	    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
-	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
+	    -e 's|^version=.*|version="'"`cat vimpager-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 	    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
 	    -e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
 	    -e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
@@ -63,7 +63,7 @@ standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	@sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> $@
 	@chmod +x $@
 
-standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile
+standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh Makefile
 	@echo building $@
 	@${MKPATH} ${@D}
 	@nlinit=`echo 'nl="'; echo '"'`; eval "$$nlinit"; \
@@ -90,7 +90,7 @@ standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh Makefile
 	@chmod +x $@
 
 vimcat.uu: vimcat vimcat-version.txt
-	@echo uuencoding $<
+	@echo uuencoding vimcat
 	@echo 'vimcat_script() {' > $@
 	@printf "\t(cat <<'EOF') | do_uudecode > bin/vimcat\n" >> $@
 	@sed \
@@ -99,8 +99,8 @@ vimcat.uu: vimcat vimcat-version.txt
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
-	    $< > $@.work
-	@uuencode $@.work $< >> $@
+	    vimcat > $@.work
+	@uuencode $@.work vimcat >> $@
 	@echo EOF >> $@
 	@echo '}' >> $@
 	@rm $@.work
