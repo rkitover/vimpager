@@ -210,7 +210,7 @@ install-deb:
 	@dpkg-buildpackage -us -uc
 	@echo y | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
-	@apt-get -y autoremove
+	@[ "$${CLEAN_BUILD_DEPS:-1}" -ne 0 ] && apt-get -y autoremove || true
 	@debian/rules clean
 
 docs: ${GEN_DOCS} docs.tar.gz Makefile
