@@ -198,8 +198,8 @@ install-deb:
 	    echo >&2; \
 	    exit 1; \
 	fi
-	@apt-get update || true
-	@apt-get -y install debhelper devscripts equivs gdebi-core
+	@-apt-get -qq update
+	@apt-get -yqq install debhelper devscripts equivs gdebi-core
 	@mk-build-deps
 	@echo y | gdebi vimpager-build-deps*.deb
 	@rm -f vimpager-build-deps*.deb
@@ -210,7 +210,7 @@ install-deb:
 	@dpkg-buildpackage -us -uc
 	@echo y | gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
-	@[ "$${CLEAN_BUILD_DEPS:-1}" -ne 0 ] && apt-get -y autoremove || true
+	@-[ "$${CLEAN_BUILD_DEPS:-1}" -ne 0 ] && apt-get -yqq autoremove
 	@debian/rules clean
 
 docs: ${GEN_DOCS} docs.tar.gz Makefile
