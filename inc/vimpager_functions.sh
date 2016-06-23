@@ -1,5 +1,7 @@
 # Function definitions for vimpager.
 
+# this is compatible with osed
+ANSI_RE='\[[;?]*[0-9.;]*[A-Za-z]'
 
 main() {
     # if no args and no stdin, display usage
@@ -816,6 +818,96 @@ fits_on_screen() {
         if (!--lines) exit(1)
     }
     ' num_files=$# total_lines=$lines total_cols=$cols file_sep_lines=3 first_file_sep_lines=2 -
+}
+
+set_system_vars() {
+    case "$(uname -s)" in
+        Linux) linux=1 ;;
+        SunOS) solaris=1 ;;
+        Darwin) osx=1; bsd=1 ;;
+        CYGWIN*) cygwin=1; win32=1 ;;
+        MINGW*) msys=1; win32=1 ;;
+        MSYS*) msys=1; win32=1 ;;
+        OpenBSD) openbsd=1; bsd=1 ;;
+        FreeBSD) freebsd=1; bsd=1 ;;
+        NetBSD) netbsd=1; bsd=1 ;;
+        *) bsd=1 ;;
+    esac
+}
+
+check_for_cygpath() {
+    # special handling to rewrite cygwin/msys paths to windows POSIX paths
+    if [ -n "$win32" ] && command -v cygpath >/dev/null; then
+        _have_cygpath=1
+    fi
+}
+
+select_awk_executable() {
+    if command -v gawk >/dev/null; then
+        _awk=gawk
+    elif command -v nawk >/dev/null; then
+        _awk=nawk
+    elif command -v mawk >/dev/null; then
+        _awk=mawk
+    elif [ -x /usr/xpg4/bin/awk ]; then
+        _awk=/usr/xpg4/bin/awk
+    elif command -v awk >/dev/null; then
+        _awk=awk
+    else
+        echo "ERROR: No awk found!" >&2
+        quit 1
+    fi
+}
+
+select_sed_executable() {
+    if command -v gsed >/dev/null; then
+        _sed=gsed
+    elif [ -x /usr/xpg4/bin/sed ]; then
+        _sed=/usr/xpg4/bin/sed
+    elif command -v sed >/dev/null; then
+        _sed=sed
+    else
+        echo "ERROR: No sed found!" >&2
+        quit 1
+    fi
+}
+
+select_grep_executable() {
+    if command -v ggrep >/dev/null; then
+        _grep=ggrep
+    elif [ -x /usr/xpg4/bin/grep ]; then
+        _grep=/usr/xpg4/bin/grep
+    elif command -v grep >/dev/null; then
+        _grep=grep
+    else
+        echo "ERROR: No grep found!" >&2
+        quit 1
+    fi
+}
+
+check_for_grep_q() {
+    # check that grep -Eq works
+    if [ -z "$(echo foo | "$_grep" -Eq foo >/dev/null 2>&1)" -a $? -eq 0 ]; then
+        _have_grep_E_q=1
+    fi
+}
+
+select_head_executable() {
+    if command -v ghead >/dev/null; then
+        _head=ghead
+    else
+        _head=head
+    fi
+}
+
+select_head_syntax() {
+    if [ "$(echo xx | head -n 1 2>/dev/null)" = "xx" ]; then
+        _head_syntax=new
+    else
+        if ! head -1 -- "$0" >/dev/null 2>&1; then
+            _head_no_double_dash=1
+        fi
+    fi
 }
 
 # vim: sw=4 et tw=0:
