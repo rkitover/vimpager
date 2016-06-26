@@ -11,13 +11,15 @@ no_output() {
 }
 
 run_cmd() {
-    echo >cmd.sh \
+    echo >_cmd.sh \
 "#!/bin/sh
 $@
 echo \"___EXITED___: \$?\""
-    chmod +x cmd.sh
+    chmod +x _cmd.sh
 
-    SHELL=./cmd.sh script output.0 </dev/tty
+    SHELL=./_cmd.sh script output.0 </dev/tty
+
+    rm -f _cmd.sh
 
     sed \
     -e '/^Script started/d' \
