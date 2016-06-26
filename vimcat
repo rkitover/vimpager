@@ -45,7 +45,7 @@ quit() {
         do_sleep 100
         kill -9 "$tail_pid" >/dev/null 2>&1
 
-        rm -rf "$tmp_dir"
+        rm -rf "$tmp_dir" 2>/dev/null # rm -rf "" shows error on OpenBSD
     ) &
     exit "$@"
 }
