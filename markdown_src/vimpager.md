@@ -24,6 +24,8 @@ For vimcat see [here](markdown/vimcat.md) or 'man vimcat'.
 * sharutils or some uuencode (only if you change the */*.vim sources)
 * pandoc (for man pages and html, optional)
 * doctoc (for markdown TOCs, optional)
+* bats (for tests, optional, get it from:
+  https://github.com/sstephenson/bats.git)
 
 # INSTALL
 
