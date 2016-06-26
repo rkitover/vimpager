@@ -2,21 +2,20 @@
 
 load helpers
 
-teardown () {
-  rm -f output.*
+teardown() {
+    rm -f output.*
 }
 
 @test "symlink to vimpager finds the correct project directory" {
-  script -q -e -c "$fixtures/bin/vimpager-relative-symlink-to-git -v" output.1
-  run sed 1d output.1
-  status_ok
-  [[ "$output" =~ vimpager.*\(git\) ]]
-}
-@test "symlink to vimcat finds the correct project directory" {
-  script -q -e -c "$fixtures/bin/vimcat-relative-symlink-to-git -v" output.1
-  run sed 1d output.1
-  status_ok
-  [[ "$output" =~ vimcat.*\(git\) ]]
+    run_cmd "$fixtures"/bin/vimpager-relative-symlink-to-git -v
+    status_ok
+    [[ "$output" =~ vimpager.*\(git\) ]]
 }
 
-# vim: filetype=sh
+@test "symlink to vimcat finds the correct project directory" {
+    run_cmd "$fixtures"/bin/vimcat-relative-symlink-to-git -v
+    status_ok
+    [[ "$output" =~ vimcat.*\(git\) ]]
+}
+
+# vim: filetype=sh sw=4 sts=4 et :
