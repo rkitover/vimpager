@@ -37,7 +37,11 @@ function! vimpager_utils#StatusLine(opts)
 endfunction
 
 function! vimpager_utils#DoAnsiEsc()
-    if vimpager#FtSetFromModeline() || exists(':AnsiEsc') !=# 2
+    if exists(':AnsiEsc') !=# 2
+        return
+    endif
+
+    if vimpager_utils#FtSetFromModeline() && !vimpager_utils#IsDiff()
         return
     endif
 
@@ -46,8 +50,17 @@ function! vimpager_utils#DoAnsiEsc()
 
     " if hidden is not set, we have to toggle AnsiEsc when entering/leaving buffer
     if !&hidden
-        exe 'autocmd! vimpager_process BufWinLeave ' . expand('%') . ' AnsiEsc'
+        execute 'autocmd! vimpager_process BufWinLeave ' . expand('%') . ' AnsiEsc'
     endif
+endfunction
+
+function! vimpager_utils#IsDiff()
+    let lnum = 1
+    while getline(lnum) =~ '^\s*$'
+        lnum += 1
+    endwhile
+
+    return getline(lnum) =~? '^\%(\e\[[;?]*[0-9.;]*[A-Za-z]\)*\%(diff\|---\)\s'
 endfunction
 
 function! vimpager_utils#ConcealRetab()

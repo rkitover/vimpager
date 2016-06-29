@@ -29,16 +29,16 @@ function! vimpager#Init(opts)
     " make buffers modifiable and not complain on quit
     autocmd BufReadPre,StdinReadPre * call s:SetBufType()
 
-    " any pre-processing necessary is written to .vim files
-    autocmd BufReadPost,StdinReadPost * silent! execute
-                \ 'source ' . s:opts.tmp_dir . '/' . (argidx() + 1) . '.vim'
+    " the post-processing .vim files are written from 1..N.vim,
+    " since the arglist is modified on q we have to save the indices
+    let s:file_indices = {}
 
-    " in case the post-processing does something we don't want
-    autocmd BufReadPost,StdinReadPost * call s:FixBufOpts()
+    for i in range(1, argc())
+        let s:file_indices[argv(i - 1)] = i
+    endfor
 
-    " hide error messages from invalid modelines
-    autocmd BufWinEnter * if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG
-                \ | silent! redraw! | endif
+    " any pre-processing necessary is written to .vim files, single shot
+    autocmd BufWinEnter * call s:PostProcess()
 
     augroup END
 
@@ -67,6 +67,36 @@ function! vimpager#Init(opts)
         set clipboard=autoselect
     else
         set laststatus=1 " neovim defaults to 2
+    endif
+endfunction
+
+let s:post_processed = {}
+
+function! s:PostProcess()
+    " only run this for args, if we are not on an arg return
+    if bufname('%') !=# argv(argidx())
+        return
+    endif
+
+    let fname = bufname('%')
+    let idx   = s:file_indices[fname]
+
+    " we only run this once if hidden is set, otherwise every time
+    if !has_key(s:post_processed, fname) || !&hidden
+        let silent=(!exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG) ? 'silent! ' : ''
+
+        " these are written by vimpager shell code
+        execute silent . 'source ' . s:opts.tmp_dir . '/' . idx . '.vim'
+
+        " in case the post-processing does something we don't want
+        call s:FixBufOpts()
+
+        " hide error messages from invalid modelines, or post processing errors
+        if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG
+            silent! redraw!
+        endif
+
+        let s:post_processed[fname] = 1
     endif
 endfunction
 

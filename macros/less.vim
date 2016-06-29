@@ -137,16 +137,17 @@ function! s:EnterWindow()
     call s:ReenableOpts()
     call g:less.statusfunc()
   else
-    call s:RestoreGlobalOpts()
+    if exists('g:less.enabled') && g:less.enabled
+      call s:LessMode()
+      call g:less.statusfunc()
+    else
+      call s:RestoreGlobalOpts()
+    endif
   endif
 endfunction
 
-" set up less mode before reading each file
 augroup less
   autocmd!
-  autocmd BufReadPost,StdinReadPost * if exists('g:less.enabled') && g:less.enabled | call s:LessMode() | endif
-
-  " display file on start
   autocmd BufWinEnter * call s:EnterWindow()
 augroup end
 
@@ -542,18 +543,16 @@ function! s:CloseBuffer()
       execute 'argument ' . (argidx() + 1)
 
       execute 'bwipeout ' . cur_buf
+    else
+      " otherwise try to delete the buffer
 
-      return
+      " if current buffer is the current arg, delete from arg list
+      if argv(argidx()) ==# bufname('%')
+        execute (argidx() + 1) . 'argdelete'
+      endif
+
+      bwipeout
     endif
-
-    " otherwise try to delete the buffer
-
-    " if current buffer is the current arg, delete from arg list
-    if argv(argidx()) ==# bufname('%')
-      execute (argidx() + 1) . 'argdelete'
-    endif
-
-    bwipeout
   catch
     echohl Error
     unsilent echo v:exception[stridx(v:exception, ':')+1 : -1]
