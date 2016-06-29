@@ -39,7 +39,7 @@ load helpers
 
 @test "usage prints the help message" {
     run usage
-    [[ "$output" = "$(sed 's/\r//' "$fixtures/vimcat-help.txt")" ]]
+    [[ "$output" = "$(tr -d '\015' < "$fixtures/vimcat-help.txt")" ]]
     status_ok
 }
 

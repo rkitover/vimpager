@@ -53,9 +53,8 @@ load helpers
 }
 
 @test "usage prints the help message" {
-    unset -f sed
     run usage
-    [[ "$output" = "$(sed 's/\r//' "$fixtures/vimpager-help.txt")" ]]
+    [[ "$output" = "$(tr -d '\015' < "$fixtures/vimpager-help.txt")" ]]
     status_ok
 }
 # vim: filetype=sh et sw=4 sts=4 :
