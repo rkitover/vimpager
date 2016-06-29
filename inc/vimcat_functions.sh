@@ -144,13 +144,6 @@ find_tmp_directory() {
     tmp=$tmp/vimcat_$$
 }
 
-create_tmp_directory() {
-    if ! mkdir $mkdir_options "$tmp"; then
-        echo "Could not create temporary directory $tmp" >&2
-        exit 1
-    fi
-}
-
 install_trap() {
     trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 }

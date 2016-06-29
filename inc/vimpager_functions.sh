@@ -80,6 +80,8 @@ main() {
 
     find_tmp_directory
 
+    create_tmp_directory
+
     trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 
     detect_term_size
@@ -254,10 +256,6 @@ find_tmp_directory() {
 
     # Create a safe directory in which we place all other tempfiles.
     tmp=$tmp/vimpager_$$
-    if ! mkdir $mkdir_options "$tmp"; then
-        echo "ERROR: Could not create temporary directory $tmp" >&2
-        quit 1
-    fi
 }
 
 detect_term_size() {
