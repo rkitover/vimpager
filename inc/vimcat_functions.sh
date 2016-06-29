@@ -90,4 +90,230 @@ start_highlight_job() {
     fi
 }
 
+select_vim_executable() {
+    if command -v vim >/dev/null; then
+        vim=vim
+    elif command -v nvim >/dev/null; then
+        vim=nvim
+    else
+        echo "$0: neither vim nor nvim found, vim or nvim is required for vimcat" >&2
+        exit 1
+    fi
+}
+
+parse_command_line_options_1() {
+    # if no args and no stdin, display usage
+    if [ $# -eq 0 -a -t 0 ]; then
+        usage
+        quit 0
+    fi
+
+    # check for -h before main option parsing, this is much faster
+    for arg in "$@"; do
+        case "$arg" in
+            "-h"|"--help"|"-help"|"--usage"|"-usage")
+                usage
+                quit 0
+                ;;
+            "-v"|"--version"|"-version")
+                echo "vimcat $version"
+                quit 0
+                ;;
+            "-x")
+                set -x
+                ;;
+        esac
+    done
+}
+
+find_tmp_directory() {
+    tmp_dir=/tmp
+    mkdir_options="-m 700"
+
+    case "$(uname -s)" in
+        MINGW*|MSYS*)
+            if [ -n "$temp" ]; then
+                # MSYS2 is a little tricky, we're gonna stick to the user's private temp
+                # the -m mode switch to mkdir doesn't work
+                tmp_dir=$(cygpath --unix "$temp")
+                mkdir_options=
+            fi
+            ;;
+    esac
+
+    tmp_dir=$tmp_dir/vimcat_$$
+}
+
+create_tmp_directory() {
+    if ! mkdir $mkdir_options "$tmp_dir"; then
+        echo "Could not create temporary directory $tmp_dir" >&2
+        exit 1
+    fi
+}
+
+install_trap() {
+    trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
+}
+
+create_fifo() {
+    tmp_file_in=$tmp_dir/vimcat_in.txt
+    out_fifo=$tmp_dir/vimcat_out.fifo
+
+    case $(uname -s) in
+        SunOS*|CYGWIN*|MINGW*|MSYS*)
+            # the fifo streaming doesn't work on windows and solaris
+            touch "$out_fifo"
+            ;;
+        *)
+            mkfifo "$out_fifo"
+            ;;
+    esac
+}
+
+main() {
+    # check for arguments
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+            "-c")
+                shift
+                if [ -z "$extra_c" ]; then
+                    extra_c=$1
+                else
+                    extra_c="$extra_c | $1"
+                fi
+                shift
+                ;;
+            "--cmd")
+                shift
+                if [ -z "$extra_cmd" ]; then
+                    extra_cmd=$1
+                else
+                    extra_cmd="$extra_cmd | $1"
+                fi
+                shift
+                ;;
+            "-u")
+                shift
+                vimcatrc=$1
+                shift
+                ;;
+            "-o")
+                shift
+                output_file=$1
+                shift
+                ;;
+            "-s")
+                shift
+                squeeze_blank_lines=1
+                ;;
+            "-n")
+                shift
+                line_numbers=1
+                ;;
+            "-x")
+                # xtrace should already be set by the first option parsing
+                shift
+                ;;
+            "--")
+                shift
+                break
+                ;;
+            -)
+                break
+                ;;
+            -*)
+                echo "$0: bad option '$1', see --help for usage." >&2
+                quit 1
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    # Just pass through if not on a tty, unless -o was given
+    if [ -z "$output_file" ]; then
+        if [ ! -t 1 ]; then
+            exec cat "$@"
+        fi
+    fi
+
+    if [ -z "$vimcatrc" ]; then
+        if [ -f ~/.vimcatrc ]; then
+            vimcatrc=~/.vimcatrc
+        else
+            vimcatrc=
+        fi
+    fi
+
+    if [ $# -eq 0 ]; then
+        set -- -
+    fi
+
+    if [ -n "$output_file" -a $# -gt 1 ]; then
+        echo "$0: -o can only be used with one input file or stdin." >&2
+        quit 1
+    fi
+
+    chunks_dir=$tmp_dir/chunks
+    mkdir "$chunks_dir"
+
+    i=1
+    for file in "$@"
+    do
+        if [ $# -ge 2 ]; then
+            if [ $i -gt 1 ]; then
+                printf '\n'
+            fi
+            printf "==> %s <==\n\n" "$file"
+        fi
+
+        pipeline=
+        pipeline_start=$file
+
+        if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
+            pipeline=squeeze_blank_lines
+        fi
+
+        exit_code=0
+
+        # Check that the file is readable
+        if [ "$file" != - ]; then
+            if [ ! -r "$file" ]; then
+                echo "$0: Cannot read file: $file" >&2
+                exit_code=1
+            fi
+
+            [ ! -s "$file" ] && continue
+        fi
+
+        if [ -z "$output_file" -o "$output_file" = "-" ]; then
+            dest_file=$out_fifo
+
+            tail -f "$out_fifo" &
+            tail_pid=$!
+        else
+            dest_file=$output_file
+            printf '' > "$dest_file"
+        fi
+
+        start_highlight_job
+        start_pipeline
+        while [ ! -f "$tmp_dir/vim_done" ]; do
+            do_sleep 50
+        done
+
+        if [ -n "$tail_pid" ]; then
+            # if it's not a fifo where this doesn't work, tail needs some time to catch up
+            [ ! -p "$out_fifo" ] && do_sleep 1100
+
+            kill $tail_pid >/dev/null 2>&1
+        fi
+
+        i=$((i + 1))
+    done
+
+    quit $exit_code
+}
+
 # vim: sw=4 et tw=0:
