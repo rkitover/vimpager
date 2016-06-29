@@ -27,6 +27,7 @@ runtime=$project_dir
 . "$project_dir/inc/vimcat_functions.sh"
 . "$project_dir/inc/common_functions.sh"
 
+set_system_vars
 select_vim_executable
 parse_command_line_options_1 "$@"
 find_tmp_directory

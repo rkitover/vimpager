@@ -82,7 +82,7 @@ main() {
 
     create_tmp_directory
 
-    trap "quit 1" PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
+    install_trap
 
     detect_term_size
 
@@ -816,21 +816,6 @@ fits_on_screen() {
         if (!--lines) exit(1)
     }
     ' num_files=$# total_lines=$lines total_cols=$cols file_sep_lines=3 first_file_sep_lines=2 -
-}
-
-set_system_vars() {
-    case "$(uname -s)" in
-        Linux) linux=1 ;;
-        SunOS) solaris=1 ;;
-        Darwin) osx=1; bsd=1 ;;
-        CYGWIN*) cygwin=1; win32=1 ;;
-        MINGW*) msys=1; win32=1 ;;
-        MSYS*) msys=1; win32=1 ;;
-        OpenBSD) openbsd=1; bsd=1 ;;
-        FreeBSD) freebsd=1; bsd=1 ;;
-        NetBSD) netbsd=1; bsd=1 ;;
-        *) bsd=1 ;;
-    esac
 }
 
 check_for_cygpath() {

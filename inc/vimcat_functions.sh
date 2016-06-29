@@ -130,37 +130,26 @@ find_tmp_directory() {
     tmp=/tmp
     mkdir_options="-m 700"
 
-    case "$(uname -s)" in
-        MINGW*|MSYS*)
-            if [ -n "$temp" ]; then
-                # MSYS2 is a little tricky, we're gonna stick to the user's private temp
-                # the -m mode switch to mkdir doesn't work
-                tmp=$(cygpath --unix "$temp")
-                mkdir_options=
-            fi
-            ;;
-    esac
+    if [ -n "$msys" -a -n "$temp" ]; then
+        # MSYS2 is a little tricky, we're gonna stick to the user's private temp
+        # the -m mode switch to mkdir doesn't work
+        tmp=$(cygpath --unix "$temp")
+        mkdir_options=
+    fi
 
     tmp=$tmp/vimcat_$$
-}
-
-install_trap() {
-    trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 }
 
 create_fifo() {
     tmp_file_in=$tmp/vimcat_in.txt
     out_fifo=$tmp/vimcat_out.fifo
 
-    case $(uname -s) in
-        SunOS*|CYGWIN*|MINGW*|MSYS*)
-            # the fifo streaming doesn't work on windows and solaris
-            touch "$out_fifo"
-            ;;
-        *)
-            mkfifo "$out_fifo"
-            ;;
-    esac
+    if [ -n "$solaris" -o -n "$win32" ]; then
+        # the fifo streaming doesn't work on windows and solaris
+        touch "$out_fifo"
+    else
+        mkfifo "$out_fifo"
+    fi
 }
 
 main() {
