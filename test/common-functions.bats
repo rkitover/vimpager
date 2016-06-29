@@ -38,4 +38,14 @@ load helpers
     find_tmp_directory
     [[ "$tmp" = /* ]]
 }
+
+@test "set_system_vars sets at least one system variable" {
+    [[ -z "$linux" && -z "$solaris" && -z "$osx" && -z "$bsd" && \
+        -z "$cygwin" && -z "$win32" && -z "$msys" && -z "$openbsd" && \
+        -z "$freebsd" && -z "$netbsd" ]]
+    set_system_vars
+    [[ "$linux" -eq 1 || "$solaris" -eq 1 || "$osx" -eq 1 || "$bsd" -eq 1 || \
+        "$cygwin" -eq 1 || "$win32" -eq 1 || "$msys" -eq 1 || \
+        "$openbsd" -eq 1 || "$freebsd" -eq 1 || "$netbsd" -eq 1 ]]
+}
 # vim: filetype=sh et sw=4 sts=4 :
