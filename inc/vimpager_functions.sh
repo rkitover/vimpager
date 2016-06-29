@@ -526,7 +526,7 @@ quit() {
     rm -f gvim.exe.stackdump # for a cygwin bug
     cd "${tmp%/*}" 2>/dev/null # some systems cannot remove CWD
     rm -rf "$tmp" 2>/dev/null # rm -rf "" shows error on OpenBSD
-    exit "$@"
+    exit "${1:-0}"
 }
 
 usage() {
