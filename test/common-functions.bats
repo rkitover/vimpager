@@ -32,4 +32,10 @@ load helpers
     [[ "${lines[5]}" = '		' ]]
     [[ "${lines[6]}" = 'last line' ]]
 }
+
+@test 'find_tmp_directory sets $tmp' {
+    [[ -z "$tmp" ]]
+    find_tmp_directory
+    [[ "$tmp" = /* ]]
+}
 # vim: filetype=sh et sw=4 sts=4 :

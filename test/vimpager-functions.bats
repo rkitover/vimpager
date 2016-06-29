@@ -4,12 +4,6 @@ load helpers
 
 . "$src/inc/vimpager_functions.sh"
 
-@test 'find_tmp_directory sets $tmp' {
-    [[ -z "$tmp" ]]
-    find_tmp_directory
-    [[ "$tmp" = /* ]]
-}
-
 @test 'detect_term_size sets $cols and $lines' {
     # detect_term_size will write files to $tmp (assuming it is a direcotry)
     tmp=$BATS_TMPDIR

@@ -1,5 +1,8 @@
 # Function definitions for vimpager.
 
+# the name of this program
+prog=vimpager
+
 # this is compatible with osed
 ANSI_RE='\[[;?]*[0-9.;]*[A-Za-z]'
 
@@ -234,28 +237,6 @@ main() {
     page_files "$@"
 
     quit $?
-}
-
-find_tmp_directory() {
-    # Find and create the temporary directory used by vimpager.  Set the $tmp variable.
-    mkdir_options="-m 700"
-
-    if [ -n "$win32" ]; then
-        # Use the real TEMP directory on windows in case we are
-        # using a native vim/gvim
-        # TEMP can be /tmp sometimes too
-
-        tmp=$(resolve_path "$TEMP")
-
-        # chmod doesn't work here, even in /tmp sometimes
-        mkdir_options=
-    else
-        # ... and /tmp otherwise
-        tmp=/tmp
-    fi
-
-    # Create a safe directory in which we place all other tempfiles.
-    tmp=$tmp/vimpager_$$
 }
 
 detect_term_size() {
@@ -541,14 +522,6 @@ expand_config_vars() {
     eval system_vimpagerrc=\"$system_vimpagerrc\"
 }
 
-resolve_path() {
-    if [ -n "$_have_cygpath" ]; then
-        cygpath -w "$1" | tr '\\' '/'
-    else
-        echo "$1"
-    fi
-}
-
 quit() {
     rm -f gvim.exe.stackdump # for a cygwin bug
     cd "${tmp%/*}" 2>/dev/null # some systems cannot remove CWD
@@ -816,13 +789,6 @@ fits_on_screen() {
         if (!--lines) exit(1)
     }
     ' num_files=$# total_lines=$lines total_cols=$cols file_sep_lines=3 first_file_sep_lines=2 -
-}
-
-check_for_cygpath() {
-    # special handling to rewrite cygwin/msys paths to windows POSIX paths
-    if [ -n "$win32" ] && command -v cygpath >/dev/null; then
-        _have_cygpath=1
-    fi
 }
 
 select_awk_executable() {

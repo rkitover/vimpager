@@ -1,5 +1,8 @@
 # Function definitions for vimcat.
 
+# the name of this program
+prog=vimcat
+
 quit() {
     (
         kill "$vim_pid" >/dev/null 2>&1
@@ -124,20 +127,6 @@ parse_command_line_options_1() {
                 ;;
         esac
     done
-}
-
-find_tmp_directory() {
-    tmp=/tmp
-    mkdir_options="-m 700"
-
-    if [ -n "$msys" -a -n "$temp" ]; then
-        # MSYS2 is a little tricky, we're gonna stick to the user's private temp
-        # the -m mode switch to mkdir doesn't work
-        tmp=$(cygpath --unix "$temp")
-        mkdir_options=
-    fi
-
-    tmp=$tmp/vimcat_$$
 }
 
 create_fifo() {
