@@ -280,11 +280,11 @@ realclean distclean clean:
 	rm -rf *.work */*.work *-stamp *-version.txt *.deb *.tar.gz *.configured *.uu */*.uu man html standalone */with_meta_*
 
 test: standalone/vimpager standalone/vimcat
-	@if ! command -v bats >/dev/null; then \
+	@if command -v bats >/dev/null; then \
+	    bats test; \
+	else \
 	    echo "[1;31mWARNING[0m: bats is not available, tests will not be run. If you want to run tests, install bats from https://github.com/sstephenson/bats.git or your distribution and rerun \`make test\`." >&2; \
 	    echo >&2; \
-	else \
-	    bats test; \
 	fi
 
 .PHONY: all install install-deb uninstall docs realclean distclean clean test
