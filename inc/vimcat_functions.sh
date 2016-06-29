@@ -14,9 +14,9 @@ quit() {
         do_sleep 100
         kill -9 "$tail_pid" >/dev/null 2>&1
 
-        cd "${tmp_dir%/*}" 2>/dev/null # some systems cannot remove CWD
+        cd "${tmp%/*}" 2>/dev/null # some systems cannot remove CWD
 
-        rm -rf "$tmp_dir" 2>/dev/null # rm -rf "" shows error on OpenBSD
+        rm -rf "$tmp" 2>/dev/null # rm -rf "" shows error on OpenBSD
     ) &
     exit "$@"
 }
@@ -65,8 +65,8 @@ start_pipeline() {
     else
         pipeline=write_chunks
     fi
-    cat -- "$pipeline_start" | (eval "$pipeline" <&3 & echo $! > "$tmp_dir/pipeline_pid") 3<&0
-    pipeline_pid=$(cat "$tmp_dir/pipeline_pid")
+    cat -- "$pipeline_start" | (eval "$pipeline" <&3 & echo $! > "$tmp/pipeline_pid") 3<&0
+    pipeline_pid=$(cat "$tmp/pipeline_pid")
 }
 
 start_highlight_job() {
@@ -82,11 +82,11 @@ start_highlight_job() {
     [ -n "$vimcatrc" ] && set -- "$@" -u "$vimcatrc"
 
     if [ "${VIMCAT_DEBUG:-0}" -eq 0 ]; then
-        ("$vim" "$@" </dev/tty >/dev/null 2>&1; touch "$tmp_dir/vim_done") &
+        ("$vim" "$@" </dev/tty >/dev/null 2>&1; touch "$tmp/vim_done") &
         vim_pid=$!
     else
         "$vim" "$@" </dev/tty
-        touch "$tmp_dir/vim_done"
+        touch "$tmp/vim_done"
     fi
 }
 
@@ -127,7 +127,7 @@ parse_command_line_options_1() {
 }
 
 find_tmp_directory() {
-    tmp_dir=/tmp
+    tmp=/tmp
     mkdir_options="-m 700"
 
     case "$(uname -s)" in
@@ -135,18 +135,18 @@ find_tmp_directory() {
             if [ -n "$temp" ]; then
                 # MSYS2 is a little tricky, we're gonna stick to the user's private temp
                 # the -m mode switch to mkdir doesn't work
-                tmp_dir=$(cygpath --unix "$temp")
+                tmp=$(cygpath --unix "$temp")
                 mkdir_options=
             fi
             ;;
     esac
 
-    tmp_dir=$tmp_dir/vimcat_$$
+    tmp=$tmp/vimcat_$$
 }
 
 create_tmp_directory() {
-    if ! mkdir $mkdir_options "$tmp_dir"; then
-        echo "Could not create temporary directory $tmp_dir" >&2
+    if ! mkdir $mkdir_options "$tmp"; then
+        echo "Could not create temporary directory $tmp" >&2
         exit 1
     fi
 }
@@ -156,8 +156,8 @@ install_trap() {
 }
 
 create_fifo() {
-    tmp_file_in=$tmp_dir/vimcat_in.txt
-    out_fifo=$tmp_dir/vimcat_out.fifo
+    tmp_file_in=$tmp/vimcat_in.txt
+    out_fifo=$tmp/vimcat_out.fifo
 
     case $(uname -s) in
         SunOS*|CYGWIN*|MINGW*|MSYS*)
@@ -255,7 +255,7 @@ main() {
         quit 1
     fi
 
-    chunks_dir=$tmp_dir/chunks
+    chunks_dir=$tmp/chunks
     mkdir "$chunks_dir"
 
     i=1
@@ -299,7 +299,7 @@ main() {
 
         start_highlight_job
         start_pipeline
-        while [ ! -f "$tmp_dir/vim_done" ]; do
+        while [ ! -f "$tmp/vim_done" ]; do
             do_sleep 50
         done
 

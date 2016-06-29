@@ -14,12 +14,12 @@ load helpers
 }
 
 @test 'quit cleans up the $tmp direcotry' {
-    tmp_dir=$BATS_TMPDIR/quit-test
-    mkdir "$tmp_dir"
-    touch "$tmp_dir/some-file"
+    tmp=$BATS_TMPDIR/quit-test
+    mkdir "$tmp"
+    touch "$tmp/some-file"
     run quit 1
-    [[ ! -e "$tmp_dir/some-file" ]]
-    [[ ! -e "$tmp_dir" ]]
+    [[ ! -e "$tmp/some-file" ]]
+    [[ ! -e "$tmp" ]]
 }
 
 @test 'quit kills $vim_pid, $pipeline_pid and $tail_pid' {
