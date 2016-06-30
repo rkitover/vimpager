@@ -235,6 +235,10 @@ If you installed vimpager via [Pathogen](#pathogen-installation) or added it to
 your `runtimepath`, then the `Page` command is available from normal vim
 sessions, and it is also available when invoking the vimpager script.
 
+If your global `keywordprg` is set to `man` or `:Man`, which is the default, the
+plugin will reset it to `:Page!\ -t\ man` to page man pages in a new tab. See
+the example below for how to set this for other file types.
+
 You may want to add something like the following to your `.vimrc` to enable the
 mapping to turn on less mode:
 
@@ -270,6 +274,8 @@ opened:
 
 The default is to open a new buffer.
 
+For `Page!` commands, STDERR is suppressed.
+
 I recommend adding `set hidden` to your `.vimrc`.
 
 If the command is one of `man`, `perldoc`, `pydoc` or `ri` it will be handled
@@ -280,15 +286,19 @@ Ansi escapes will be handled with `AnsiEsc` if available, or removed otherwise.
 See [here](#ansi-escape-sequences-and-overstrikes) for details. The
 `g:vimpager.ansiesc` setting applies to the `Page` command if set.
 
-Here is an example of how you can use this command in a mapping to look up
-the python documentation for the module under the cursor in a new tab:
+Here is an example (that is already enabled in the plugin) of how you can use
+this command to look up the python documentation for the module under the cursor
+in a new tab:
 
 ```vim
-nnoremap <silent> <Leader>d :Page! -t pydoc <C-R><C-W><CR>
+autocmd FileType python setlocal keywordprg=:Page!\ -t\ pydoc
 ```
 
-Then pressing `,d` on a module name under the cursor will open the pydoc for it
+Then pressing `K` on a module name under the cursor will open the pydoc for it
 in a new tab.
+
+This is done by default in the plugin now for python, ruby, perl and sh (bash
+help.) The global default is man.
 
 # COMMAND LINE OPTIONS
 

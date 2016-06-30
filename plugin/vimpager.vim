@@ -10,7 +10,16 @@ endif
 
 let g:vimpager_plugin_loaded = 1
 
-command! -nargs=* -complete=customlist,s:PageCmdComplete -bang Page call s:PageCmd('<args>', '<bang>')
+if &keywordprg =~# '^:\?[Mm]an\%(\s\|$\)'
+    set keywordprg=:Page!\ -t\ man
+endif
+
+autocmd FileType python setlocal keywordprg=:Page!\ -t\ pydoc
+autocmd FileType ruby   setlocal keywordprg=:Page!\ -t\ ri
+autocmd FileType perl   setlocal keywordprg=:Page!\ -t\ perldoc
+autocmd FileType sh     setlocal keywordprg=:Page!\ -t\ bash\ -c\ help\\
+
+command! -nargs=* -complete=customlist,s:PageCmdComplete -bang Page call s:PageCmd(<q-args>, '<bang>')
 
 function! s:PageCmdComplete(arg_lead, cmd_line, cur_pos)
     " if the user hasn't typed a space, return a space
@@ -56,7 +65,11 @@ function! s:PageCmd(args, bang)
             let save_less_enabled = g:less.enabled
         endif
 
+        let g:less.enabled = 0 " don't turn on less mode for current buffer
+
         runtime macros/less.vim
+
+        call remove(g:less, 'enabled')
 
         if exists('l:save_less_enabled')
             let g:less.enabled = save_less_enabled
@@ -101,7 +114,7 @@ function! s:PageCmd(args, bang)
     endif
 
     if a:bang ==# '!'
-        silent execute '0read! ' . join(args, ' ')
+        silent execute '0read! ' . join(args, ' ') . ' 2>/dev/null'
 
         " check if it's a man or perldoc command
         if args[0] =~? '^\%(man\|perldoc\|pydoc\|ri\)$'
@@ -111,13 +124,15 @@ function! s:PageCmd(args, bang)
             endwhile
 
             " remove overstrikes
-            %s/.\b//eg
+            silent %s/.\b//eg
 
             " remove ANSI codes
-            %s/\e\[[;?]*[0-9.;]*[A-Za-z]//eg
+            silent %s/\e\[[;?]*[0-9.;]*[A-Za-z]//eg
 
             let &l:filetype = tolower(args[0]) ==# 'perldoc' ? 'perldoc' : 'man'
         endif
+
+        let buftype='nowrite'
     else
         execute 'edit ' . join(args, ' ')
     endif
@@ -134,7 +149,9 @@ function! s:PageCmd(args, bang)
             call vimpager_utils#ConcealRetab()
         else
             " otherwise remove ANSI codes
-            %s/\e\[[;?]*[0-9.;]*[A-Za-z]//eg
+            silent %s/\e\[[;?]*[0-9.;]*[A-Za-z]//eg
+
+            let buftype='nowrite'
         endif
     endif
 
@@ -142,6 +159,10 @@ function! s:PageCmd(args, bang)
     normal gg0
 
     filetype detect
+
+    if exists('l:buftype')
+        let &l:buftype=buftype
+    endif
 
     Less!
 endfunction

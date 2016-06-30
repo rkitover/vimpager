@@ -2,7 +2,8 @@
 2.07:
 - stream large files and stdin instead of copying to /tmp
 - allow clicking on man links in man and perldoc mode
-- check if buffer was modified and is a normal buffer when moving to next arg on q
+- support 'K' for ft=vim (and Page! for vim commands, :help in this case)
+- support non-unified color diffs
 
 FUTURE:
 - tabs do not look correct in vimcat on Solaris
@@ -25,3 +26,4 @@ DONE:
 - make vimpager usable from vim with pathogen and other plugin handlers
 - set buftype=nowrite only for processed files or stdin, and not in less.vim
 - make vimcat streaming
+- check if buffer was modified and is a normal buffer when moving to next arg on q
