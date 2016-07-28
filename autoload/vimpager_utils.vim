@@ -28,7 +28,8 @@ function! vimpager_utils#StatusLine(opts)
     let leader = exists('g:mapleader') ? g:mapleader : '\'
     let pos .= "  [ Press '".leader."h' for HELP ]"
     " Trim the status line to fit the window width.
-    let pos = len(pos) > &columns - 1 ? '<' . pos[-&columns+2:-1] : pos
+    let width = &columns - 12
+    let pos = len(pos) >= width ? '<' . pos[-width+1:-1] : pos
     highlight VimpagerStatusLine ctermbg=NONE ctermfg=DarkMagenta guibg=NONE guifg=DarkMagenta
     echohl VimpagerStatusLine
     redraw
