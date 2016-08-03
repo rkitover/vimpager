@@ -131,7 +131,7 @@ function! s:GroupToAnsi(groupnum)
 endfunction
 
 function! s:ReadChunks()
-    let chunk_files = filter(glob(s:pipeline_dir . '/*', 1, 1), 'getfsize(v:val) > 0')
+    let chunk_files = filter(split(glob(s:pipeline_dir . '/*', 1), '\n'), 'getfsize(v:val) > 0')
 
     if !len(chunk_files)
         return 0

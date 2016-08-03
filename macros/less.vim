@@ -232,17 +232,17 @@ function! s:LessCmdComplete(arg_lead, cmd_line, cur_pos)
 
   " check for absolute path
   if a:arg_lead =~# '^/'
-    return glob(a:arg_lead . '*', 0, 1)
+    return split(glob(a:arg_lead . '*', 0), '\n')
   endif
 
   " check if command (first word after :Less!)
   if a:cmd_line =~# '^Less!\s\+\S\+$'
-    return map(globpath(substitute($PATH, '[:;]', ',', 'g'), a:arg_lead . '*', 1, 1),
+    return map(split(globpath(substitute($PATH, '[:;]', ',', 'g'), a:arg_lead . '*', 1), '\n'),
       \ 'substitute(v:val, ''^.*/\(.*\)'', ''\1'', '''')')
   endif
 
   " otherwise complete files in current dir
-  return glob(a:arg_lead . '*', 0, 1)
+  return split(glob(a:arg_lead . '*', 0), '\n')
 endfunction
 
 function! s:LessCmd(args, bang)

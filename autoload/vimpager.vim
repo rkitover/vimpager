@@ -117,7 +117,7 @@ endfunction
 function! s:LoadOurPlugins()
     call s:SetRTP()
 
-    for plugin in glob(s:opts.runtime . '/plugin/**/*.vim', 0, 1)
+    for plugin in split(glob(s:opts.runtime . '/plugin/**/*.vim', 1), '\n')
         execute 'source ' . fnameescape(plugin)
     endfor
 endfunction
