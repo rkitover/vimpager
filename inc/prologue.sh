@@ -18,8 +18,6 @@ if [ -z "$POSIX_SHELL" ]; then
 		POSIX_SHELL=ksh93
 	elif command -v bash >/dev/null; then
 		POSIX_SHELL=bash
-	elif command -v zsh >/dev/null; then
-		POSIX_SHELL=zsh
 	fi
 
 	if [ ! -z "$POSIX_SHELL" ]; then
