@@ -29,6 +29,8 @@ if [ -z "$POSIX_SHELL" ]; then
 		POSIX_SHELL=/bin/sh # hope for the best
 		export POSIX_SHELL
 	fi
+elif [ "$POSIX_SHELL" = "zsh" ]; then
+	emulate -R sh # force zsh into full POSIX
 fi
 
 # hopefully we're now POSIX.
