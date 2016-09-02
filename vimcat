@@ -19,6 +19,8 @@ project_dir=`dirname "$link"`
 
 . "$project_dir/inc/prologue.sh"
 
+[ -n "$ZSH_VERSION" ] && emulate -R sh 2>/dev/null # force zsh into full POSIX
+
 version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" || version="$version_tag (checkout)"
 runtime=$project_dir
 
@@ -44,6 +46,8 @@ quit() {
         kill "$tail_pid" >/dev/null 2>&1
         do_sleep 100
         kill -9 "$tail_pid" >/dev/null 2>&1
+
+        cd "${tmp_dir%/*}" 2>/dev/null # some systems cannot remove CWD
 
         rm -rf "$tmp_dir" 2>/dev/null # rm -rf "" shows error on OpenBSD
     ) &
