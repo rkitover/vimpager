@@ -1,4 +1,24 @@
 #!/bin/sh
 
 . inc/prologue.sh
-command -v "$POSIX_SHELL"
+
+full_path=$(command -v "$POSIX_SHELL")
+
+case "$full_path" in
+    /*)
+        echo "$full_path"
+        exit 0
+esac
+
+# not a full path, search PATH ourselves
+
+cmd=$full_path
+
+echo "$PATH" | tr ':' '\n' | while read -r p; do
+    if [ -x "$p/$cmd" ]; then
+        echo "$p/$cmd"
+        exit 0
+    fi
+done
+
+exit 1
