@@ -200,6 +200,7 @@ install-deb:
 	fi
 	@-apt-get -qq update
 	@apt-get -yqq install debhelper devscripts equivs gdebi-core
+	@$(MAKE) clean
 	@mk-build-deps
 	@echo y | gdebi vimpager-build-deps*.deb
 	@rm -f vimpager-build-deps*.deb

@@ -1,5 +1,3 @@
-# dash -n is confused by the vimscript
-vimpager binary: shell-script-fails-syntax-check usr/bin/vimcat
 # we'll do that in 2.07
 vimpager binary: new-package-should-close-itp-bug
 # also for trusty
