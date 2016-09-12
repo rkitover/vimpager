@@ -195,6 +195,8 @@ function! s:StatusLine()
   let pos = substitute(pos, '[\r\n]\+', '', 'g')
   " remove any beginning quotes
   let pos = substitute(pos, '^"*', '', '')
+  " remove possible [readonly] or [Modified] tag
+  let pos = substitute(pos, '\[\%(readonly\|Modified\)\]\s\+', '', '')
   " remove closing quote
   let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
   " add help message
@@ -520,7 +522,7 @@ endfunction
 function! s:CloseBuffer()
   try
     redir => ls_out
-      silent! ls!
+      silent! ls
     redir END
 
     " check if this is the last buffer, if so quit

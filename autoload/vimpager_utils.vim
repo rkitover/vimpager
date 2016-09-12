@@ -18,8 +18,8 @@ function! vimpager_utils#StatusLine(opts)
     else
         let pos = substitute(pos, '^.*/', '', '')
     endif
-    " remove possible [readonly] tag (edge case)
-    let pos = substitute(pos, '\[readonly\]\s\+', '', '')
+    " remove possible [readonly] or [Modified] tag
+    let pos = substitute(pos, '\[\%(readonly\|Modified\)\]\s\+', '', '')
     " remove closing quote
     let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
     " urldecode
@@ -68,6 +68,8 @@ function! vimpager_utils#ConcealRetab()
     let current_modifiable = &l:modifiable
     setlocal modifiable
 
+    let modified = 0
+
     let current_cursor = getpos('.')
 
     call cursor(1,1)
@@ -99,7 +101,10 @@ function! vimpager_utils#ConcealRetab()
             let linepos += 1
         endwhile
 
-        call setline(lnum, newline)
+        if newline !=# line
+            call setline(lnum, newline)
+            let modified = 1
+        endif
 
         let lnum = search('\t')
     endwhile
@@ -107,6 +112,10 @@ function! vimpager_utils#ConcealRetab()
     call setpos('.', current_cursor)
 
     let &l:modifiable = current_modifiable
+
+    if modified
+        setlocal buftype=nowrite " prevent writing out these changes to disk
+    endif
 endfunction
 
 function! vimpager_utils#FtSetFromModeline()

@@ -52,6 +52,9 @@ function! vimpager#Init(opts)
         autocmd VimEnter * call s:GUIInit()
     endif
 
+    " hide error messages from invalid modelines, or post processing errors
+    autocmd VimEnter * if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG | silent! redraw! | endif
+
     " remove autocmds when done initializing
     autocmd VimEnter * autocmd! vimpager
 
@@ -73,13 +76,21 @@ endfunction
 let s:post_processed = {}
 
 function! s:PostProcess()
-    " only run this for args, if we are not on an arg return
-    if bufname('%') !=# argv(argidx())
+    let bufname = bufname('%')
+
+    " only run this for args, if we are not on an arg or file return
+    if bufname ==# '' || bufname !=# argv(argidx())
         return
     endif
 
-    let fname = bufname('%')
-    let idx   = s:file_indices[fname]
+    let fname = bufname
+
+    " if we can't find the file bail out
+    if !has_key(s:file_indices, fname)
+        return
+    endif
+
+    let idx = s:file_indices[fname]
 
     " we only run this once if hidden is set, otherwise every time
     if !has_key(s:post_processed, fname) || !&hidden
@@ -91,7 +102,7 @@ function! s:PostProcess()
         " in case the post-processing does something we don't want
         call s:FixBufOpts()
 
-        " hide error messages from invalid modelines, or post processing errors
+        " hide post-processing errors
         if !exists('$VIMPAGER_DEBUG') || !$VIMPAGER_DEBUG
             silent! redraw!
         endif
