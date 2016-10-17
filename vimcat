@@ -105,7 +105,8 @@ start_pipeline() {
 start_highlight_job() {
     # INSERT VIMCAT_DEBUG PREPARATION HERE
     set -- -NE -i NONE -n \
-        --cmd "set rtp^=$runtime" \
+        --cmd "set runtimepath^=$runtime" \
+        --cmd "call vimcat#Init({ 'rc': '$vimcatrc' })" \
         --cmd visual \
         ${extra_cmd:+--cmd "$extra_cmd"} \
         ${extra_c:+-c "$extra_c"} \

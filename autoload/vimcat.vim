@@ -28,17 +28,13 @@
 " (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 " SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-" Turn off vi-compatible mode, unless it's already off {{{1
-if &cp
-    set nocp
-endif
-
-let s:type = 'cterm'
-if &t_Co == 0
-    let s:type = 'term'
-endif
-
 " Converts info for a highlight group to a string of ANSI color escapes {{{1
+
+scriptencoding utf-8
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 function! s:GroupToAnsi(groupnum)
     if ! exists("s:ansicache")
         let s:ansicache = {}
@@ -295,17 +291,38 @@ function! s:AnsiHighlight(output_file, line_numbers, pipeline_dir)
     return 1
 endfunction
 
+function! vimcat#Init(opts)
+    " Turn off vi-compatible mode, unless it's already off {{{1
+    if &cp
+        set nocp
+    endif
+
+    let s:type = 'cterm'
+    if &t_Co == 0
+        let s:type = 'term'
+    endif
+
+    set foldlevel=9999
+
+    " set sensible default highlight options for people without an rc
+    if (a:opts.rc =~? '^ *$' || a.opts.rc =~? '^ *NONE *$') && $MYVIMRC =~? '^ *$'
+        set bg=dark
+        highlight Normal ctermbg=NONE
+    endif
+
+    syntax enable
+endfunction
+
 function! vimcat#Run(output_file, line_numbers, pipeline_dir, pipeline_start)
     silent! execute 'file ' . fnameescape(a:pipeline_start)
-    set bg=dark fdl=9999
-    syn enable
-    hi Normal ctermbg=NONE
-    set buftype=nowrite
+    setlocal buftype=nowrite modifiable noreadonly viminfo=
     call s:AnsiHighlight(a:output_file, a:line_numbers, a:pipeline_dir)
     if !exists('$VIMCAT_DEBUG') || $VIMCAT_DEBUG == 0
         quitall!
     endif
 endfunction
+
+let &cpo = s:save_cpo
 
 " See copyright in the vim script above (for the vim script) and in
 " vimcat.md for the whole script.
