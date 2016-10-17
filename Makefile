@@ -73,8 +73,8 @@ standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh
 	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
 	    -e '/^runtime=.*/d' \
 	    -e '/^ *--cmd "set rtp^=\$$runtime" \\$$/d' \
-	    -e '/call vimcat#Run/i\'"$$nl"'-c "$$silent source $$0" \\' \
-	    -e 's/vimcat#Run(/Run(/g' \
+	    -e '/call vimcat#Init/i\'"$$nl"'--cmd "$$silent source $$0" \\' \
+	    -e 's/vimcat#\([^ ]*\)(/\1(/g' \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
@@ -86,7 +86,7 @@ standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh
 	  | sed -e 's/^/: end/' >> $@.work
 	@mv -f $@.work $@
 	@echo ': endif' >> $@
-	@sed -e 's/vimcat#Run(/Run(/g' autoload/vimcat.vim >> $@
+	@sed -e 's/vimcat#\([^ ]*\)(/\1(/g' autoload/vimcat.vim >> $@
 	@chmod +x $@
 
 vimcat.uu: vimcat vimcat-version.txt
