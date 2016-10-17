@@ -292,8 +292,11 @@ function! s:AnsiHighlight(output_file, line_numbers, pipeline_dir)
 endfunction
 
 function! vimcat#Init(opts)
+    " save for other functions
+    let s:opts = a:opts
+
     " Turn off vi-compatible mode, unless it's already off {{{1
-    if &cp
+    if !has('nvim') && &cp
         set nocp
     endif
 
@@ -303,9 +306,11 @@ function! vimcat#Init(opts)
     endif
 
     set foldlevel=9999
+endfunction
 
+function! s:SetHighlightOpts()
     " set sensible default highlight options for people without an rc
-    if (a:opts.rc =~? '^ *$' || a:opts.rc =~? '^ *NONE *$') && $MYVIMRC =~? '^ *$'
+    if (s:opts.rc =~? '^ *$' || s:opts.rc =~? '^ *NO\(NE\|RC\) *$') && $MYVIMRC =~? '^ *$'
         set bg=dark
         highlight Normal ctermbg=NONE
     endif
@@ -314,6 +319,7 @@ function! vimcat#Init(opts)
 endfunction
 
 function! vimcat#Run(output_file, line_numbers, pipeline_dir, pipeline_start)
+    call s:SetHighlightOpts()
     silent! execute 'file ' . fnameescape(a:pipeline_start)
     setlocal buftype=nowrite modifiable noreadonly viminfo=
     call s:AnsiHighlight(a:output_file, a:line_numbers, a:pipeline_dir)

@@ -45,6 +45,7 @@ function! vimpager#Init(opts)
     augroup vimpager
 
     " can't use VimEnter because that fires after first file is read
+    autocmd BufReadPre,StdinReadPre * call s:SetHighlightOpts()
     autocmd BufReadPre,StdinReadPre * call s:SetOptions()
     autocmd BufReadPre,StdinReadPre * runtime macros/less.vim
 
@@ -61,8 +62,6 @@ function! vimpager#Init(opts)
     augroup END
 
     " allow user's .vimrc or -c commands to override this
-    set bg=dark
-    syntax enable
     set mouse=a
 
     if !has('nvim') " neovim has its own clipboard support
@@ -70,6 +69,14 @@ function! vimpager#Init(opts)
         set clipboard=autoselect
     else
         set laststatus=1 " neovim defaults to 2
+    endif
+endfunction
+
+function! s:SetHighlightOpts()
+    " set sensible default highlight options for people without an rc
+    if (s:opts.rc =~? '^ *$' || s:opts.rc =~? '^ *NO\(NE\|RC\) *$') && $MYVIMRC =~? '^ *$'
+        set bg=dark
+        syntax enable
     endif
 endfunction
 
