@@ -132,11 +132,11 @@ main() {
 
     expand_config_vars
 
+    find_vim_executable
+
     find_vimpagerrc_files
 
     read_vim_settings
-
-    find_vim_executable
 
     parse_pstree
 
@@ -348,7 +348,7 @@ find_vimpagerrc_files() {
     OLDIFS=$IFS
     IFS='
 '
-    for var in $(vim -NEnR -i NONE ${vimrc:+-u "$vimrc"} +'call writefile(["", "VAL:" . $VIM, "VAL:" . $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
+    for var in $("$tvim" -NEnR -i NONE ${vimrc:+-u "$vimrc"} +'call writefile(["", "VAL:" . $VIM, "VAL:" . $MYVIMRC], "/dev/stderr")' +q </dev/tty 2>&1 >/dev/null); do
         case "$var" in
             VAL:*)
                 case $i in
@@ -368,7 +368,7 @@ find_vimpagerrc_files() {
     IFS=$OLDIFS
 
     # find system vimrc
-    system_vimrc=$(vim --version | sed -n '/system vimrc file: "/{
+    system_vimrc=$("$tvim" --version | sed -n '/system vimrc file: "/{
         s|\$VIM|'"$vim_dir"'|
         s/.*: "\([^"]*\).*/\1/p
         q
@@ -381,11 +381,11 @@ find_vimpagerrc_files() {
     elif [ -n "$VIMPAGER_RC" ]; then
         vimrc=$VIMPAGER_RC
     # check for vimpagerrc in same dir as vimrc in case it is set in VIMINIT
-    elif [ -r "$user_vimrc_dir/.vimpagerrc" ]; then
+    elif [ -n "$user_vimrc_dir" -a -r "$user_vimrc_dir/.vimpagerrc" ]; then
         vimrc=$user_vimrc_dir/.vimpagerrc
-    elif [ -r "$user_vimrc_dir/_vimpagerrc" ]; then
+    elif [ -n "$user_vimrc_dir" -a -r "$user_vimrc_dir/_vimpagerrc" ]; then
         vimrc=$user_vimrc_dir/_vimpagerrc
-    elif [ -r "$user_vimrc_dir/vimpagerrc" ]; then
+    elif [ -n "$user_vimrc_dir" -a -r "$user_vimrc_dir/vimpagerrc" ]; then
         vimrc=$user_vimrc_dir/vimpagerrc
     # check standard paths, according to :h initialization
     elif [ -r ~/.vimpagerrc ]; then
@@ -420,7 +420,7 @@ read_vim_settings() {
     OLDIFS=$IFS
     IFS='
 '
-    for var in $(vim -NEnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
+    for var in $("$tvim" -NEnR -u "$vimrc" -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
         if !exists("g:vimpager.gvim")
             if !exists("g:vimpager_use_gvim")
                 let g:vimpager.gvim = 0
@@ -617,7 +617,7 @@ quit() {
 usage() {
     cat <<'EOF'
 Usage: [32mvimpager [1;34m[[1;35mOPTION[1;34m][0m... [1;34m[[1;35mFILE [1;37m| [1;35m-[1;34m][0m...
-Display [1;35mFILE[0m(s) in vim with a pager emulating less.
+Display [1;35mFILE[0m(s) in (n)vim with a pager emulating less.
 
 With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard input.
 
@@ -626,8 +626,8 @@ With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard 
   [1;37m+G, +[0m                              Go to the end of the file.
   [1;37m-N, --LINE-NUMBERS[0m                 Show line numbers.
   [1;37m-s[0m                                 Squeeze multiple blank lines into one.
-  [1;37m--cmd [1;35mCOMMAND[0m                      Run vim [1;35mCOMMAND[0m before initialization.
-  [1;37m-c [1;35mCOMMAND[0m                         Run vim [1;35mCOMMAND[0m after initialization.
+  [1;37m--cmd [1;35mCOMMAND[0m                      Run (n)vim [1;35mCOMMAND[0m before initialization.
+  [1;37m-c [1;35mCOMMAND[0m                         Run (n)vim [1;35mCOMMAND[0m after initialization.
   [1;37m-u [1;35mFILE[0m                            Use [1;35mFILE[0m as the vimrc.
   [1;37m-x [0m                                Give debugging output on stderr.
 
@@ -811,7 +811,7 @@ page_files() {
 
     init_opts="'columns': $cols, 'tmp_dir': '$tmp', 'line_numbers': ${line_numbers:-0}, 'is_doc': ${is_doc:-0}, 'runtime': '$runtime'"
 
-    $vim_cmd -N -i NONE \
+    "$vim_cmd" -N -i NONE \
         $vim_options \
         --cmd "set rtp^=$runtime" \
         --cmd "call vimpager#Init({ $init_opts })" \
