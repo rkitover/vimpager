@@ -305,7 +305,7 @@ function! vimcat#Init(opts)
     set foldlevel=9999
 
     " set sensible default highlight options for people without an rc
-    if (a:opts.rc =~? '^ *$' || a.opts.rc =~? '^ *NONE *$') && $MYVIMRC =~? '^ *$'
+    if (a:opts.rc =~? '^ *$' || a:opts.rc =~? '^ *NONE *$') && $MYVIMRC =~? '^ *$'
         set bg=dark
         highlight Normal ctermbg=NONE
     endif
