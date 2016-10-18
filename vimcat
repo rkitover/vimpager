@@ -66,15 +66,15 @@ Display [1;35mFILE[0m(s) in the terminal with (n)vim syntax highlighting using
 
 With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard input.
 
-  [1;37m-h, --help, --usage[0m                This help screen.
-  [1;37m-v, --version[0m                      Show version information and exit.
-  [1;37m-n[0m                                 Print with line numbers.
-  [1;37m-s[0m                                 Squeeze multiple blank lines into one.
-  [1;37m-o [1;35mFILE[0m | [1;35m-[0m                        Output ANSI highlighted text to [1;35mFILE[0m or standard output.
-  [1;37m--cmd [1;35mCOMMAND[0m                      Run (n)vim [1;35mCOMMAND[0m before initialization.
-  [1;37m-c [1;35mCOMMAND[0m                         Run (n)vim [1;35mCOMMAND[0m after initialization.
-  [1;37m-u [1;35mFILE[0m                            Use [1;35mFILE[0m as the vimrc.
-  [1;37m-x [0m                                Give debugging output on stderr.
+  -h, --help, --usage                This help screen.
+  -v, --version                      Show version information and exit.
+  -n                                 Print with line numbers.
+  -s                                 Squeeze multiple blank lines into one.
+  -o [1;35mFILE[0m | [1;35m-[0m                        Output ANSI highlighted text to [1;35mFILE[0m or standard output.
+  --cmd [1;35mCOMMAND[0m                      Run (n)vim [1;35mCOMMAND[0m before initialization.
+  -c [1;35mCOMMAND[0m                         Run (n)vim [1;35mCOMMAND[0m after initialization.
+  -u [1;35mFILE[0m                            Use [1;35mFILE[0m as the vimrc.
+  -x                                 Give debugging output on stderr.
 
 Examples:
   [32mvimcat [1;35mprogram.py[0m                  # output [1;35mprogram.py[0m with highlighting to terminal
