@@ -130,10 +130,9 @@ squeeze_blank_lines() {
     }'
 }
 
-# if no args and no stdin, display usage
+# if no args and stdin is on a terminal, pretend we're cat and wait on stdin.
 if [ $# -eq 0 -a -t 0 ]; then
-    usage
-    quit 0
+    exec cat
 fi
 
 # check for -h before main option parsing, this is much faster
