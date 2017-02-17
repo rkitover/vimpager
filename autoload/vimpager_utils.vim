@@ -76,6 +76,13 @@ function! vimpager_utils#SripBlankLines()
     call cursor(pos)
 endfunction
 
+function! vimpager_utils#SqueezeBlankLines()
+    let pos = getpos('.')
+    %substitute/\v^\_s*$//
+    set nomodified
+    call cursor(pos)
+endfunction
+
 function! vimpager_utils#IsDiff()
     let lnum = 1
     while getline(lnum) =~ '^\s*$'
