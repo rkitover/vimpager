@@ -880,21 +880,11 @@ win32_native() {
 # this is compatible with osed
 ANSI_RE='\[[;?]*[0-9.;]*[A-Za-z]'
 
-ansi_filter() {
-    sed -e 's/'"$ANSI_RE"'//g' "$@"
-}
-
-# Even /bin/sed on Solaris handles UTF-8 characters correctly, so we can safely
-# use sed for this.
-overstrike_filter() {
-    sed 's/.//g' "$@"
-}
-
 fits_on_screen() {
     [ $# -eq 0 ] && set -- -
 
     # First remove overstrikes and ANSI codes with sed
-    ansi_filter "$@" | overstrike_filter | \
+    sed -e 's/'"$ANSI_RE"'//g' -e 's/.//g' "$@" | \
     awk '
     {
         if (NR == 1) {
