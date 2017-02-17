@@ -55,6 +55,13 @@ function! vimpager_utils#DoAnsiEsc()
     endif
 endfunction
 
+function! vimpager_utils#StripAnsiEsc()
+    let pos = getpos('.')
+    %substitute/\v\e\[[;?]*[0-9.;]*[a-z]//egi
+    set nomodified
+    call cursor(pos)
+endfunction
+
 function! vimpager_utils#IsDiff()
     let lnum = 1
     while getline(lnum) =~ '^\s*$'

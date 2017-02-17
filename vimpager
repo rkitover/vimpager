@@ -208,9 +208,7 @@ main() {
         # check for ANSI codes and strip if not using ansiesc
         if head -100 "${tempfile:-$file}" | grep -Eq "$ANSI_RE"; then
             if [ -z "$ansiesc_available" -o -n "$force_strip_ansi" ]; then
-                ansi_filter "${tempfile:-$file}" > "$tmp/$filename.work"
-                tempfile=$tmp/$filename
-                mv -f -- "$tempfile.work" "$tempfile"
+                echo 'call vimpager_utils#StripAnsiEsc()' >> "$tmp/$file_idx.vim"
             else
                 echo 'call vimpager_utils#DoAnsiEsc()' >> "$tmp/$file_idx.vim"
                 set_key ansi_files "$file_idx" yes
