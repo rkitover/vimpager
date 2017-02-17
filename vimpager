@@ -234,13 +234,9 @@ main() {
         # if it's a man page, remove starting blank lines, or the C syntax highlighting fails
         # and write out ft command for vim
         if [ -n "$is_doc" ]; then
-            ansi_filter "${tempfile:-$file}" | overstrike_filter | awk '
-                BEGIN { skipblank=1 }
-                /^[ 	]*$/ { if (!skipblank) print }
-                /[^ 	]/ { skipblank=0; print }
-            ' > "$tmp/$filename.work"
-            tempfile=$tmp/$filename
-            mv -f -- "$tempfile.work" "$tempfile"
+            echo 'call vimpager_utils#StripAnsiEsc()' >> "$tmp/$file_idx.vim"
+            echo 'call vimpager_utils#StripOverstrike()' >> "$tmp/$file_idx.vim"
+            echo 'call vimpager_utils#StripBlankLines()' >> "$tmp/$file_idx.vim"
 
             if [ -n "$is_man" ]; then
                 echo 'set ft=man' >> "$tmp/$file_idx.vim"

@@ -62,6 +62,20 @@ function! vimpager_utils#StripAnsiEsc()
     call cursor(pos)
 endfunction
 
+function! vimpager_utils#StripOverstrike()
+    let pos = getpos('.')
+    %substitute/\v.\b//egi
+    set nomodified
+    call cursor(pos)
+endfunction
+
+function! vimpager_utils#SripBlankLines()
+    let pos = getpos('.')
+    1,/[^ 	]/ global /^[ 	]*$/ delete
+    set nomodified
+    call cursor(pos)
+endfunction
+
 function! vimpager_utils#IsDiff()
     let lnum = 1
     while getline(lnum) =~ '^\s*$'
