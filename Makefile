@@ -226,13 +226,15 @@ docs.tar.gz: ${GEN_DOCS} ${DOC_SRC}
 	    gzip -9 docs.tar; \
 	fi
 
-# Build markdown with TOCs
+# Build markdown with TOCs and gitter.im badge
 markdown/%.md: markdown_src/%.md
 	@if command -v doctoc >/dev/null; then \
 	    echo 'generating $@'; \
 	    ${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-	    cp $< $@; \
-	    doctoc --title '### Vimpager User Manual' $@ >/dev/null; \
+	    cp $< $@.work; \
+	    doctoc --title '### Vimpager User Manual' $@.work >/dev/null; \
+	    cat markdown_src/gitter-im-badge.md $@.work > $@; \
+	    rm -f $@.work; \
 	else \
 	    if [ ! -r doctoc-warn-stamp ]; then \
 		echo >&2; \
