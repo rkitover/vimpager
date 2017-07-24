@@ -173,6 +173,11 @@ function! s:SetOptions()
     if exists('s:opts.line_numbers')
         let g:less.number = s:opts.line_numbers
     endif
+
+    " turn off man.vim mappings
+    if !exists('g:no_man_maps')
+        let g:no_man_maps = 1
+    endif
 endfunction
 
 function! s:SetBufType()
