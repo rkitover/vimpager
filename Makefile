@@ -202,14 +202,14 @@ install-deb:
 	@apt-get -yqq install debhelper devscripts equivs gdebi-core
 	@$(MAKE) clean
 	@mk-build-deps
-	@echo y | gdebi vimpager-build-deps*.deb
+	@echo y | LANG=C gdebi vimpager-build-deps*.deb
 	@rm -f vimpager-build-deps*.deb
 	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar; \
 	    rm -f "$$orig_tar_ball".gz; \
 	    tar cf "$$orig_tar_ball" * .travis.yml .mailmap .gitignore; \
 	    gzip "$$orig_tar_ball"
 	@dpkg-buildpackage -us -uc
-	@echo y | gdebi `ls -1t ../vimpager*deb | head -1`
+	@echo y | LANG=C gdebi `ls -1t ../vimpager*deb | head -1`
 	@dpkg --purge vimpager-build-deps
 	@-[ "$${CLEAN_BUILD_DEPS:-1}" -ne 0 ] && apt-get -yqq autoremove
 	@debian/rules clean
