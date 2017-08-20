@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: xenial
 
 install:
     # Update to a new version of lintian as the one on trusty is quite old.
