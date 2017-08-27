@@ -1,3 +1,4 @@
+language: generic
 sudo: required
 dist: zesty
 
@@ -28,5 +29,12 @@ script:
     - lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
     - make all
     - make test
+    - |
+        set -e
+        sudo make install
+        [[ "$(which vimpager)" == /usr/local/bin/vimpager ]]
+        [[ "$(which vimcat)" == /usr/local/bin/vimcat ]]
+        vimpager -v
+        vimcat -v
 
 # vim: sw=4

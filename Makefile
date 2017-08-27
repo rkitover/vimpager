@@ -42,19 +42,27 @@ all: ${PROGRAMS:=-vertag-stamp} standalone/vimpager standalone/vimcat docs
 	@git describe >$<-version.txt 2>/dev/null \
 	|| sed -n '/^[0-9][0-9.]* [0-9-]*:$$/{s/ .*//;p;q;}' ChangeLog_$<.yml >$<-version.txt
 
-standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
+standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/bundled_scripts.sh inc/do_uudecode.sh inc/prologue.sh inc/vimpager_functions.sh Makefile
 	@echo building $@
 	@${MKPATH} ${@D}
 	@sed \
-	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e '/^\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
+	    -e '/^\. .*inc\/vimpager_functions.sh"$$/{' \
+	    -e     'r inc/vimpager_functions.sh' \
+	    -e     d \
+	    -e '}' \
+	    -e '/^\. .*inc\/common_functions.sh"$$/{' \
+	    -e     'r inc/common_functions.sh' \
+	    -e     d \
+	    -e '}' \
 	    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
-	    -e 's|^version=.*|version="'"`cat vimpager-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-	    -e 's!^\( *\)runtime=.*$$!\1runtime='\''\$$tmp/runtime'\''!' \
-	    -e 's!^\( *\)vimcat=.*$$!\1vimcat='\''\$$runtime/bin/vimcat'\''!' \
-	    -e 's!^\( *\)system_vimpagerrc=.*$$!\1system_vimpagerrc='\'\''!' \
+	    -e 's!^version=.*!version="'"`cat vimpager-version.txt`"' (standalone, shell=\$$(command -v \$$POSIX_SHELL))"!' \
+	    -e 's!^runtime=.*$$!runtime='\''\$$tmp/runtime'\''!' \
+	    -e 's!^vimcat=.*$$!vimcat='\''\$$runtime/bin/vimcat'\''!' \
+	    -e 's!^system_vimpagerrc=.*$$!system_vimpagerrc='\'\''!' \
 	    -e '/^# INCLUDE BUNDLED SCRIPTS HERE$$/{ q; }' \
 	    vimpager > $@
 	@cat inc/do_uudecode.sh >> $@
@@ -63,7 +71,7 @@ standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	@sed -n '/^# END OF BUNDLED SCRIPTS$$/,$$p' vimpager >> $@
 	@chmod +x $@
 
-standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh Makefile
+standalone/vimcat: vimcat autoload/vimcat.vim inc/prologue.sh inc/vimcat_functions.sh inc/common_functions.sh Makefile vimcat-version.txt
 	@echo building $@
 	@${MKPATH} ${@D}
 	@nlinit=`echo 'nl="'; echo '"'`; eval "$$nlinit"; \
@@ -79,6 +87,14 @@ standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
+	    -e '/^\. .*inc\/vimcat_functions.sh"$$/{' \
+	    -e     'r inc/vimcat_functions.sh' \
+	    -e     d \
+	    -e '}' \
+	    -e '/^\. .*inc\/common_functions.sh"$$/{' \
+	    -e     'r inc/common_functions.sh' \
+	    -e     d \
+	    -e '}' \
 	    vimcat > $@
 	@cp $@ $@.work
 	@awk '/^[ 	]*(if|for|while)/ { print $$1 }' $@ \
@@ -89,14 +105,22 @@ standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh
 	@sed -e 's/vimcat#\([^ ]*\)(/\1(/g' autoload/vimcat.vim >> $@
 	@chmod +x $@
 
-vimcat.uu: vimcat vimcat-version.txt
+vimcat.uu: vimcat vimcat-version.txt inc/vimcat_functions.sh inc/common_functions.sh inc/prologue.sh Makefile
 	@echo uuencoding vimcat
 	@echo 'vimcat_script() {' > $@
 	@printf "\t(cat <<'EOF') | do_uudecode > bin/vimcat\n" >> $@
 	@sed \
 	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e '/^\. .*inc\/prologue.sh"$$/{' \
 	    -e     'r inc/prologue.sh' \
+	    -e     d \
+	    -e '}' \
+	    -e '/^\. .*inc\/vimcat_functions.sh"$$/{' \
+	    -e     'r inc/vimcat_functions.sh' \
+	    -e     d \
+	    -e '}' \
+	    -e '/^\. .*inc\/common_functions.sh"$$/{' \
+	    -e     'r inc/common_functions.sh' \
 	    -e     d \
 	    -e '}' \
 	    vimcat > $@.work
@@ -173,9 +197,11 @@ install: docs vimpager.configured vimcat.configured
 	echo ${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"; \
 	${INSTALLCONF} vimpagerrc "$${SYSCONFDIR}/vimpagerrc"
 
-%.configured: % %-version.txt
+%.configured: % %-version.txt inc/%_functions.sh inc/common_functions.sh
 	@echo configuring $<
 	@POSIX_SHELL="`scripts/find_shell`"; \
+	BASE='${@F}'; \
+	BASE=$${BASE%.configured}; \
 	if [ '${PREFIX}' = /usr ]; then \
 	    vimpagerrc=/etc/vimpagerrc; \
 	else \
@@ -184,11 +210,19 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
-	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"|' \
+	    -e 's|^version=.*|version="'"`cat $$BASE-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
-	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
-	    -e 's!^\( *\)vimcat=.*!\1vimcat='\''${PREFIX}/bin/vimcat'\''!' \
-	    -e 's!^\( *\)system_vimpagerrc=.*!\1system_vimpagerrc='\'"$$vimpagerrc"\''!' \
+	    -e 's!^runtime=.*!runtime='\''${PREFIX}/share/vimpager'\''!' \
+	    -e 's!^vimcat=.*!vimcat='\''${PREFIX}/bin/vimcat'\''!' \
+	    -e 's!^system_vimpagerrc=.*!system_vimpagerrc='\'"$$vimpagerrc"\''!' \
+	    -e '/^\. .*inc\/'"$$BASE"'_functions.sh"$$/{' \
+	    -e     "r inc/$${BASE}_functions.sh" \
+	    -e     d \
+	    -e '}' \
+	    -e '/^\. .*inc\/common_functions.sh"$$/{' \
+	    -e     'r inc/common_functions.sh' \
+	    -e     d \
+	    -e '}' \
 	    $< > $@
 	@chmod +x $@
 

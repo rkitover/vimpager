@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 fixtures=$BATS_TEST_DIRNAME/fixtures
+src=${BATS_TEST_DIRNAME%/*}
 
 status_ok() {
     [ "$status" -eq 0 ]
