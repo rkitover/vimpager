@@ -1,0 +1,3 @@
+Tests: bats-suite
+Depends: @, bats
+Restrictions: allow-stderr

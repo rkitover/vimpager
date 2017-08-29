@@ -192,27 +192,42 @@ install: docs vimpager.configured vimcat.configured
 	    $< > $@
 	@chmod +x $@
 
-install-deb:
+check-root:
 	@if [ "`id | cut -d= -f2 | cut -d'(' -f1`" -ne 0 ]; then \
 	    echo '[1;31mERROR[0m: You must be root, try sudo.' >&2; \
 	    echo >&2; \
 	    exit 1; \
 	fi
+
+build-deb-deps-prereqs: check-root
 	@-apt-get -qq update
 	@apt-get -yqq install debhelper devscripts equivs gdebi-core
-	@$(MAKE) clean
+
+build-deb-deps-build: build-deb-deps-prereqs clean
 	@mk-build-deps
 	@echo y | LANG=C gdebi vimpager-build-deps*.deb
+
+build-deb-deps-clean:
 	@rm -f vimpager-build-deps*.deb
+
+build-deb-deps: build-deb-deps-build build-deb-deps-clean
+
+build-deb-build: build-deb-deps
 	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar; \
 	    rm -f "$$orig_tar_ball".gz; \
 	    tar cf "$$orig_tar_ball" * .travis.yml .mailmap .gitignore; \
 	    gzip "$$orig_tar_ball"
 	@dpkg-buildpackage -us -uc
-	@echo y | LANG=C gdebi `ls -1t ../vimpager*deb | head -1`
+
+build-deb-clean:
 	@dpkg --purge vimpager-build-deps
 	@-[ "$${CLEAN_BUILD_DEPS:-1}" -ne 0 ] && apt-get -yqq autoremove
 	@debian/rules clean
+
+build-deb: build-deb-build build-deb-clean
+
+install-deb: build-deb
+	@echo y | LANG=C gdebi `ls -1t ../vimpager*deb | head -1`
 
 docs: ${GEN_DOCS} docs.tar.gz Makefile
 	@rm -f docs-warn-stamp doctoc-warn-stamp
@@ -290,5 +305,5 @@ test: standalone/vimpager standalone/vimcat
 	    echo >&2; \
 	fi
 
-.PHONY: all install install-deb uninstall docs realclean distclean clean test
+.PHONY: all install uninstall docs realclean distclean clean test check-root build-deb-deps-prereqs build-deb-deps-build build-deb-deps-clean build-deb-deps build-deb-clean build-deb install-deb
 # vim: sw=4

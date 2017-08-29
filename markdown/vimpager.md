@@ -67,7 +67,9 @@ cd vimpager
 sudo make install-deb
 ```
 
-Otherwise use 'make install' instead:
+To just build the `.deb` use `make build-deb` instead.
+
+Otherwise use 'make install':
 
 ```bash
 git clone git://github.com/rkitover/vimpager

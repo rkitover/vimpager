@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+make
+
+make test
+
+if [ -f /etc/debian_version ]; then
+    sudo make install-deb CLEAN_BUILD_DEPS=0
+    lintian --profile debian -i --fail-on-warnings -EvIL +pedantic ../vimpager*.changes
+fi
