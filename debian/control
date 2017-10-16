@@ -3,7 +3,6 @@ Section: text
 Priority: optional
 Maintainer: Rafael Kitover <rkitover@gmail.com>
 Build-Depends: debhelper (>= 9), ash, pandoc, sharutils
-Testsuite: autopkgtest
 Standards-Version: 3.9.8
 Homepage: http://github.com/rkitover/vimpager
 Vcs-Git: https://github.com/rkitover/vimpager.git

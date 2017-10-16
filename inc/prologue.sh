@@ -1,6 +1,12 @@
 # try to find a better shell, especially on Solaris
 
 PATH="$PATH:/usr/local/bin:/opt/csw/bin:/opt/local/bin:/usr/xpg6/bin:/usr/xpg4/bin:/usr/dt/bin:/usr/bin:/bin"
+
+# debian lintian bitches if /usr/bin/ash is used instead of /bin/ash
+if [ -f /etc/debian_version ]; then
+    PATH=$(echo "$PATH" | sed 's,/usr/bin,/bin:/usr/bin,')
+fi
+
 export PATH
 
 if [ -z "$POSIX_SHELL" ]; then

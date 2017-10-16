@@ -1,4 +1,4 @@
 # Compulsory line, this is a version 3 file
 version=3
 
-http://github.com/rkitover/vimpager/releases /rkitover/vimpager/archive/(.*)\.tar\.gz
+https://github.com/rkitover/vimpager/releases /rkitover/vimpager/archive/(.*)\.tar\.gz
