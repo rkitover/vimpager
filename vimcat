@@ -24,7 +24,9 @@ project_dir=`dirname "$link"`
 version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" || version="$version_tag (checkout)"
 runtime=$project_dir
 
-if command -v vim >/dev/null; then
+if command -v vim.basic >/dev/null; then
+    vim=vim.basic
+elif command -v vim >/dev/null; then
     vim=vim
 elif command -v nvim >/dev/null; then
     vim=nvim
