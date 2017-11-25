@@ -16,9 +16,14 @@ function! vimpager#Init(opts)
 
     " some plugin managers like dein overwrite the runtimepath, so we have to
     " make sure all of our versions of our plugins are loaded explicitly
-
     call s:LoadOurPlugins()
 
+    " restore default runtimepath for the duration of .vimrc loading, because a
+    " non-default one conflicts with some plugin managers
+    call s:RestoreDefaultRTP()
+
+    " but make sure our runtime is in runtimepath when a file is read, so that
+    " things like AnsiEsc work
     autocmd BufReadPre,StdinReadPre * call s:SetRTP()
 
     augroup END
@@ -130,6 +135,10 @@ endfunction
 
 function! s:SetRTP()
     execute 'set runtimepath^=' . s:opts.runtime
+endfunction
+
+function! s:RestoreDefaultRTP()
+    let &rtp = substitute(&rtp, '^[^,]\+,', '', '')
 endfunction
 
 function! s:LoadOurPlugins()
