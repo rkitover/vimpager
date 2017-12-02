@@ -33,13 +33,20 @@ fi
 
 first_arg=1
 for arg in "$@"; do
-    [ $first_arg -eq 1 ] && set -- && first_arg=0
+    if [ $first_arg -eq 1 ]; then
+        if [ $old_pandoc -eq 1 ]; then
+            set -- "-S"
+        else
+            set --
+        fi
+        first_arg=0
+    fi
 
     if [ "$arg" = markdown_github ]; then
 	if [ $old_pandoc -eq 1 ]; then
 	    set -- "$@" markdown
 	else
-	    set -- "$@" markdown_github+pandoc_title_block
+	    set -- "$@" markdown_github+pandoc_title_block+smart
 	fi
     else
 	set -- "$@" "$arg"
