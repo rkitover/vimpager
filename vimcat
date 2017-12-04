@@ -308,7 +308,11 @@ do
     if [ -z "$output_file" -o "$output_file" = "-" ]; then
         dest_file=$out_fifo
 
-        tail -f "$out_fifo" &
+        (
+            while :; do
+                cat "$out_fifo"
+            done
+        ) &
         tail_pid=$!
     else
         dest_file=$output_file
