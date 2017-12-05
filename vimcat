@@ -179,15 +179,7 @@ trap 'quit 1' PIPE HUP INT QUIT ILL TRAP KILL BUS TERM
 tmp_file_in=$tmp_dir/vimcat_in.txt
 out_fifo=$tmp_dir/vimcat_out.fifo
 
-case $(uname -s) in
-    SunOS*|CYGWIN*|MINGW*|MSYS*)
-        # the fifo streaming doesn't work on windows and solaris
-        touch "$out_fifo"
-        ;;
-    *)
-        mkfifo "$out_fifo"
-        ;;
-esac
+mkfifo "$out_fifo"
 
 # check for arguments
 while [ $# -gt 0 ] ; do
