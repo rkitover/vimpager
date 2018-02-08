@@ -69,7 +69,7 @@ sudo make install-deb
 
 To just build the `.deb` use `make build-deb` instead.
 
-Otherwise use 'make install':
+Otherwise use `make install`:
 
 ```bash
 git clone git://github.com/rkitover/vimpager
@@ -85,6 +85,9 @@ The following make settings are supported at `make install` time:
 | PREFIX       | install prefix to configure for, e.g. /usr/local    |
 | prefix       | prefix for writing files, e.g. for GNU stow         |
 | POSIX_SHELL  | POSIX shell to use to run the scripts               |
+
+Note, you should `make clean` before modifying these make settings, as the `install` make target does not account for
+their change (when e.g. "configuring" vimpager; vimpager.configured).
 
 If you got vimpager from the vim.org scripts section, just put it
 somewhere in your PATH, e.g.:
