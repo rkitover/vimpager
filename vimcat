@@ -47,6 +47,10 @@ quit() {
 
         kill "$tail_pid" >/dev/null 2>&1
         do_sleep 100
+        if [ -f "${tmp_dir}/cat_pid" ]; then
+            cat_pid=$(cat "${tmp_dir}/cat_pid")
+            kill "$cat_pid" >/dev/null 2>&1
+        fi
         kill -9 "$tail_pid" >/dev/null 2>&1
 
         cd "${tmp_dir%/*}" 2>/dev/null # some systems cannot remove CWD
@@ -302,7 +306,9 @@ do
 
         (
             while :; do
-                cat "$out_fifo"
+                cat "$out_fifo" & cat_pid=$!
+                echo ${cat_pid} > "${tmp_dir}/cat_pid"
+                wait ${cat_pid}
             done
         ) &
         tail_pid=$!
