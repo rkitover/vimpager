@@ -157,6 +157,10 @@ main() {
         if [ "$file" = - ]; then
             filename=stdin
         else
+            if [ -d "$file" ]; then
+                echo "$0: '$file' is a directory" >&2
+                quit 1
+            fi
             if [ ! -r "$file" ]; then
                 echo "$0: cannot read file '$file'" >&2
                 quit 1
