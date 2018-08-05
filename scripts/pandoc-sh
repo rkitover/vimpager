@@ -27,19 +27,30 @@ title="`echo \"$title\" | \
 # use markdown instead of markdown_github on older versions
 # and markdown_github+pandoc_title_block on newer ones
 old_pandoc=0
-if ! ( pandoc --help | grep markdown_github >/dev/null ); then
+pandoc_version=$(pandoc --version | head -1 | cut -d' ' -f2)
+pandoc_major_version=${pandoc_version%%.*}
+pandoc_minor_version=${pandoc_version#*.}
+pandoc_minor_version=${pandoc_minor_version%%.*}
+if [ $pandoc_major_version -le 1 ] && [ $pandoc_minor_version -le 9 ]; then
     old_pandoc=1
 fi
 
 first_arg=1
 for arg in "$@"; do
-    [ $first_arg -eq 1 ] && set -- && first_arg=0
+    if [ $first_arg -eq 1 ]; then
+        if [ $old_pandoc -eq 1 ]; then
+            set -- "-S"
+        else
+            set --
+        fi
+        first_arg=0
+    fi
 
     if [ "$arg" = markdown_github ]; then
 	if [ $old_pandoc -eq 1 ]; then
 	    set -- "$@" markdown
 	else
-	    set -- "$@" markdown_github+pandoc_title_block
+	    set -- "$@" markdown_github+pandoc_title_block+smart
 	fi
     else
 	set -- "$@" "$arg"
