@@ -263,7 +263,7 @@ man/%.1: markdown_src/%.md
 	@if command -v pandoc >/dev/null; then \
 	    echo 'generating $@'; \
 	    ${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-	    ${PANDOC} -Ss -f markdown_github $< -o $@; \
+	    ${PANDOC} -s -f markdown_github $< -o $@; \
 	else \
 	    if [ ! -r docs-warn-stamp ]; then \
 		echo >&2; \
@@ -283,7 +283,7 @@ html/%.html: %.md.work
 	@if command -v pandoc >/dev/null; then \
 	    echo 'generating $@'; \
 	    ${MKPATH} `dirname '$@'` 2>/dev/null || true; \
-	    ${PANDOC} -Ss --toc -f markdown_github $< -o $@; \
+	    ${PANDOC} -s --toc -f markdown_github $< -o $@; \
 	    rm -f $<; \
 	else \
 	    if [ ! -r docs-warn-stamp ]; then \

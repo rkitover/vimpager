@@ -37,7 +37,9 @@ cd vimpager
 sudo make install-deb
 ```
 
-Otherwise use 'make install' instead:
+To just build the '.deb' use `make build-deb` instead.
+
+Otherwise use 'make install':
 
 ```bash
 git clone git://github.com/rkitover/vimpager
@@ -53,6 +55,9 @@ The following make settings are supported at `make install` time:
 | PREFIX       | install prefix to configure for, e.g. /usr/local    |
 | prefix       | prefix for writing files, e.g. for GNU stow         |
 | POSIX_SHELL  | POSIX shell to use to run the scripts               |
+
+**NOTE:** you should `make clean` before modifying these make settings, as the
+'install' make target does not account for their change.
 
 If you got vimpager from the vim.org scripts section, just put it
 somewhere in your PATH, e.g.:
@@ -336,6 +341,21 @@ Use alternate .vimrc or .vimpagerrc.
 
 Squeeze blank lines into a single blank line. GNU man passes this option to
 /usr/bin/pager.
+
+## --passthrough
+
+If files fit on the screen, print them with syntax highlighting using vimcat
+instead of invoking the pager.
+
+## --force-passthrough
+
+Always print files with syntax highlighting to the terminal instead of invoking
+the pager, regardless of whether they fit on the screen.
+
+## --no-passthrough
+
+Never print files with syntax highlighting to the terminal with vimcat, always
+invoke the pager.
 
 ## -x
 

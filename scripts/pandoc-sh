@@ -31,14 +31,29 @@ if ! ( pandoc --help | grep markdown_github >/dev/null ); then
     old_pandoc=1
 fi
 
+use_smart=
+# newer pandoc does not support -S
+if ! (pandoc --help | grep -- -S); then
+    use_smart=1
+fi
+
+
 first_arg=1
 for arg in "$@"; do
     [ $first_arg -eq 1 ] && set -- && first_arg=0
 
-    if [ "$arg" = markdown_github ]; then
+    if [ "$arg" = "-f" ]; then
+        if [ -z "$use_smart" ]; then
+            set -- "$@" -S -f
+        else
+            set -- "$@" -f
+        fi
+    elif [ "$arg" = markdown_github ]; then
 	if [ $old_pandoc -eq 1 ]; then
 	    set -- "$@" markdown
-	else
+        elif [ -n "$use_smart" ]; then
+	    set -- "$@" markdown_github+pandoc_title_block+smart
+        else
 	    set -- "$@" markdown_github+pandoc_title_block
 	fi
     else

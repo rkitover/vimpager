@@ -57,11 +57,7 @@ main() {
     fi
 
     # Parse the command line options as early as possible.  These variables might be set because of command line options and are thus initialized.
-    vim_options=
-    vimrc=
-    extra_c=
-    extra_cmd=
-    line_numbers=0
+    vim_options= vimrc= extra_c= extra_cmd= line_numbers=0 no_pass_thru=
 
     # Check for certain parameters to pass on to vim (or conceivably do something else)
     # Couldn't use getopt or getopts as neither supports options prepended with +
@@ -101,6 +97,19 @@ main() {
             -s) # Ubuntu man passes this option to /usr/bin/pager
                 shift
                 squeeze_blank_lines=1
+                ;;
+            --passthrough)
+                shift
+                no_pass_thru=0
+                ;;
+            --force-passthrough)
+                shift
+                no_pass_thru=0
+                cat_files=1
+                ;;
+            --no-passthrough)
+                shift
+                no_pass_thru=1
                 ;;
             --)
                 shift
@@ -466,7 +475,9 @@ read_vim_settings() {
                         [ "${var#VAL:}" -eq 0 ] && disable_x11=1
                         ;;
                     3)
-                        [ "${var#VAL:}" -eq 0 ] && no_pass_thru=1
+                        if [ -z "$no_pass_thru" ]; then
+                            [ "${var#VAL:}" -eq 0 ] && no_pass_thru=1
+                        fi
                         ;;
                     4)
                         [ "${var#VAL:}" -ne 0 ] && ansiesc_available=1
@@ -628,6 +639,9 @@ With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard 
   [1m+G, +[0m                              Go to the end of the file.
   [1m-N, --LINE-NUMBERS[0m                 Show line numbers.
   [1m-s[0m                                 Squeeze multiple blank lines into one.
+  [1m---passthrough[0m                     If files fit on screen, print them with highlighting (DEFAULT.)
+  [1m---force-passthrough[0m               Always print the files with highlighting, don't invoke pager.
+  [1m---no-passthrough[0m                  Never print the files, always invoke pager.
   [1m--cmd [1;35mCOMMAND[0m                      Run (n)vim [1;35mCOMMAND[0m before initialization.
   [1m-c [1;35mCOMMAND[0m                         Run (n)vim [1;35mCOMMAND[0m after initialization.
   [1m-u [1;35mFILE[0m                            Use [1;35mFILE[0m as the vimrc.
