@@ -28,7 +28,7 @@ echo \"___EXITED___: \$?\""
       -e 'w exit-code' \
       -e q \
     -e '}' \
-    output.0 | sed '$d' > output.1
+    output.0 | sed '$d' | tr -d '\r' > output.1
 
     rm -f output.0
 
