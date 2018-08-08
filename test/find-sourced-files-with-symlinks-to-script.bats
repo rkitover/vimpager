@@ -2,6 +2,12 @@
 
 load helpers
 
+setup() {
+    if [ "$(uname -o)" = Msys ]; then
+        skip "may not have symlink support on Msys git"
+    fi
+}
+
 teardown() {
     rm -f output.* "$fixtures"/bin/absolute-symlink-*
 }
