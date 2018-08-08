@@ -33,7 +33,7 @@ fi
 
 use_smart=
 # newer pandoc does not support -S
-if ! (pandoc --help | grep -- -S); then
+if ! (pandoc --help | grep -- -S >/dev/null); then
     use_smart=1
 fi
 
