@@ -221,9 +221,7 @@ main() {
         # check for ANSI codes and strip if not using ansiesc
         if head -100 "${tempfile:-$file}" | grep -Eq "$ANSI_RE"; then
             if [ -z "$ansiesc_available" -o -n "$force_strip_ansi" ]; then
-                ansi_filter "${tempfile:-$file}" > "$tmp/$filename.work"
-                tempfile=$tmp/$filename
-                mv -f -- "$tempfile.work" "$tempfile"
+                echo 'call vimpager_utils#StripAnsiEsc()' >> "$tmp/$file_idx.vim"
             else
                 echo 'call vimpager_utils#DoAnsiEsc()' >> "$tmp/$file_idx.vim"
                 set_key ansi_files "$file_idx" yes
@@ -232,12 +230,7 @@ main() {
 
         # squeeze blank lines if option was specified, Ubuntu man with /usr/bin/pager does this
         if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
-                sed -e '/^[ 	]*$/{
-                    N
-                    /^[ 	]*\n[ 	]*$/D
-                }' < "${tempfile:-$file}" > "$tmp/$filename.work"
-                tempfile=$tmp/$filename
-                mv -f -- "$tempfile.work" "$tempfile"
+            echo 'call vimpager_utils#SqueezeBlankLines()' >> "$tmp/$file_idx.vim"
         fi
 
         # dumb man detection when the pstree heuristic fails
@@ -249,13 +242,9 @@ main() {
         # if it's a man page, remove starting blank lines, or the C syntax highlighting fails
         # and write out ft command for vim
         if [ -n "$is_doc" ]; then
-            ansi_filter "${tempfile:-$file}" | overstrike_filter | awk '
-                BEGIN { skipblank=1 }
-                /^[ 	]*$/ { if (!skipblank) print }
-                /[^ 	]/ { skipblank=0; print }
-            ' > "$tmp/$filename.work"
-            tempfile=$tmp/$filename
-            mv -f -- "$tempfile.work" "$tempfile"
+            echo 'call vimpager_utils#StripAnsiEsc()' >> "$tmp/$file_idx.vim"
+            echo 'call vimpager_utils#StripOverstrike()' >> "$tmp/$file_idx.vim"
+            echo 'call vimpager_utils#StripBlankLines()' >> "$tmp/$file_idx.vim"
 
             if [ -n "$is_man" ]; then
                 echo 'set ft=man' >> "$tmp/$file_idx.vim"
@@ -904,21 +893,11 @@ win32_native() {
 # this is compatible with osed
 ANSI_RE='\[[;?]*[0-9.;]*[A-Za-z]'
 
-ansi_filter() {
-    sed -e 's/'"$ANSI_RE"'//g' "$@"
-}
-
-# Even /bin/sed on Solaris handles UTF-8 characters correctly, so we can safely
-# use sed for this.
-overstrike_filter() {
-    sed 's/.//g' "$@"
-}
-
 fits_on_screen() {
     [ $# -eq 0 ] && set -- -
 
     # First remove overstrikes and ANSI codes with sed
-    ansi_filter "$@" | overstrike_filter | \
+    sed -e 's/'"$ANSI_RE"'//g' -e 's/.//g' "$@" | \
     awk '
     {
         if (NR == 1) {
