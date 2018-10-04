@@ -3,6 +3,7 @@
 # https://github.com/rkitover/vimpager
 
 2.07 UNRELEASED:
+- don't use ansiesc on files bigger than 1250 lines, or it hangs
 - pass files as a normal arg list to vim so special chars are not an issue gh#120
 - turn hlsearch on by default, configurable via less.hlsearch, better toggle with <Esc>u gh#121
 - allow turning off less mode on start with less.enabled=0, ,v enables it gh#121

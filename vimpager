@@ -219,8 +219,9 @@ main() {
         esac
 
         # check for ANSI codes and strip if not using ansiesc
+        # don't use ansiesc if file is too big, or it hangs
         if head -100 "${tempfile:-$file}" | grep -Eq "$ANSI_RE"; then
-            if [ -z "$ansiesc_available" -o -n "$force_strip_ansi" ]; then
+            if [ -z "$ansiesc_available" ] || [ -n "$force_strip_ansi" ] || [ "$(wc -l "${tempfile:-$file}" | awk '{print $1}')" -ge 1250 ]; then
                 ansi_filter "${tempfile:-$file}" > "$tmp/$filename.work"
                 tempfile=$tmp/$filename
                 mv -f -- "$tempfile.work" "$tempfile"
