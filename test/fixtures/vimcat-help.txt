@@ -8,6 +8,7 @@ With no [1;35mFILE[0m, or when [1;35mFILE[0m is [1;35m-[0m, read standard 
   [1m-n[0m                                 Print with line numbers.
   [1m-s[0m                                 Squeeze multiple blank lines into one.
   [1m-o [1;35mFILE[0m | [1;35m-[0m                        Output ANSI highlighted text to [1;35mFILE[0m or standard output.
+  [1m-t [1;35mseconds[0m                         Scroll time in seconds (e.g: 1, 5, 0.4)
   [1m--cmd [1;35mCOMMAND[0m                      Run (n)vim [1;35mCOMMAND[0m before initialization.
   [1m-c [1;35mCOMMAND[0m                         Run (n)vim [1;35mCOMMAND[0m after initialization.
   [1m-u [1;35mFILE[0m                            Use [1;35mFILE[0m as the vimrc.
