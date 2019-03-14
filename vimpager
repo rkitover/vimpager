@@ -589,7 +589,7 @@ parse_pstree() {
     ptree=$(do_ptree)
 
     # Check if called from man, perldoc or pydoc
-    if echo "$ptree" | grep -Eq '([ \t]+|/)(man|[Pp]y(thon|doc)[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
+    if echo "$ptree" | grep -Eq '([ \t]+|/)(man|[Pp]ydoc[0-9.]*|[Rr](uby|i)[0-9.]*)([ \t]|$)'; then
         is_man=1
         is_doc=1
         force_strip_ansi=1
