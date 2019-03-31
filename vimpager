@@ -330,8 +330,8 @@ detect_term_size() {
 
         # 2>/dev/null makes tput not work, so don't do that
         # we are just going to hope that tput errors don't happen
-        tput cols  > "$tmp/cols"
-        tput lines > "$tmp/lines"
+        tput cols  </dev/tty >"$tmp/cols"
+        tput lines </dev/tty >"$tmp/lines"
 
         cols=$(cat "$tmp/cols")
         lines=$(cat "$tmp/lines")
@@ -339,18 +339,24 @@ detect_term_size() {
         rm -f -- "$tmp/cols" "$tmp/lines"
     fi
 
-    # msys has no tput, this doesn't work on Cygwin by the way
-    if [ -z "$cols" ] && command -v bash >/dev/null; then
-        cols=$(bash -i -c 'echo $COLUMNS')
-        lines=$(bash -i -c 'echo $LINES')
+    # this often works if tput is not available, on msys as well
+    if [ -z "$lines" ] && command -v bash >/dev/null; then
+        cols=$(bash -O checkwinsize -i -c 'echo $COLUMNS' </dev/tty)
+        lines=$(bash -O checkwinsize -i -c 'echo $LINES' </dev/tty)
     fi
 
-    # If we are unable to detect lines/columns, maximize
-    # the window.
-    if [ -z "$cols" ]; then
-        cols=999
-        lines=999
-        no_pass_thru=1 # force loading vimpager
+    # if both methods fail use the env vars, if available
+    # otherwise turn off passthrough
+    if [ -z "$lines" ] && [ -z "$cols" ]; then
+        if [ -n "$LINES" ] && [ -n "$COLUMNS" ]; then
+            cols=$COLUMNS
+            lines=$LINES
+        else
+            echo "$0: WARNING: tput is not available, this program will not work correctly. Please install the 'ncurses' or 'ncurses-bin' packages."
+            cols=999
+            lines=999
+            no_pass_thru=1 # force loading vimpager
+        fi
     fi
 }
 
