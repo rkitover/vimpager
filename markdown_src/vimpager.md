@@ -142,8 +142,13 @@ check `exists('g:vimpager.enabled')` instead.
 below, make sure the `g:vimpager` and `g:less` dicts exist like so:
 
 ```vim
-let g:vimpager = {}
-let g:less     = {}
+if !exists('g:vimpager')
+  let g:vimpager = {}
+endif
+
+if !exists('g:less')
+  let g:less     = {}
+endif
 ```
 
 If you want to disable less compatibility mode, and use regular vim
