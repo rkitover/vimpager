@@ -20,8 +20,8 @@ function! vimpager_utils#StatusLine(opts)
     endif
     " remove possible [readonly] or [Modified] tag
     let pos = substitute(pos, '\[\%(readonly\|Modified\)\]\s\+', '', '')
-    " remove closing quote
-    let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
+    " remove closing quote (must match localized text)
+    let pos = substitute(pos, '"\(\s\+\d*\s*\D\+\s\d\+\s\D\+\s\d\+\)', '\1', '')
     " urldecode
     let pos = substitute(pos, '%\(\x\x\)', '\=nr2char("0x" . submatch(1))', 'g')
     " add help message

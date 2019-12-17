@@ -197,8 +197,8 @@ function! s:StatusLine()
   let pos = substitute(pos, '^"*', '', '')
   " remove possible [readonly] or [Modified] tag
   let pos = substitute(pos, '\[\%(readonly\|Modified\)\]\s\+', '', '')
-  " remove closing quote
-  let pos = substitute(pos, '"\(\s\+\d*\s*line\)', '\1', '')
+  " remove closing quote (must match localized text)
+  let pos = substitute(pos, '"\(\s\+\d*\s*\D\+\s\d\+\s\D\+\s\d\+\)', '\1', '')
   " add help message
   let leader = exists('g:mapleader') ? g:mapleader : '\'
   let pos .= "  [ Press '".leader."h' for HELP ]"
