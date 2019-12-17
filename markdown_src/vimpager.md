@@ -324,6 +324,11 @@ Print the version information.
 
 Start at the end of the file, just like less.
 
+## +F
+
+Follow file, like `tail -f` or `less +F`, equivalent to pressing `F` in less
+mode.
+
 ## -N | --LINE-NUMBERS
 
 Turn on line numbers, this can also be set with `let g:less.number = 1` .

@@ -183,6 +183,10 @@ function! s:SetOptions()
         let g:less.number = s:opts.line_numbers
     endif
 
+    if exists('s:opts.tail')
+        let g:less.tail = s:opts.tail
+    endif
+
     " turn off man.vim mappings
     if !exists('g:no_man_maps')
         let g:no_man_maps = 1

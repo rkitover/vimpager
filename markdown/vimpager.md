@@ -15,6 +15,7 @@
   - [-h | --help | --usage](#-h----help----usage)
   - [-v | --version](#-v----version)
   - [+ | +G](#--g)
+  - [+F](#f)
   - [-N | --LINE-NUMBERS](#-n----line-numbers)
   - [-c cmd](#-c-cmd)
   - [--cmd cmd](#--cmd-cmd)
@@ -356,6 +357,11 @@ Print the version information.
 ## + | +G
 
 Start at the end of the file, just like less.
+
+## +F
+
+Follow file, like `tail -f` or `less +F`, equivalent to pressing `F` in less
+mode.
 
 ## -N | --LINE-NUMBERS
 

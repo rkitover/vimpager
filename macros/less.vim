@@ -342,6 +342,35 @@ function! s:LessCmd(args, bang)
   normal gg0
 endfunction
 
+function! s:FileModTime()
+  return getftime(expand('%:p'))
+endfunction
+
+" timers are only available in vim 8+
+
+if v:version >= 800
+  function! s:DoTail(timer)
+    if b:timestamp != s:FileModTime()
+      let b:timestamp = s:FileModTime()
+      e
+      normal G
+    endif
+  endfunction
+
+  function! s:TailMode()
+    " turn off tail mode if on, by deleting timer
+    if exists('b:tail_timer')
+      call timer_stop(b:tail_timer)
+      unlet b:tail_timer
+      return
+    endif
+
+    " set up tail mode
+    let b:timestamp  = s:FileModTime()
+    let b:tail_timer = timer_start(200, function('s:DoTail'), { 'repeat': -1 })
+  endfunction
+endif
+
 function! s:LessMode()
   if !exists('g:less')
     let g:less = {}
@@ -439,7 +468,12 @@ function! s:LessMode()
   call s:Map('map <buffer> <Esc><Space> <Space>')
 
   " Re-read file and page forward "tail -f"
-  call s:Map('map <silent> <buffer> F :e<CR>G<SID>L:sleep 1<CR>F')
+  " use timers in vim 8+ and the old method otherwise
+  if v:version >= 800
+    call s:Map('map <silent> <buffer> F :call <SID>TailMode()<CR>')
+  else
+    call s:Map('map <silent> <buffer> F :e<CR>G<SID>L:sleep 1<CR>F')
+  endif
 
   " Scroll half a page forward
   call s:Map('noremap <buffer> <script> d <C-D><SID>L')
@@ -517,6 +551,11 @@ function! s:LessMode()
 
   " Switch to editing (switch off less mode) with v (,v is global)
   call s:Map('map <silent> <buffer> v :call <SID>ToggleLess()<CR>')
+
+  " turn on tail if in options
+  if exists('g:less.tail') && g:less.tail
+    normal F
+  endif
 endfunction
 
 function! s:CloseBuffer()
@@ -582,6 +621,7 @@ function! s:Help()
   echo "d         Half a page forward       u         Half a page backward"
   echo "<Enter>   One line forward          k         One line backward"
   echo "G         End of file               g         Start of file"
+  echo "F         Follow (like tail -F)"
   echo "N%        percentage in file        ".leader."h        Display this help"
   echo "\n"
   echo "/pattern  Search for pattern        ?pattern  Search backward for pattern"
