@@ -1,4 +1,4 @@
-FROM ubuntu:artful
+FROM ubuntu:bionic
 WORKDIR /vimpager
 ADD . /vimpager
 RUN apt-get -qqy update
