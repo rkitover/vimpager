@@ -253,6 +253,11 @@ while [ $# -gt 0 ] ; do
     esac
 done
 
+# Check for directories in args.
+for arg; do
+    [ -d "$arg" ] && echo "$0: '$arg' is a directory" && quit 1
+done
+
 # Just pass through if not on a tty, unless -o was given
 if [ -z "$output_file" ]; then
     if [ ! -t 1 ]; then
