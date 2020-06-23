@@ -37,6 +37,8 @@ else
     exit 1
 fi
 
+tab_stop=8
+
 quit() {
     (
         kill "$vim_pid" >/dev/null 2>&1
@@ -59,6 +61,9 @@ quit() {
 
         rm -rf "$tmp_dir" 2>/dev/null # rm -rf "" shows error on OpenBSD
     ) &
+
+    [ $tab_stop -ne 8 ] && tabs -8 2>/dev/null
+
     exit "$@"
 }
 
@@ -137,6 +142,34 @@ squeeze_blank_lines() {
         N
         /^[ 	]*\n[ 	]*$/D
     }'
+}
+
+read_vim_settings() {
+    i=1
+    OLDIFS=$IFS
+    IFS='
+'
+    for var in $(IFS=$OLDIFS; "$vim" -NEnR ${vimcatrc:+-u "$vimcatrc"} ${extra_cmd:+--cmd "$extra_cmd"} ${extra_c:+-c "$extra_c"} -i NONE +'
+        let g:tab_stop = 8
+        if ! &et
+            let g:tab_stop = &ts
+        endif
+        call writefile([""] + map([g:tab_stop], "\"VAL:\".v:val"), "/dev/stderr")
+        quit
+    ' </dev/tty 2>&1 >/dev/null); do
+        case "$var" in
+            VAL:*)
+                case $i in
+                    1)
+                        tab_stop=${var#VAL:}
+                        break
+                        ;;
+                esac
+                i=$((i + 1))
+                ;;
+        esac
+    done
+    IFS=$OLDIFS
 }
 
 # if no args and stdin is on a terminal, pretend we're cat and wait on stdin.
@@ -282,6 +315,8 @@ if [ -n "$output_file" -a $# -gt 1 ]; then
     quit 1
 fi
 
+read_vim_settings
+
 chunks_dir=$tmp_dir/chunks
 mkdir "$chunks_dir"
 
@@ -318,6 +353,10 @@ do
         dest_file=$out_fifo
 
         (
+            if [ $tab_stop -ne 8 ]; then
+                stty tab0         2>/dev/null
+                tabs -${tab_stop} 2>/dev/null
+            fi
             while :; do
                 [ ! -z "$scroll_time" ] && sleep ${scroll_time}
                 cat "$out_fifo" & cat_pid=$!
