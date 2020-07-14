@@ -320,7 +320,7 @@ find_tmp_directory() {
         mkdir_options=
     else
         # ... and /tmp otherwise
-        tmp=/tmp
+        tmp=${TMPDIR:-/tmp}
     fi
 
     # Create a safe directory in which we place all other tempfiles.

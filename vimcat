@@ -194,7 +194,7 @@ for arg in "$@"; do
     esac
 done
 
-tmp_dir=/tmp
+tmp_dir=${TMPDIR:-/tmp}
 mkdir_options="-m 700"
 
 case "$(uname -s)" in
