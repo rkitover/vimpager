@@ -841,12 +841,17 @@ page_files() {
     fi
 
     init_opts="'columns': $cols, 'tmp_dir': '$tmp', 'line_numbers': ${line_numbers:-0}, 'tail': ${tail:-0}, 'is_doc': ${is_doc:-0}, 'runtime': '$runtime', 'rc': '$vimrc'"
+    tail_cmd=
+    if [ $tail -eq 1 ]; then
+      tail_cmd="normal F"
+    fi
 
     "$vim_cmd" -N -i NONE \
         $vim_options \
         --cmd "set rtp^=$runtime" \
         --cmd "call vimpager#Init({ $init_opts })" \
         --cmd "silent! exe 'source ' . fnameescape('$system_vimrc')" \
+        ${tail_cmd:+-c "$tail_cmd"} \
         ${extra_cmd:+--cmd "$extra_cmd"} \
         ${vimrc:+-u "$vimrc"} \
         ${extra_c:+-c "$extra_c"} \

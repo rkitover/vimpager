@@ -553,9 +553,9 @@ function! s:LessMode()
   call s:Map('map <silent> <buffer> v :call <SID>ToggleLess()<CR>')
 
   " turn on tail if in options
-  if exists('g:less.tail') && g:less.tail
-    normal F
-  endif
+  " if exists('g:less.tail') && g:less.tail
+  "   normal F
+  " endif
 endfunction
 
 function! s:CloseBuffer()
