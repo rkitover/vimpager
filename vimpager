@@ -249,10 +249,16 @@ main() {
                 mv -f -- "$tempfile.work" "$tempfile"
         fi
 
-        # dumb man detection when the pstree heuristic fails
-        if [ -z "$is_doc" ] && head -12 "${tempfile:-$file}" | grep -Eq '^N(.)?A(.)?M(.)?E(.)?[ \t]*$'; then
-            is_man=1
-            is_doc=1
+        if [ -z "$is_doc" ]; then
+            # Dumb man detection when the pstree heuristic fails.
+            if head -12 "${tempfile:-$file}" | grep -Eq '^N(.)?A(.)?M(.)?E(.)?[ \t]*$'; then
+                is_man=1
+                is_doc=1
+            # Detect python docs.
+            elif head -1 "${tempfile:-$file}" | grep -Eq '^Help on .+:$'; then
+                is_man=1
+                is_doc=1
+            fi
         fi
 
         # if it's a man page, remove starting blank lines, or the C syntax highlighting fails
