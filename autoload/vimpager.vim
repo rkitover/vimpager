@@ -69,9 +69,8 @@ function! vimpager#Init(opts)
     " allow user's .vimrc or -c commands to override this
     set mouse=a
 
-    if !has('nvim') " neovim has its own clipboard support
+    if !has('nvim')
         set ttymouse=xterm2
-        set clipboard=autoselect
     else
         set laststatus=1 " neovim defaults to 2
     endif
