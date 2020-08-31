@@ -39,6 +39,10 @@ fi
 
 tab_stop=8
 
+# Do not interact with X server in any way (fixes bug #255 with clobbering
+# selection buffer and clipboard.)
+unset DISPLAY
+
 quit() {
     (
         kill "$vim_pid" >/dev/null 2>&1
@@ -69,7 +73,7 @@ quit() {
 
 do_sleep() {
     _ms=${1:-100}
-    "$vim" -NEsnR -i NONE -u NONE +"sleep $_ms m" +q >/dev/null 2>&1
+    "$vim" -NEnR -i NONE -u NONE +"sleep $_ms m" +q >/dev/null 2>&1
 }
 
 usage() {
@@ -118,7 +122,7 @@ start_pipeline() {
 
 start_highlight_job() {
     # INSERT VIMCAT_DEBUG PREPARATION HERE
-    set -- -NE -i NONE -n \
+    set -- -NEn -i NONE \
         --cmd "set runtimepath^=$runtime" \
         --cmd "call vimcat#Init({ 'rc': '$vimcatrc' })" \
         --cmd visual \
