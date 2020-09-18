@@ -464,8 +464,10 @@ function! s:LessMode()
   call s:Map('map <buffer> <PageDown> <Space>')
   call s:Map('map <buffer> <kPageDown> <Space>')
   call s:Map('map <buffer> <S-Down> <Space>')
-  call s:Map('map <buffer> z <Space>')
   call s:Map('map <buffer> <Esc><Space> <Space>')
+
+  " less uses this mapping, but it interferes with fold commands.
+  "call s:Map('map <buffer> z <Space>')
 
   " Re-read file and page forward "tail -f"
   " use timers in vim 8+ and the old method otherwise
