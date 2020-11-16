@@ -68,6 +68,8 @@ quit() {
 
     [ $tab_stop -ne 8 ] && tabs -8 2>/dev/null
 
+    stty sane 2>/dev/null # Terminal settings may get screwed up.
+
     exit "$@"
 }
 
