@@ -58,6 +58,8 @@ quit() {
         if [ -f "${tmp_dir}/cat_pid" ]; then
             cat_pid=$(cat "${tmp_dir}/cat_pid")
             kill "$cat_pid" >/dev/null 2>&1
+            do_sleep 100
+            kill -9 "$cat_pid" >/dev/null 2>&1
         fi
         kill -9 "$tail_pid" >/dev/null 2>&1
 
@@ -66,9 +68,12 @@ quit() {
         rm -rf "$tmp_dir" 2>/dev/null # rm -rf "" shows error on OpenBSD
     ) &
 
-    [ $tab_stop -ne 8 ] && tabs -8 2>/dev/null
+    # Terminal settings may get screwed up.
+    if [ -n "$OLDSTTY" ]; then
+        stty "$OLDSTTY" 2>/dev/null >/dev/tty
+    fi
 
-    stty sane 2>/dev/null # Terminal settings may get screwed up.
+    [ $tab_stop -ne 8 ] && tabs -8 2>/dev/null >/dev/tty
 
     exit "$@"
 }
@@ -321,6 +326,9 @@ if [ -n "$output_file" -a $# -gt 1 ]; then
     quit 1
 fi
 
+# Save terminal settings to restore on quit.
+OLDSTTY=$(stty -g 2>/dev/null </dev/tty)
+
 read_vim_settings
 
 chunks_dir=$tmp_dir/chunks
@@ -360,8 +368,8 @@ do
 
         (
             if [ $tab_stop -ne 8 ]; then
-                stty tab0         2>/dev/null
-                tabs -${tab_stop} 2>/dev/null
+                stty tab0         2>/dev/null >/dev/tty
+                tabs -${tab_stop} 2>/dev/null >/dev/tty
             fi
             while :; do
                 [ ! -z "$scroll_time" ] && sleep ${scroll_time}
