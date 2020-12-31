@@ -806,11 +806,13 @@ encode_filename() {
 
 # emulate arrays
 set_key() {
-    eval "$1_$2=\"$3\""
+    key="$1_$2"
+    eval "$key="'$3'
 }
 
 get_key() {
-    eval "echo \"\${$1_$2}\""
+    key="$1_$2"
+    eval "echo \$${key}"
 }
 
 # this actually runs vim or gvim, or vimcat, or just cats the file
