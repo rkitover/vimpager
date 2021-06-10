@@ -213,7 +213,7 @@ build-deb-deps-clean:
 build-deb-deps: build-deb-deps-build build-deb-deps-clean
 
 build-deb-build: build-deb-deps
-	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog)`".orig.tar; \
+	@orig_tar_ball=../vimpager_"`sed -ne '/^vimpager (/{ s/^vimpager (\([^)-]*\).*/\1/p; q; }' debian/changelog`".orig.tar; \
 	    rm -f "$$orig_tar_ball".gz; \
 	    tar cf "$$orig_tar_ball" * .travis.yml .mailmap .gitignore; \
 	    gzip "$$orig_tar_ball"
