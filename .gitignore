@@ -13,6 +13,8 @@ man/
 standalone/
 tmp/
 *.[0-9]
+*.buildinfo
+*.changes
 
 # Test files
 #####################
