@@ -66,7 +66,7 @@ For vimcat see [here](markdown/vimcat.md) or 'man vimcat'.
 On Ubuntu or Debian, use the following to install a package:
 
 ```bash
-git clone git://github.com/rkitover/vimpager
+git clone https://github.com/rkitover/vimpager
 cd vimpager
 sudo make install-deb
 ```
@@ -76,7 +76,7 @@ To just build the '.deb' use `make build-deb` instead.
 Otherwise use 'make install':
 
 ```bash
-git clone git://github.com/rkitover/vimpager
+git clone https://github.com/rkitover/vimpager
 cd vimpager
 sudo make install
 ```
