@@ -452,7 +452,7 @@ read_vim_settings() {
     OLDIFS=$IFS
     IFS='
 '
-    for var in $(IFS=$OLDIFS; "$tvim" -NEnR ${vimrc:+-u "$vimrc"} -i NONE --cmd 'let g:vimpager = { "enabled": 1 }' +'
+    for var in $(IFS=$OLDIFS; "$tvim" -NEnR ${vimrc:+-u "$vimrc"} -i NONE --cmd 'let g:vimpager = { "enabled": 1 }
         if !exists("g:vimpager.gvim")
             if !exists("g:vimpager_use_gvim")
                 let g:vimpager.gvim = 0
@@ -460,7 +460,6 @@ read_vim_settings() {
                 let g:vimpager.gvim = g:vimpager_use_gvim
             endif
         endif
-
         if !exists("g:vimpager.X11")
             if !exists("g:vimpager_disable_x11")
                 let g:vimpager.X11 = 1
@@ -468,7 +467,6 @@ read_vim_settings() {
                 let g:vimpager.X11 = !g:vimpager_disable_x11
             endif
         endif
-
         if !exists("g:vimpager.passthrough")
             if !exists("g:vimpager_passthrough")
                 let g:vimpager.passthrough = 1
@@ -476,16 +474,13 @@ read_vim_settings() {
                 let g:vimpager.passthrough = g:vimpager_passthrough
             endif
         endif
-
         let g:use_ansiesc = 0
-
         if has("conceal") && (!exists("g:vimpager.ansiesc") || g:vimpager.ansiesc == 1) && (!exists("g:vimpager_disable_ansiesc") || g:vimpager_disable_ansiesc == 0)
             let g:use_ansiesc = 1
         endif
-
         call writefile([""] + map([g:vimpager.gvim, g:vimpager.X11, g:vimpager.passthrough, g:use_ansiesc], "\"VAL:\".v:val"), "/dev/stderr")
         quit
-    ' </dev/tty 2>&1 >/dev/null); do
+        ' </dev/tty 2>&1 >/dev/null); do
         case "$var" in
             VAL:*)
                 case $i in

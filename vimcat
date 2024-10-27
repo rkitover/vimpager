@@ -160,8 +160,8 @@ read_vim_settings() {
     OLDIFS=$IFS
     IFS='
 '
-    for var in $(IFS=$OLDIFS; "$vim" -NEnR ${vimcatrc:+-u "$vimcatrc"} ${extra_cmd:+--cmd "$extra_cmd"} ${extra_c:+-c "$extra_c"} -i NONE +'
-        let g:tab_stop = 8
+    for var in $(IFS=$OLDIFS; "$vim" -NEnR ${vimcatrc:+-u "$vimcatrc"} ${extra_cmd:+--cmd "$extra_cmd"} ${extra_c:+-c "$extra_c"} -i NONE --cmd \
+        'let g:tab_stop = 8
         if ! &et
             let g:tab_stop = &ts
         endif
