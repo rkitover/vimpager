@@ -828,7 +828,7 @@ page_files() {
                 cat "$cur_file"
                 _exit_status=$?
             else
-                "$POSIX_SHELL" ${trace:+-x} "$vimcat" ${vimrc:+-u "$vimrc"} \
+                $POSIX_SHELL ${trace:+-x} "$vimcat" ${vimrc:+-u "$vimrc"} \
                     --cmd "set rtp^=$runtime | let vimpager={ 'enabled': 1 }" \
                     ${extra_cmd:+--cmd "$extra_cmd"} \
                     -c 'silent! source '"$tmp/$i"'.vim' \

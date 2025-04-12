@@ -2,7 +2,7 @@
 
 . inc/prologue.sh
 
-full_path=$(command -v "$POSIX_SHELL")
+full_path=$(command -v $POSIX_SHELL)
 
 case "$full_path" in
     /*)
