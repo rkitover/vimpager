@@ -282,7 +282,7 @@ main() {
         # if file is zero length, or one blank line (cygwin), and is only arg, exit
         if [ ! -s "${tempfile:-$file}" \
             -a $# -eq 1 \
-            -o "$(cat "${tempfile:-$file}")" = "" \
+            -o "$(head -c 1 "${tempfile:-$file}")" = "" \
             -a "$(wc -l < "${tempfile:-$file}")" -eq 1 ]; then
 
             quit 0
