@@ -283,7 +283,7 @@ main() {
         if [ ! -s "${tempfile:-$file}" \
             -a $# -eq 1 \
             -o "$(head -c 1 "${tempfile:-$file}")" = "" \
-            -a "$(wc -l < "${tempfile:-$file}")" -eq 1 ]; then
+            -a "$(head -2 "${tempfile:-$file}" | wc -l)" -eq 1 ]; then
 
             quit 0
         fi
