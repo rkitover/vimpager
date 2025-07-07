@@ -27,7 +27,8 @@ done
 project_dir=`dirname "$link"`
 # END OF FIND REAL PARENT DIRECTORY
 
-. "$project_dir/inc/prologue.sh"
+. "$project_dir/inc/prologue.sh" # Hopefully we're now POSIX.
+. "$project_dir/inc/platform.sh"
 
 [ -n "$ZSH_VERSION" ] && emulate -R sh 2>/dev/null # force zsh into full POSIX
 
@@ -35,19 +36,6 @@ version="$(cd "$project_dir" && git describe 2>/dev/null) (git)" || version="$ve
 runtime='$project_dir'
 vimcat='$project_dir/vimcat'
 system_vimpagerrc='$project_dir/vimpagerrc'
-
-case "$(uname -s)" in
-    Linux) linux=1 ;;
-    SunOS) solaris=1 ;;
-    Darwin) osx=1; bsd=1 ;;
-    CYGWIN*) cygwin=1; win32=1 ;;
-    MINGW*) msys=1; win32=1 ;;
-    MSYS*) msys=1; win32=1 ;;
-    OpenBSD) openbsd=1; bsd=1 ;;
-    FreeBSD) freebsd=1; bsd=1 ;;
-    NetBSD) netbsd=1; bsd=1 ;;
-    *) bsd=1 ;;
-esac
 
 main() {
     # if no args and no stdin, display usage
@@ -241,12 +229,12 @@ main() {
 
         # squeeze blank lines if option was specified, Ubuntu man with /usr/bin/pager does this
         if [ "${squeeze_blank_lines:-0}" -eq 1 ]; then
-                sed -e '/^[ 	]*$/{
-                    N
-                    /^[ 	]*\n[ 	]*$/D
-                }' < "${tempfile:-$file}" > "$tmp/$filename.work"
-                tempfile=$tmp/$filename
-                mv -f -- "$tempfile.work" "$tempfile"
+            sed -e '/^[ 	]*$/{
+                N
+                /^[ 	]*\n[ 	]*$/D
+            }' < "${tempfile:-$file}" > "$tmp/$filename.work"
+            tempfile=$tmp/$filename
+            mv -f -- "$tempfile.work" "$tempfile"
         fi
 
         if [ -z "$is_doc" ]; then
@@ -674,38 +662,12 @@ Press '[1;35m,h[0m' for a summary of keystrokes in the program.
 EOF
 }
 
-if command -v gawk >/dev/null; then
-    _awk=gawk
-elif command -v nawk >/dev/null; then
-    _awk=nawk
-elif command -v mawk >/dev/null; then
-    _awk=mawk
-elif [ -x /usr/xpg4/bin/awk ]; then
-    _awk=/usr/xpg4/bin/awk
-elif command -v awk >/dev/null; then
-    _awk=awk
-else
-    echo "ERROR: No awk found!" >&2
-    quit 1
-fi
-
 awk() {
-    command "$_awk" "$@"
+    command "$AWK" "$@"
 }
 
-if command -v gsed >/dev/null; then
-    _sed=gsed
-elif [ -x /usr/xpg4/bin/sed ]; then
-    _sed=/usr/xpg4/bin/sed
-elif command -v sed >/dev/null; then
-    _sed=sed
-else
-    echo "ERROR: No sed found!" >&2
-    quit 1
-fi
-
 sed() {
-    command "$_sed" "$@"
+    command "$SED" "$@"
 }
 
 
@@ -759,20 +721,6 @@ awk_grep_E_q() {
     ' "$@"
 }
 
-if command -v ghead >/dev/null; then
-    _head=ghead
-else
-    _head=head
-fi
-
-if [ "$(echo xx | head -n 1 2>/dev/null)" = "xx" ]; then
-    _head_syntax=new
-else
-    if ! head -1 -- "$0" >/dev/null 2>&1; then
-        _head_no_double_dash=1
-    fi
-fi
-
 head() {
     _lines=
     case "$1" in
@@ -782,13 +730,13 @@ head() {
     esac
 
     if [ -z "$_lines" ]; then
-        command "$_head" "$@"
-    elif [ "$_head_syntax" = "new" ]; then
-        command "$_head" -n $_lines -- "$@"
-    elif [ -z "$_head_no_double_dash" ]; then
-        command "$_head" -$_lines -- "$@"
+        command "$HEAD" "$@"
+    elif [ "$HEAD_SYNTAX" = "new" ]; then
+        command "$HEAD" -n $_lines -- "$@"
+    elif [ -z "$HEAD_NO_DOUBLE_DASH" ]; then
+        command "$HEAD" -$_lines -- "$@"
     else
-        command "$_head" -$_lines "$@"
+        command "$HEAD" -$_lines "$@"
     fi
 }
 

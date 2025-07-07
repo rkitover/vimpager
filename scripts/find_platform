@@ -1,0 +1,30 @@
+#!/bin/sh
+
+. inc/platform.sh
+
+# The backslash has to be put here 4 times: foctor two to get past the initial
+# shell quoting, another factor two because it is used in the replacement
+# string for sed.  This yields one backslash that can escape the single quote
+# in the configured vimpager script.
+AWK=$(echo "$AWK" | sed "s/'/'\\\\''/g")
+SED=$(echo "$SED" | sed "s/'/'\\\\''/g")
+
+# The final sed is used to escape special characters for the sed command in
+# the makefile, where the output will be used.
+echo \
+    ${bsd:+bsd=$bsd} \
+    ${cygwin:+cygwin=$cygwin} \
+    ${freebsd:+freebsd=$freebsd} \
+    ${linux:+linux=$linux} \
+    ${msys:+msys=$msys} \
+    ${netbsd:+netbsd=$netbsd} \
+    ${openbsd:+openbsd=$openbsd} \
+    ${osx:+osx=$osx} \
+    ${solaris:+solaris=$solaris} \
+    ${win32:+win32=$win32} \
+    "AWK='$AWK'" \
+    "SED='$SED'" \
+    ${HEAD_SYNTAX:+HEAD_SYNTAX=$HEAD_SYNTAX} \
+    | sed -e 's/\\/\\\\/g' -e 's/|/\|/g'
+
+# vim: sw=4 et tw=0:

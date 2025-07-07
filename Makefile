@@ -46,8 +46,12 @@ standalone/vimpager: vimpager vimpager-version.txt ${SRC:=.uu} inc/* Makefile
 	@echo building $@
 	@${MKPATH} ${@D}
 	@sed \
-	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e '/^\. .*inc\/prologue.sh/{' \
 	    -e     'r inc/prologue.sh' \
+	    -e     d \
+	    -e '}' \
+	    -e '/^\. .*inc\/platform.sh/{' \
+	    -e     'r inc/platform.sh' \
 	    -e     d \
 	    -e '}' \
 	    -e 's/^\( *\)# EXTRACT BUNDLED SCRIPTS HERE$$/\1extract_bundled_scripts/' \
@@ -75,7 +79,7 @@ standalone/vimcat: vimcat autoload/vimcat.vim vimcat-version.txt inc/prologue.sh
 	    -e '/^ *--cmd "set rtp^=\$$runtime" \\$$/d' \
 	    -e '/call vimcat#Init/i\'"$$nl"'--cmd "$$silent source $$0" \\' \
 	    -e 's/vimcat#\([^ ]*\)(/\1(/g' \
-	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e '/^\. .*inc\/prologue.sh/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
@@ -95,7 +99,7 @@ vimcat.uu: vimcat vimcat-version.txt
 	@printf "\t(cat <<'EOF') | do_uudecode > bin/vimcat\n" >> $@
 	@sed \
 	    -e 's|^version=.*|version="'"`cat vimcat-version.txt`"' (bundled, shell=\$$(command -v \$$POSIX_SHELL))"|' \
-	    -e '/^ *\. .*inc\/prologue.sh"$$/{' \
+	    -e '/^\. .*inc\/prologue.sh/{' \
 	    -e     'r inc/prologue.sh' \
 	    -e     d \
 	    -e '}' \
@@ -184,6 +188,7 @@ install: docs vimpager.configured vimcat.configured
 	sed -e '1{ s|.*|#!'"$$POSIX_SHELL"'|; }' \
 	    -e 's|\$$POSIX_SHELL|'"$$POSIX_SHELL|" \
 	    -e '/^ *\. .*inc\/prologue.sh"$$/d' \
+	    -e 's/^ *\. .*inc\/platform.sh"$$/'"`scripts/find_platform`"/ \
 	    -e 's|^version=.*|version="'"`cat $<-version.txt`"' (configured, shell='"$$POSIX_SHELL"')"|' \
 	    -e '/^# FIND REAL PARENT DIRECTORY$$/,/^# END OF FIND REAL PARENT DIRECTORY$$/d' \
 	    -e 's!^\( *\)runtime=.*!\1runtime='\''${PREFIX}/share/vimpager'\''!' \
